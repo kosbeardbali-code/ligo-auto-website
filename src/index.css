@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .font-serif {
+    font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+}
+
+@layer components {
+  .champagne-hover {
+    position: relative;
+  }
+  .champagne-hover::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #D4AF37;
+    transition: width 0.3s ease;
+  }
+  .champagne-hover:hover::after {
+    width: 100%;
+  }
+
+  .gold-glow-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gold-glow-hover:hover {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.35);
+  }
+}
+
+/* Add/Edit Vehicle Modal dark theme overrides */
+.dark #add-edit-modal-wrapper .bg-white {
+  background-color: #121214 !important;
+  border-color: #1a1a1e !important;
+}
+.dark #add-edit-modal-wrapper h3,
+.dark #add-edit-modal-wrapper h4,
+.dark #add-edit-modal-wrapper .text-neutral-900 {
+  color: #ffffff !important;
+}
+.dark #add-edit-modal-wrapper label,
+.dark #add-edit-modal-wrapper .text-neutral-600 {
+  color: #a3a3a3 !important;
+}
+.dark #add-edit-modal-wrapper .text-neutral-500 {
+  color: #737373 !important;
+}
+.dark #add-edit-modal-wrapper .border-neutral-200 {
+  border-color: #1a1a1e !important;
+}
+.dark #add-edit-modal-wrapper input,
+.dark #add-edit-modal-wrapper select,
+.dark #add-edit-modal-wrapper textarea {
+  background-color: #0d0d0d !important;
+  border-color: #262626 !important;
+  color: #ffffff !important;
+}
+.dark #add-edit-modal-wrapper input::placeholder,
+.dark #add-edit-modal-wrapper textarea::placeholder {
+  color: #525252 !important;
+}
+.dark #add-edit-modal-wrapper .bg-neutral-50 {
+  background-color: #0d0d0d !important;
+}
+.dark #add-edit-modal-wrapper .bg-neutral-100 {
+  background-color: #0d0d0d !important;
+  border-color: #262626 !important;
+  color: #a3a3a3 !important;
+}
+.dark #add-edit-modal-wrapper .bg-neutral-150 {
+  background-color: #0d0d0d !important;
+  border-color: #262626 !important;
+  color: #a3a3a3 !important;
+}
+.dark #add-edit-modal-wrapper .hover:bg-neutral-200:hover {
+  background-color: #1c1c21 !important;
+  color: #ffffff !important;
+}
+
+/* Theme Switching Smooth Transitions */
+body, header, section, footer, div, p, span, h1, h2, h3, h4, input, select, textarea, button {
+  transition-property: background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium Light Theme Tweaks */
+html:not(.dark) {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+/* Custom scrollbars for light mode */
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

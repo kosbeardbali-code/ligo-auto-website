@@ -1,0 +1,3818 @@
+text-neutral-700
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// Client-side image compression utility
+const compressImage = (file: File): Promise<string> => {
+return new Promise((resolve, reject) => {
+const reader = new FileReader();
+reader.readAsDataURL(file);
+reader.onload = (event) => {
+const img = new Image();
+img.src = event.target?.result as string;
+img.onload = () => {
+const canvas = document.createElement('canvas');
+let width = img.width;
+let height = img.height;
+
+// Resize if too large
+const MAX_DIM = 1200;
+if (width > MAX_DIM || height > MAX_DIM) {
+if (width > height) {
+height = Math.round((height * MAX_DIM) / width);
+width = MAX_DIM;
+} else {
+width = Math.round((width * MAX_DIM) / height);
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+),
+Filter: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+),
+Lock: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+),
+Unlock: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+),
+Calendar: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+),
+Gauge: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"></path><path d="M12 6v6l4 2"></path></svg>
+),
+Fuel: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="22" x2="21" y2="22"></line><path d="M4 12V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8"></path><path d="M14 16H8a2 2 0 0 0-2 2v4h10v-4a2 2 0 0 0-2-2z"></path><circle cx="11" cy="7" r="1"></circle></svg>
+),
+Activity: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+),
+Plus: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+),
+Trash: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+),
+Edit: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+),
+  X: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  ),
+  Sun: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+  ),
+  Moon: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+  ),
+  CheckBadge: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#D4AF37]"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+),
+WhatsApp: () => (
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.003 5.324 5.328 0 11.855 0c3.161.001 6.133 1.233 8.37 3.472 2.237 2.24 3.466 5.215 3.465 8.381-.004 6.53-5.329 11.854-11.853 11.854H11.85c-2.002-.001-3.974-.531-5.741-1.542L0 24zm6.275-3.665c1.603.951 3.52 1.453 5.566 1.454h.005c5.385 0 9.764-4.379 9.767-9.767.002-2.61-1.012-5.064-2.857-6.911-1.846-1.847-4.3-2.864-6.918-2.865C6.463 2.245 2.083 6.625 2.08 12.014c-.001 2.115.553 4.184 1.607 5.962l-.993 3.623 3.638-.954zm11.082-7.531c-.302-.151-1.787-.882-2.064-.983-.277-.101-.479-.151-.68.151-.201.302-.78.983-.956 1.185-.176.201-.353.227-.655.076-1.22-.61-2.155-1.066-2.997-2.507-.222-.38.222-.353.635-1.173.076-.151.038-.283-.019-.384-.056-.101-.479-1.154-.655-1.58-.173-.414-.347-.359-.479-.365l-.409-.008c-.142 0-.374.053-.57.266-.197.212-.751.734-.751 1.79 0 1.057.77 2.079.877 2.223.107.144 1.516 2.315 3.673 3.247.513.221.913.353 1.223.452.516.164.986.141 1.357.086.414-.061 1.787-.731 2.039-1.411.252-.68.252-1.261.176-1.385-.076-.124-.277-.201-.579-.352z"/></svg>
+),
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+const DEMO_CARS = [
+{
+id: "demo-1",
+brand: "Porsche",
+model: "911 GT3 RS",
+year: 2023,
+km: 4800,
+price: 289000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 525,
+co2: 290,
+vin: "WP0ZZZ99ZPS240811",
+status: "En stock",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuClvuoUxKQIu-RmKS7kxWdKDQU7g4pTofke_W29SOKrl2Q1zpfNa-82f2MdubRYVCgtf7fY3uZxofApF7_grlRusi7X1YiqOzf6sSjCkug0EyimW0dOSyFP8pzxz1Q6IN9BxQ9l893DsnYEry4D-SJB4j_K-_Y2-mnHNUltlBVqbZp1dckyEbOVDIR5oRm0eFGwKGSLWw2oSiTzS51KjpApor6UZCRhkFxe7M0U9YlAl2VUJgDiqiJN",
+description: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация с пакетом Weissach, карбоно-керамическими тормозами (PCCB), системой подъема передней оси (Lift) и отделкой салона расширенной кожей/Alcantara с контрастной прострочкой цвета Racing Yellow. Активная гарантия Porsche Approved.",
+verifiedVin: true
+},
+{
+id: "demo-2",
+brand: "Ferrari",
+model: "F8 Tributo",
+year: 2022,
+km: 7200,
+price: 315000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 720,
+co2: 280,
+vin: "ZFF81AHA000284561",
+status: "En stock",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDTbmRwZBxvLeWY9FCQrzSC13P-Qss_BKa7Qc8_ObbsE0jBoWhgUgSsrc-CVB3s0Cetf6ClQUG8gfv91j9OyK2NRGJagwp7_kRessWeAIGxAHY1iD52m8tM5_UTomP8KGb6RuhB59kky40dfd5GRULpGKRB707GiWnRtuFPhd-3YKAREzTR6dHeFGVwVTkcTzzG7ZMqPEtdpvjTUkudUZmDwZEtaOXIO8yhWzQRYg3MLEMcwWscKt1D",
+description: "Оригинальная краска Rosso Corsa с контрастной крышей Nero DS. Оснащена 20-дюймовыми коваными дисками, окрашенными в желтый цвет тормозными суппортами, гоночными сиденьями из углеродного волокна Daytona и отделкой салона карбоном. Полностью покрыта прозрачной защитной пленкой (PPF).",
+verifiedVin: true
+},
+{
+id: "demo-3",
+brand: "Audi",
+model: "RS6 Avant Performance",
+year: 2024,
+km: 12000,
+price: 154900,
+fuel: "Hybride",
+transmission: "Automatique",
+hp: 630,
+co2: 215,
+vin: "WAUZZZ4GZPS182455",
+status: "En arrivage",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCUegYAhIi4Tgdh7bIIdSIHMP8BdTXPie_4Ot2mQza2NVN-2mMNXgAlZSZJEyJqf9NCRDruU3lbuCUKKPoTo44eSwyIN6Jme_aG9f7IR03ezODgtdMbvbfM57ue1gECOBoTVy50vjv3ipd0dNjg1NNosiWdIgC-Dxong1pKNojzUw8ic5Vx9Rtyf3Vh9D-cgvgzVhvGnHlH9eUo5jHBWvRZTINSiE8LiYBPcp8A_XHM5Jvl3BDRySKT",
+description: "Первый владелец. Красивейший цвет металлик Mythic Black от Audi Exclusive. Максимальная комплектация, включающая полноуправляемое шасси (подруливающие задние колеса), спортивный выхлоп RS, фары HD Matrix LED с лазерной оптикой последнего поколения и премиальную аудиосистему Bang & Olufsen Advanced 3D.",
+verifiedVin: true
+},
+{
+id: "demo-4",
+brand: "Aston Martin",
+model: "Vantage V8 F1 Edition",
+year: 2023,
+km: 8500,
+price: 179000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 535,
+co2: 263,
+vin: "SCFKS53E8PGC02415",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&q=80&w=1200",
+description: "Специальная серия F1 Edition. Уникальный цвет Satin Aston Martin Racing Green. Оптимизированное шасси, специальный аэродинамический комплект, создающий дополнительную прижимную силу, и эксклюзивные 21-дюймовые диски. Активный спортивный выхлоп.",
+verifiedVin: true
+},
+{
+id: "demo-5",
+brand: "Lamborghini",
+model: "Huracán Tecnica",
+year: 2023,
+km: 3900,
+price: 295000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 640,
+co2: 328,
+vin: "ZH1UA5ZS4NLA09812",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
+description: "Атмосферный двигатель V10 мощностью 640 лошадиных сил. Задний привод с подруливающей задней осью. Окраска кузова металлик Verde Selvans. Полный карбоновый пакет салона и экстерьера, карбоно-керамические тормоза.",
+verifiedVin: true
+},
+{
+id: "demo-6",
+brand: "Mercedes-Benz",
+model: "AMG GT 63 S E Performance",
+year: 2022,
+km: 14500,
+price: 168000,
+fuel: "Hybride",
+transmission: "Automatique",
+hp: 843,
+co2: 180,
+vin: "WDD1903781A024105",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
+description: "Гибридная технология E Performance, заимствованная из Формулы-1. Суммарная мощность 843 л.с. Матовый цвет Gris Sélénite Magno designo (матовый). Панорамный люк, высокоэффективная тормозная система AMG из керамики.",
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+verifiedVin: true
+}
+];
+
+export default function App() {
+  // Theme state synced with localStorage, defaulting to 'light'
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('theme');
+      return saved || 'light';
+    }
+    return 'light';
+  });
+
+useEffect(() => {
+const root = window.document.documentElement;
+if (theme === 'dark') {
+root.classList.add('dark');
+} else {
+root.classList.remove('dark');
+}
+localStorage.setItem('theme', theme);
+}, [theme]);
+
+// Аутентификация и облачные пользователи
+const [user, setUser] = useState(null);
+
+// Данные каталога автомобилей
+const [cars, setCars] = useState(DEMO_CARS);
+const [loading, setLoading] = useState(false);
+const [globalError, setGlobalError] = useState(null);
+
+// Кастомная система нотификаций (без алертов)
+const [notification, setNotification] = useState(null);
+
+// Фильтрация
+const [searchQuery, setSearchQuery] = useState('');
+const [selectedBrand, setSelectedBrand] = useState('');
+const [selectedModel, setSelectedModel] = useState('');
+const [priceMin, setPriceMin] = useState('');
+const [priceMax, setPriceMax] = useState('');
+const [yearMin, setYearMin] = useState('');
+const [yearMax, setYearMax] = useState('');
+const [transmission, setTransmission] = useState('');
+const [fuel, setFuel] = useState('');
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+
+// Маршрутизация и детальный вид машины (SPA)
+const [currentView, setCurrentView] = useState('home'); // 'home' | 'catalog' | 'car-details'
+const [previousView, setPreviousView] = useState('home');
+const [activeDetailsTab, setActiveDetailsTab] = useState('specs'); // 'specs' | 'finance' | 'paperwork' | 'testdrive'
+const [activeImage, setActiveImage] = useState('');
+
+// Полноэкранный просмотр фотографий (лайтбокс)
+const [showLightbox, setShowLightbox] = useState(false);
+const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Локализация и языковые настройки (по умолчанию французский, считывается из localStorage)
+  const [lang, setLang] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('lang');
+return saved || 'fr';
+}
+return 'fr';
+});
+
+useEffect(() => {
+localStorage.setItem('lang', lang);
+}, [lang]);
+
+const [translationEditLang, setTranslationEditLang] = useState('fr'); // 'fr' | 'ru' for editing
+const [translationActiveTab, setTranslationActiveTab] = useState('general'); // 'general' | 'catalog' | 'vehicle' | 'forms'
+
+  const translations = {
+    fr: {
+      catalog: "Catalogue",
+      about: "À Propos",
+      contact: "Contact",
+      adminPanel: "Panneau d'administration",
+      nousContacter: "Nous Contacter",
+      vinVerified: "VIN vérifié",
+      available: "Disponible",
+      incoming: "En arrivage",
+      sold: "Vendu",
+      details: "Détails du véhicule",
+      specifications: "Spécifications",
+      financing: "Financement",
+      procedures: "Démarches",
+      testDrive: "Essai",
+      techSpecs: "Caractéristiques techniques",
+      modelYear: "Année modèle",
+      mileage: "Kilométrage",
+      fuel: "Carburant",
+      transmission: "Transmission",
+      enginePower: "Puissance moteur",
+      co2Emissions: "Émissions CO₂",
+      vinCertified: "Numéro VIN certifié",
+      backToCatalog: "Retour au catalogue",
+      backToHome: "Retour à l'accueil",
+      brand: "Marque",
+      model: "Modèle",
+      year: "Année",
+      price: "Prix",
+      allTransmissions: "Toutes les transmissions",
+      allStatuses: "Tous les statuts",
+      clearFilters: "Effacer les filtres",
+      filterBrandModel: "Marque, modèle...",
+      filterPriceMax: "Prix max",
+      whatsapp: "WhatsApp",
+      callUs: "Nous appeler",
+      copySuccess: "Copié !",
+      copiedToClipboard: "Copié dans le presse-papiers !",
+      simulatedLoa: "Mensualité LOA estimée",
+      apport: "Apport personnel",
+      duration: "Durée de location",
+      months: "mois",
+      monthlyPayment: "Mensualité",
+      applyCG: "Faire ma demande de Carte Grise",
+      clientInfo: "Informations du titulaire",
+      fullName: "Nom complet",
+      email: "Adresse e-mail",
+      phone: "Numéro de téléphone",
+      address: "Adresse postale",
+      tradeInQuestion: "Avez-vous un véhicule à faire reprendre ?",
+      tradeInInfo: "Détails du véhicule à reprendre",
+      tradeInBrandModel: "Marque & Modèle",
+      tradeInYear: "Année",
+      tradeInKm: "Kilométrage",
+      tradeInCondition: "État général",
+      bookTestDrive: "Planifier mon essai routier",
+      selectDateTime: "Sélectionnez la date et l'heure",
+      preferredDate: "Date souhaitée",
+      preferredTime: "Heure souhaitée",
+      specialRequest: "Demande particulière",
+      sendRequest: "Envoyer ma demande",
+      formSuccess: "Votre demande a été enregistrée avec succès !",
+      formError: "Une erreur est survenue, veuillez réessayer.",
+      adminTitle: "Administration",
+      logout: "Se déconnecter",
+      addCar: "Ajouter un véhicule",
+      editCar: "Modifier le véhicule",
+      carSaved: "Véhicule enregistré !",
+      carDeleted: "Véhicule supprimé !",
+      deleteConfirm: "Êtes-vous sûr de vouloir supprimer ce véhicule ?",
+      cancel: "Annuler",
+      save: "Enregistrer",
+      companyName: "Nom de l'entreprise",
+      settingsSaved: "Paramètres mis à jour !",
+      inquiries: "Demandes clients",
+      Essence: "Essence",
+      Diesel: "Diesel",
+      Hybride: "Hybride",
+      Automatique: "Automatique",
+      Manuelle: "Manuelle",
+      Mécanique: "Manuelle",
+      "En stock": "Disponible",
+      "En arrivage": "En arrivage",
+      Vendu: "Vendu",
+      hp: "ch",
+      copy: "Copier",
+      settingsSavedOffline: "Paramètres enregistrés (mode hors ligne).",
+      discoverCatalog: "Découvrir le catalogue",
+      bookAppointment: "Prendre rendez-vous",
+      ourSelection: "Notre sélection",
+      featuredVehicles: "Véhicules à la Une",
+      featuredDescription: "Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.",
+      vehicleCatalogue: "Catalogue des Véhicules",
+      vehicleCatalogueDesc: "Explorez notre catalogue de véhicules d'occasion et neufs.",
+      all: "Toutes",
+      priceMin: "Prix min (€)",
+      priceMax: "Prix max (€)",
+      minYear: "Année min",
+      maxYear: "Année max",
+      allTypes: "Tous",
+      availability: "Disponibilité",
+      searchText: "Recherche textuelle",
+      searchPlaceholder: "Ex: GT3, Weissach...",
+      noVehicles: "Aucun véhicule ne correspond à vos critères de recherche.",
+      contactUs: "Contactez-nous",
+      discussProject: "Discutons de votre projet",
+      contactDesc: "Vous souhaitez avoir plus d'informations sur un modèle en particulier ? Contactez-nous directement.",
+      messageSent: "Message envoyé avec succès !",
+      specialRequestPlaceholder: "Je souhaite obtenir des informations complémentaires...",
+      noDescription: "Aucune description de présentation n'a été spécifiée.",
+      lightMode: "Mode Clair",
+      darkMode: "Mode Sombre"
+    },
+    en: {
+      catalog: "Catalogue",
+      about: "About Us",
+      contact: "Contact",
+      adminPanel: "Admin Panel",
+      nousContacter: "Contact Us",
+      vinVerified: "VIN verified",
+      available: "In stock",
+      incoming: "In transit",
+      sold: "Sold",
+      details: "Details",
+      specifications: "Specifications",
+      financing: "Financing",
+      procedures: "Procedures",
+      testDrive: "Test Drive",
+      techSpecs: "Technical Specs",
+      modelYear: "Model Year",
+      mileage: "Mileage",
+      fuel: "Fuel",
+      transmission: "Transmission",
+      enginePower: "Engine Power",
+      co2Emissions: "CO₂ Emissions",
+      vinCertified: "Certified VIN",
+      backToCatalog: "Back to catalogue",
+      backToHome: "Back to home",
+      brand: "Brand",
+      model: "Model",
+      year: "Year",
+      price: "Price",
+      allTransmissions: "All Transmissions",
+      allStatuses: "All Statuses",
+      clearFilters: "Clear Filters",
+      filterBrandModel: "Brand, model...",
+      filterPriceMax: "Max Price",
+      whatsapp: "WhatsApp",
+      callUs: "Call Us",
+      copySuccess: "Copied!",
+      copiedToClipboard: "Copied to clipboard!",
+      simulatedLoa: "Estimated Monthly Payment",
+      apport: "Down Payment",
+      duration: "Leasing Duration",
+      months: "months",
+      monthlyPayment: "Monthly Payment",
+      applyCG: "Apply for Registration (Carte Grise)",
+      clientInfo: "Owner Information",
+      fullName: "Full Name",
+      email: "Email Address",
+      phone: "Phone Number",
+      address: "Postal Address",
+      tradeInQuestion: "Do you have a vehicle to trade in?",
+      tradeInInfo: "Trade-in Vehicle Details",
+      tradeInBrandModel: "Brand & Model",
+      tradeInYear: "Year",
+      tradeInKm: "Mileage",
+      tradeInCondition: "General Condition",
+      bookTestDrive: "Schedule a Test Drive",
+      selectDateTime: "Select Date & Time",
+      preferredDate: "Preferred Date",
+      preferredTime: "Preferred Time",
+      specialRequest: "Special Requests",
+      sendRequest: "Send Request",
+      formSuccess: "Your request has been successfully submitted!",
+      formError: "An error occurred, please try again.",
+      adminTitle: "Admin Panel",
+      logout: "Log Out",
+      addCar: "Add Vehicle",
+      editCar: "Edit Vehicle",
+      carSaved: "Vehicle saved!",
+      carDeleted: "Vehicle deleted!",
+      deleteConfirm: "Are you sure you want to delete this vehicle?",
+      cancel: "Cancel",
+      save: "Save",
+      companyName: "Company Name",
+      settingsSaved: "Settings saved successfully!",
+      inquiries: "Client Inquiries",
+      Essence: "Petrol",
+      Diesel: "Diesel",
+      Hybride: "Hybrid",
+      Automatique: "Automatic",
+      Manuelle: "Manual",
+      Mécanique: "Manual",
+      "En stock": "In stock",
+      "En arrivage": "In transit",
+      Vendu: "Sold",
+      hp: "hp",
+      copy: "Copy",
+      settingsSavedOffline: "Settings saved locally (offline mode).",
+      discoverCatalog: "Browse catalogue",
+      bookAppointment: "Book an appointment",
+      ourSelection: "Our Selection",
+      featuredVehicles: "Featured Vehicles",
+      featuredDescription: "All vehicles are rigorously inspected and ready for delivery.",
+      vehicleCatalogue: "Vehicle Catalogue",
+      vehicleCatalogueDesc: "Explore our catalogue of new and pre-owned vehicles.",
+      all: "All",
+      priceMin: "Min Price (€)",
+      priceMax: "Max Price (€)",
+      minYear: "Min Year",
+      maxYear: "Max Year",
+      allTypes: "All",
+      availability: "Availability",
+      searchText: "Search keywords",
+      searchPlaceholder: "Ex: GT3, Weissach...",
+      noVehicles: "No vehicles match your search criteria.",
+      contactUs: "Contact Us",
+      discussProject: "Let's discuss your project",
+      contactDesc: "Want more information about a specific model or to schedule a visit? Contact us directly.",
+      messageSent: "Message sent successfully! We will contact you.",
+      specialRequestPlaceholder: "I would like to get more information about...",
+      noDescription: "No description available.",
+      lightMode: "Light Mode",
+      darkMode: "Dark Mode"
+    },
+    ru: {
+      catalog: "Каталог",
+      about: "О нас",
+      contact: "Контакты",
+      adminPanel: "Панель администратора",
+      nousContacter: "Связаться с нами",
+      vinVerified: "VIN проверен",
+      available: "В наличии",
+      incoming: "В пути",
+      sold: "Продано",
+      details: "Подробнее",
+      specifications: "Характеристики",
+      financing: "Кредит / Лизинг",
+      procedures: "Оформление документов",
+      testDrive: "Тест-драйв",
+      techSpecs: "Технические характеристики",
+      modelYear: "Год выпуска",
+      mileage: "Пробег",
+      fuel: "Тип топлива",
+      transmission: "Коробка передач",
+      enginePower: "Мощность двигателя",
+      co2Emissions: "Выбросы CO₂",
+      vinCertified: "Сертифицированный VIN",
+      backToCatalog: "Назад в каталог",
+      backToHome: "Назад на главную",
+      brand: "Марка",
+      model: "Модель",
+      year: "Год",
+      price: "Цена",
+      allTransmissions: "Все коробки передач",
+      allStatuses: "Все статусы",
+      clearFilters: "Сбросить фильтры",
+      filterBrandModel: "Марка, модель...",
+      filterPriceMax: "Макс. цена",
+      whatsapp: "WhatsApp",
+      callUs: "Позвонить нам",
+      copySuccess: "Скопировано!",
+      copiedToClipboard: "Скопировано в буфер обмена!",
+      simulatedLoa: "Оценочный лизинг",
+      apport: "Первоначальный взнос",
+      duration: "Срок лизинга",
+      months: "мес",
+      monthlyPayment: "Ежемесячный платеж",
+      applyCG: "Подать заявку на Carte Grise",
+      clientInfo: "Информация о владельце",
+      fullName: "ФИО владельца",
+      email: "Адрес эл. почты",
+      phone: "Номер телефона",
+      address: "Почтовый адрес",
+      tradeInQuestion: "Хотите сдать старый автомобиль в трейд-ин?",
+      tradeInInfo: "Детали старого автомобиля",
+      tradeInBrandModel: "Марка и Модель",
+      tradeInYear: "Год выпуска",
+      tradeInKm: "Пробег",
+      tradeInCondition: "Общее состояние",
+      bookTestDrive: "Записаться на тест-драйв",
+      selectDateTime: "Выберите дату и время",
+      preferredDate: "Желаемая дата",
+      preferredTime: "Желаемое время",
+      specialRequest: "Особые пожелания",
+      sendRequest: "Отправить запрос",
+      formSuccess: "Ваш запрос успешно отправлен!",
+      formError: "Произошла ошибка, попробуйте еще раз.",
+      adminTitle: "Панель администратора",
+      logout: "Выйти",
+      addCar: "Добавить автомобиль",
+      editCar: "Редактировать автомобиль",
+      carSaved: "Автомобиль сохранен!",
+      carDeleted: "Автомобиль удален!",
+      deleteConfirm: "Вы уверены, что хотите удалить этот автомобиль?",
+      cancel: "Отмена",
+      save: "Сохранить",
+      companyName: "Название компании",
+      settingsSaved: "Настройки успешно сохранены!",
+      inquiries: "Запросы клиентов",
+      Essence: "Бензин",
+      Diesel: "Дизель",
+      Hybride: "Гибрид",
+      Automatique: "Автомат",
+      Manuelle: "Механика",
+      Mécanique: "Механика",
+      "En stock": "В наличии",
+      "En arrivage": "В пути",
+      Vendu: "Продано",
+      hp: "л.с.",
+      copy: "Копировать",
+      settingsSavedOffline: "Настройки сохранены локально.",
+      discoverCatalog: "Открыть каталог",
+      bookAppointment: "Записаться на встречу",
+      ourSelection: "Наш выбор",
+      featuredVehicles: "Рекомендуемые модели",
+      featuredDescription: "Автомобили прошли полную предпродажную подготовку и технический контроль.",
+      vehicleCatalogue: "Каталог автомобилей",
+      vehicleCatalogueDesc: "Ознакомьтесь с нашим каталогом б/у и новых автомобилей.",
+      all: "Все",
+      priceMin: "Цена от (€)",
+      priceMax: "Цена до (€)",
+      minYear: "Год выпуска от",
+      maxYear: "Год выпуска до",
+      allTypes: "Все типы",
+      availability: "Статус",
+      searchText: "Поиск по ключевым словам",
+      searchPlaceholder: "Например: GT3, Weissach...",
+      noVehicles: "Ни один автомобиль не соответствует вашим критериям поиска.",
+      contactUs: "Связаться с нами",
+      discussProject: "Обсудим ваш проект",
+      contactDesc: "Хотите узнать больше о конкретной модели или запланировать визит? Свяжитесь с нами напрямую.",
+      messageSent: "Сообщение успешно отправлено! Мы свяжемся с вами.",
+      specialRequestPlaceholder: "Я хотел бы получить дополнительную информацию о Porsche 911 GT3...",
+      noDescription: "Описание отсутствует.",
+      lightMode: "Светлая тема",
+      darkMode: "Тёмная тема"
+    }
+  };
+
+const t = (key: string) => {
+if (siteSettings?.translations?.[lang]?.[key]) {
+return siteSettings.translations[lang][key];
+}
+return translations[lang][key] || key;
+};
+
+// Images de la galerie de la voiture sélectionnée (для клавиатурной навигации лайтбокса)
+const currentCarGallery = useMemo(() => {
+if (!selectedCar) return [];
+return selectedCar.images && selectedCar.images.length > 0
+? selectedCar.images
+: [
+selectedCar.image || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=80&w=1200',
+selectedCar.image2 || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
+selectedCar.image3 || "https://images.unsplash.com/photo-1611566141071-1a3b96d8373a?auto=format&fit=crop&q=80&w=1200"
+].filter(Boolean);
+}, [selectedCar]);
+
+// Входящие запросы клиентов
+const [inquiries, setInquiries] = useState([]);
+
+// CMS настройки сайта
+const DEFAULT_SETTINGS = {
+companyName: 'Ligo Automobiles',
+phone: '+33 6 00 00 00 00',
+email: 'contact@ligoautomobiles.fr',
+address: 'Paris, France',
+bannerImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuAWWY8eJuzYiD9GK0tUeHHip6ZeuNT-8wBqp4yXhWopeA8_OLcGVQ8LozxOrbNMIiIVUmQA4wV4q3CauqsJI52tUnUqxxPqPXrT919JL9uw7Zq5Fr3HI_AJUOQ69ZQq8XNkrXaPsQSDo5IaX8rnsIyllDgz-yQ5tt6UxNW5TIIIK-Cch06UzMYWUTudMocVe70WCCxJDFqrWOBbgyARkZR7hZeJahDQcPtXRAQU4W8rICjExbX3FPgH",
+aboutImage: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+ru: {
+bannerTitle: "Покупка и продажа б/у и новых автомобилей во Франции",
+bannerSubtitle: "Ligo Automobiles • Франция",
+bannerDescription: "Профессиональный подбор, проверка истории и технического состояния каждого автомобиля. Оформление сделки под ключ.",
+aboutSubtitle: "Ligo Automobiles",
+aboutTitle: "Ваш надежный партнер по подбору авто во Франции",
+aboutText: "Мы обеспечиваем полную прозрачность на всех этапах сделки. Каждый автомобиль проходит комплексную техническую проверку и юридическую экспертизу.",
+featuredCategory: "Каталог",
+featuredTitle: "Наши автомобили",
+featuredSubtitle: "Проверенные технически и готовые к эксплуатации модели.",
+stat1Number: "✓",
+stat1Label: "Гарантия на все авто",
+stat2Number: "VIN",
+stat2Label: "Проверенный номер",
+stat3Number: "DOC",
+stat3Label: "Помощь с документами",
+contactTitle: "Связаться с нами",
+contactSubtitle: "Обсудим ваш проект",
+contactDescription: "Хотите получить дополнительную информацию о конкретной модели? Свяжитесь с нами напрямую."
+},
+    fr: {
+      bannerTitle: "Achat & Vente de Véhicules d'Occasion et Neufs",
+      bannerSubtitle: "Ligo Automobiles • France",
+      bannerDescription: "Sélection rigoureuse, historique transparent et accompagnement administratif complet.",
+      aboutSubtitle: "Ligo Automobiles",
+      aboutTitle: "Votre partenaire de confiance en France",
+      aboutText: "Nous assurons une transparence totale à chaque étape de la transaction. Chaque véhicule subit une inspection technique et juridique complète.",
+      featuredCategory: "Catalogue",
+      featuredTitle: "Nos Véhicules",
+      featuredSubtitle: "Des modèles techniquement éprouvés et prêts à l'emploi.",
+      stat1Number: "✓",
+      stat1Label: "Garantie sur tous les véhicules",
+      stat2Number: "VIN",
+      stat2Label: "Numéro VIN vérifié",
+      stat3Number: "DOC",
+      stat3Label: "Aide aux démarches",
+      contactTitle: "Contactez-nous",
+      contactSubtitle: "Discutons de votre projet",
+      contactDescription: "Vous souhaitez plus d'informations sur un modèle précis ? Contactez-nous directement."
+    },
+en: {
+bannerTitle: "Buy & Sell Used and New Cars in France",
+bannerSubtitle: "Ligo Automobiles • France",
+bannerDescription: "Professional selection, history check, and technical inspection of each vehicle. Turnkey deal support.",
+aboutSubtitle: "Ligo Automobiles",
+aboutTitle: "Your Trusted Car Sourcing Partner in France",
+aboutText: "We ensure complete transparency at every stage of the deal. Every car undergoes a comprehensive technical check and legal inspection.",
+featuredCategory: "Catalogue",
+featuredTitle: "Our Vehicles",
+featuredSubtitle: "Technically proven and ready-to-run models.",
+stat1Number: "✓",
+stat1Label: "Warranty on all cars",
+stat2Number: "VIN",
+stat2Label: "Verified VIN number",
+stat3Number: "DOC",
+stat3Label: "Help with paperwork",
+contactTitle: "Contact Us",
+contactSubtitle: "Discuss your project",
+contactDescription: "Want to get more information about a specific model? Contact us directly."
+    }
+  };
+
+const [siteSettings, setSiteSettings] = useState(DEFAULT_SETTINGS);
+const [adminLang, setAdminLang] = useState<'ru'|'fr'>('ru');
+
+// Состояние кредитного симулятора
+const [loanApport, setLoanApport] = useState(10000);
+const [loanDuration, setLoanDuration] = useState(36); // 24 | 36 | 48
+
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+await Promise.all(uploadPromises);
+setGalleryUploading(false);
+};
+
+
+// Первая фаза: Авторизация в системе (Правило №3)
+useEffect(() => {
+const initAuth = async () => {
+try {
+if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+await signInWithCustomToken(auth, __initial_auth_token);
+} else {
+await signInAnonymously(auth);
+}
+} catch (err) {
+console.error("Auth Exception Error: ", err);
+}
+};
+initAuth();
+
+const unsubscribe = onAuthStateChanged(auth, (usr) => {
+setUser(usr);
+});
+return () => unsubscribe();
+}, []);
+
+// Таймер управления полноэкранным просмотром фотографий с клавиатуры
+useEffect(() => {
+if (!showLightbox || currentCarGallery.length === 0) return;
+const handleKeyDown = (e: KeyboardEvent) => {
+if (e.key === 'Escape') {
+setShowLightbox(false);
+} else if (e.key === 'ArrowRight') {
+setLightboxIndex(prev => (prev === currentCarGallery.length - 1 ? 0 : prev + 1));
+} else if (e.key === 'ArrowLeft') {
+setLightboxIndex(prev => (prev === 0 ? currentCarGallery.length - 1 : prev - 1));
+}
+};
+window.addEventListener('keydown', handleKeyDown);
+return () => window.removeEventListener('keydown', handleKeyDown);
+}, [showLightbox, currentCarGallery]);
+
+// Вторая фаза: Загрузка данных каталога в реальном времени (Правило №1 и №2)
+useEffect(() => {
+if (!user) return;
+
+setLoading(true);
+let isResolved = false;
+
+// Тайм-аут загрузки из сети: если Firestore зависает, переходим на оффлайн демо-режим через 4 секунды
+const loadTimeout = setTimeout(() => {
+if (!isResolved) {
+console.warn("Firestore connection timed out. Activating offline demo mode...");
+setGlobalError("Connexion à la base de données lente. Mode démo hors ligne activé.");
+setCars(DEMO_CARS);
+setLoading(false);
+}
+}, 4000);
+
+// Строгий путь к публичной коллекции автомобилей согласно Правилу №1
+const carsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+}, 4500);
+};
+
+// Копирование VIN номера автомобиля строго через устаревший execCommand (по требованию ТЗ)
+const handleCopyVIN = (vinText) => {
+const tempInput = document.createElement("input");
+tempInput.value = vinText;
+document.body.appendChild(tempInput);
+tempInput.select();
+document.execCommand("copy");
+document.body.removeChild(tempInput);
+showNotification("Le numéro VIN a été copié dans le presse-papiers !", "success");
+};
+
+// Генерация стартового каталога люксовых спортивных машин
+const seedDemoData = async () => {
+try {
+const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
+for (const car of DEMO_CARS) {
+// Исключаем локальный id при записи в Firestore
+const { id, ...carData } = car;
+await withTimeout(addDoc(carsCollection, carData), 2000);
+}
+showNotification("Catalogue de démonstration initialisé avec succès !", "info");
+} catch (err) {
+console.error("Error seeding catalog:", err);
+}
+};
+
+// Фильтрация каталога в оперативной памяти на клиенте (избегаем сложных индексов Firestore)
+const filteredCars = useMemo(() => {
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+setCars(prev => prev.filter(car => car.id !== deleteConfirmCar.id));
+showNotification("Le véhicule a été supprimé du catalogue (mode hors ligne).", "success");
+setDeleteConfirmCar(null);
+if (selectedCar && selectedCar.id === deleteConfirmCar.id) {
+setSelectedCar(null);
+}
+}
+};
+
+// Резервные копии запросов в случае работы офлайн
+const MOCK_INQUIRIES = [
+{
+id: "inq-1",
+type: "Carte Grise & Immatriculation",
+carBrand: "Porsche",
+carModel: "911 GT3 RS",
+carPrice: 289000,
+clientName: "Pierre Dubois",
+clientEmail: "pierre.dubois@example.fr",
+clientPhone: "+33612345678",
+clientAddress: "15 Rue de la Paix, 75002 Paris",
+hasTradeIn: true,
+tradeInDetails: "Porsche Cayman S (2016) - 65k km - Excellent état",
+status: "Nouveau",
+createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+},
+{
+id: "inq-2",
+type: "Demande d'essai / RDV",
+carBrand: "Ferrari",
+carModel: "F8 Tributo",
+carPrice: 315000,
+clientName: "Marc Vasseur",
+clientEmail: "marc.vasseur@example.fr",
+clientPhone: "+33687654321",
+clientAddress: "Showroom",
+hasTradeIn: false,
+tradeInDetails: "",
+status: "Traité",
+createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+}
+];
+
+// Загрузка запросов от клиентов в реальном времени (для администратора)
+useEffect(() => {
+if (!isAdmin) return;
+
+const inquiriesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+const q = query(inquiriesCollectionRef);
+
+const unsubscribe = onSnapshot(q, (snapshot) => {
+const list = [];
+snapshot.forEach((doc) => {
+list.push({ id: doc.id, ...doc.data() });
+});
+// Сортировка по времени создания
+list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+setInquiries(list);
+}, (err) => {
+// Сортировка по времени создания
+list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+setInquiries(list);
+}, (err) => {
+console.warn('Firestore inquiries subscription error:', err);
+});
+
+return () => unsubscribe();
+}, [isAdmin, appId]);
+
+// Загрузка CMS настроек сайта в реальном времени
+useEffect(() => {
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+const unsubscribe = onSnapshot(settingsDocRef, (docSnap) => {
+if (docSnap.exists()) {
+setSiteSettings(prev => ({ ...prev, ...docSnap.data() }));
+}
+}, (err) => {
+console.warn('Firestore settings subscription error (using default config):', err);
+});
+return () => unsubscribe();
+}, [appId]);
+
+const renderAdminVehicles = () => {
+return (
+<div className="space-y-6">
+<div className="flex justify-between items-center pb-4 border-b border-neutral-200 dark:border-neutral-900">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide">Gestion du Parc Automobile</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-xs mt-1">Ajoutez, modifiez ou supprimez des véhicules du catalogue.</p>
+</div>
+className="w-24 h-16 object-cover rounded-lg border border-neutral-200 dark:border-neutral-850" 
+onError={(e) => {
+const fallback = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"><rect width="100%" height="100%" fill="%230D0D0D"/><rect x="5" y="5" width="390" height="240" fill="none" stroke="%23D4AF37" stroke-width="1" opacity="0.3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="%23D4AF37" letter-spacing="2">LIGO AUTOMOBILES</text></svg>';
+if (e.currentTarget.src !== fallback) {
+e.currentTarget.src = fallback;
+}
+}}
+/>
+<div className="space-y-1">
+<span className="text-[10px] text-[#D4AF37] uppercase tracking-widest font-bold">{car.brand}</span>
+<h4 className="text-sm font-bold text-neutral-900 dark:text-white truncate max-w-[150px]">{car.model}</h4>
+<div className="text-xs text-[#D4AF37] font-semibold">{car.price ? car.price.toLocaleString('fr-FR') : '0'} €</div>
+</div>
+</div>
+<div className="flex items-center justify-between gap-4 mt-4 pt-3 border-t border-neutral-900">
+<span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+car.status === 'Vendu' ? 'bg-neutral-950/20 text-neutral-400 border border-neutral-800' : car.status === 'En arrivage' ? 'bg-amber-950/20 text-amber-400 border border-amber-900/50' : 'bg-green-950/20 text-green-400 border border-green-900/50'
+}`}>
+{car.status === 'En stock' ? 'Disponible' : car.status === 'En arrivage' ? 'En arrivage' : 'Vendu'}
+</span>
+<div className="flex gap-2">
+<button onClick={() => handleOpenEditModal(car)} className="p-2 rounded-lg bg-neutral-100 hover:bg-[#D4AF37]/10 text-neutral-600 hover:text-[#D4AF37] border border-neutral-200 dark:bg-[#0D0D0D] dark:hover:bg-[#D4AF37]/10 dark:text-neutral-400 dark:hover:text-[#D4AF37] dark:border-neutral-850 transition-all" title="Modifier">
+<Icons.Edit />
+</button>
+<button onClick={() => setDeleteConfirmCar(car)} className="p-2 rounded-lg bg-neutral-100 hover:bg-red-50 text-neutral-600 hover:text-red-600 border border-neutral-200 dark:bg-[#0D0D0D] dark:hover:bg-red-950/20 dark:text-neutral-400 dark:hover:text-red-400 dark:border-neutral-850 transition-all" title="Supprimer">
+<Icons.Trash />
+</button>
+</div>
+</div>
+</div>
+))}
+</div>
+</div>
+);
+};
+
+const handleDeleteInquiry = async (inquiryId) => {
+try {
+const isMockFirebase = !firebaseConfig || 
+!firebaseConfig.apiKey || 
+firebaseConfig.apiKey.includes('mock') || 
+firebaseConfig.projectId === 'mock-project';
+
+if (isMockFirebase) {
+throw new Error("Mock Firebase detected");
+}
+
+const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'inquiries', inquiryId);
+await withTimeout(deleteDoc(docRef), 3000);
+showNotification("La demande a été supprimée.", "success");
+} catch (err) {
+console.error("Error deleting inquiry: ", err);
+setInquiries(prev => prev.filter(inq => inq.id !== inquiryId));
+showNotification("Demande supprimée (mode hors ligne).", "info");
+}
+};
+
+const renderAdminDashboard = () => {
+return (
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 animate-fadeIn text-neutral-800 dark:text-neutral-200">
+<div>
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">Administration</span>
+<h1 className="text-4xl font-serif text-neutral-900 dark:text-white tracking-wide mt-1">Tableau de Bord</h1>
+<p className="text-neutral-600 dark:text-neutral-400 text-sm mt-2">Gérez le catalogue des véhicules, traitez les demandes clients et modifiez les textes du site.</p>
+</div>
+
+{/* Navigation Admin */}
+<div className="flex border-b border-neutral-200 dark:border-neutral-900 gap-4">
+<button
+onClick={() => setActiveAdminTab('vehicles')}
+className={`px-4 py-3 text-xs uppercase font-bold tracking-widest border-b-2 transition-all ${
+activeAdminTab === 'vehicles'
+? 'border-[#D4AF37] text-[#D4AF37]'
+: 'border-transparent text-neutral-500 dark:text-neutral-450 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+}`}
+>
+Gestion des Véhicules
+</button>
+<button
+onClick={() => setActiveAdminTab('inquiries')}
+className={`px-4 py-3 text-xs uppercase font-bold tracking-widest border-b-2 transition-all ${
+activeAdminTab === 'inquiries'
+? 'border-[#D4AF37] text-[#D4AF37]'
+: 'border-transparent text-neutral-500 dark:text-neutral-450 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+}`}
+>
+Demandes Clients
+</button>
+<button
+onClick={() => setActiveAdminTab('settings')}
+className={`px-4 py-3 text-xs uppercase font-bold tracking-widest border-b-2 transition-all ${
+activeAdminTab === 'settings'
+? 'border-[#D4AF37] text-[#D4AF37]'
+: 'border-transparent text-neutral-500 dark:text-neutral-450 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
+}`}
+>
+Configuration Site
+</button>
+</div>
+
+{/* Содержимое вкладок */}
+<div className="min-h-[400px]">
+{activeAdminTab === 'vehicles' && renderAdminVehicles()}
+{activeAdminTab === 'inquiries' && renderAdminInquiries()}
+{activeAdminTab === 'settings' && renderAdminSettings()}
+</div>
+</div>
+);
+};
+
+const handleSelectCar = (car) => {
+: 'border-transparent text-neutral-500 hover:text-neutral-900'
+}`}
+>
+Gestion des Véhicules
+setActiveDetailsTab('specs');
+window.scrollTo(0, 0);
+};
+
+const renderCarDetails = () => {
+if (!selectedCar) return null;
+
+// Calcul de la LOA
+const residual = selectedCar.price * 0.45;
+const financed = selectedCar.price - loanApport - residual;
+const base = financed / loanDuration;
+const interest = (selectedCar.price - loanApport) * 0.04 / 12;
+const monthlyLOA = Math.max(50, Math.round(base + interest));
+
+// Calcul du malus écologique
+const malus = selectedCar.hp < 150 ? 0 : (selectedCar.hp <= 250 ? 950 : (selectedCar.hp <= 450 ? 4500 : 15000));
+
+// Images de la galerie
+const galleryImages = selectedCar.images && selectedCar.images.length > 0
+? selectedCar.images
+: [
+selectedCar.image || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=80&w=1200',
+selectedCar.image2 || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
+selectedCar.image3 || "https://images.unsplash.com/photo-1611566141071-1a3b96d8373a?auto=format&fit=crop&q=80&w=1200"
+].filter(Boolean);
+
+const prefilledText = `Bonjour, je vous contacte concernant la ${selectedCar.brand} ${selectedCar.model} affichée à ${selectedCar.price.toLocaleString('fr-FR')} € sur votre site...`;
+
+// Soumettre le financement
+const handleFinanceSubmit = (e) => {
+e.preventDefault();
+handleInquirySubmit({
+type: "Demande de financement (LOA)",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: user?.email || "Visiteur",
+message: `Simulateur LOA: Apport de ${loanApport.toLocaleString()} €, Durée de ${loanDuration} mois. Mensualité estimée de ${monthlyLOA} € / mois.`
+});
+};
+
+// Soumettre la carte grise / reprise
+const handleCarteGriseSubmit = (e) => {
+e.preventDefault();
+if (!cgForm.name || !cgForm.email || !cgForm.phone || !cgForm.address) {
+showNotification("Veuillez remplir tous les champs du dossier.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Carte Grise & Immatriculation",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: cgForm.name,
+clientEmail: cgForm.email,
+clientPhone: cgForm.phone,
+clientAddress: cgForm.address,
+hasTradeIn: cgForm.hasTradeIn,
+tradeInDetails: cgForm.hasTradeIn ? `${cgForm.tradeInBrandModel} (${cgForm.tradeInYear}) - ${cgForm.tradeInKm} km - État: ${cgForm.tradeInCondition}` : ""
+});
+};
+
+// Soumettre la demande d'essai
+const handleTestDriveSubmit = (e) => {
+e.preventDefault();
+if (!testDriveForm.name || !testDriveForm.email || !testDriveForm.phone || !testDriveForm.date || !testDriveForm.time) {
+showNotification("Veuillez remplir toutes les informations pour le rendez-vous.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Demande d'essai / RDV",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: testDriveForm.name,
+clientEmail: testDriveForm.email,
+clientPhone: testDriveForm.phone,
+preferredDate: testDriveForm.date,
+preferredTime: testDriveForm.time,
+message: testDriveForm.message
+});
+};
+
+// Soumettre la carte grise / reprise
+const handleCarteGriseSubmit = (e) => {
+e.preventDefault();
+if (!cgForm.name || !cgForm.email || !cgForm.phone || !cgForm.address) {
+showNotification("Veuillez remplir tous les champs du dossier.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Carte Grise & Immatriculation",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: cgForm.name,
+clientEmail: cgForm.email,
+clientPhone: cgForm.phone,
+clientAddress: cgForm.address,
+hasTradeIn: cgForm.hasTradeIn,
+tradeInDetails: cgForm.hasTradeIn ? `${cgForm.tradeInBrandModel} (${cgForm.tradeInYear}) - ${cgForm.tradeInKm} km - État: ${cgForm.tradeInCondition}` : ""
+});
+};
+
+// Soumettre la demande d'essai
+const handleTestDriveSubmit = (e) => {
+e.preventDefault();
+if (!testDriveForm.name || !testDriveForm.email || !testDriveForm.phone || !testDriveForm.date || !testDriveForm.time) {
+showNotification("Veuillez remplir toutes les informations pour le rendez-vous.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Demande d'essai / RDV",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: testDriveForm.name,
+clientEmail: testDriveForm.email,
+e.currentTarget.src = primaryImg;
+} else if (e.currentTarget.src !== fallback) {
+e.currentTarget.src = fallback;
+}
+}}
+/>
+<button 
+onClick={() => {
+const idx = galleryImages.indexOf(activeImage || galleryImages[0]);
+setLightboxIndex(idx >= 0 ? idx : 0);
+setShowLightbox(true);
+}}
+className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 dark:bg-neutral-900/90 hover:bg-[#D4AF37] border border-neutral-200 dark:border-neutral-800 hover:border-neutral-950 text-neutral-750 dark:text-neutral-300 hover:text-neutral-950 shadow-lg transition-all group z-10"
+title="Plein écran"
+>
+<Icons.Maximize />
+</button>
+<div className="absolute top-4 left-4 flex flex-col gap-2">
+{selectedCar.verifiedVin && (
+<span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
+<Icons.CheckBadge />
+}}
+/>
+<button 
+onClick={() => {
+const idx = galleryImages.indexOf(activeImage || galleryImages[0]);
+setLightboxIndex(idx >= 0 ? idx : 0);
+setShowLightbox(true);
+}}
+className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 dark:bg-neutral-900/90 hover:bg-[#D4AF37] border border-neutral-200 dark:border-neutral-800 hover:border-neutral-950 text-neutral-750 dark:text-neutral-300 hover:text-neutral-950 shadow-lg transition-all group z-10"
+title="Plein écran"
+>
+<Icons.Maximize />
+</button>
+<div className="absolute top-4 left-4 flex flex-col gap-2">
+{selectedCar.verifiedVin && (
+<span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
+}`}
+>
+<img 
+src={img} 
+className="w-full h-full object-cover" 
+onError={(e) => {
+const fallback = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"><rect width="100%" height="100%" fill="%23121214"/><rect x="5" y="5" width="390" height="240" fill="none" stroke="%23D4AF37" stroke-width="1" opacity="0.3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="%23D4AF37" letter-spacing="2">LIGO AUTOMOBILES</text></svg>';
+if (e.currentTarget.src !== fallback) {
+e.currentTarget.src = fallback;
+}
+}}
+/>
+</button>
+))}
+</div>
+</div>
+
+{/* Правая column: Детали, цена и табы */}
+<div className="lg:col-span-5 space-y-8">
+<div className="space-y-3 pb-6 border-b border-neutral-200 dark:border-neutral-900">
+<div className="flex justify-between items-start">
+<div>
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{selectedCar.brand}</span>
+<h1 className="text-4xl sm:text-5xl font-serif text-white font-bold leading-tight mt-1">{selectedCar.model}</h1>
+</div>
+{isAdmin && (
+<button 
+onClick={() => handleOpenEditModal(selectedCar)}
+className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#D4AF37]/10 border border-neutral-200 dark:border-neutral-850 hover:border-[#D4AF37] text-neutral-700 dark:text-neutral-300 hover:text-[#D4AF37] text-xs font-bold transition-all"
+>
+<Icons.Edit />
+Modifier la fiche
+</button>
+)}
+</div>
+<div className="text-3xl font-serif font-black text-[#D4AF37] mt-2">
+{selectedCar.price ? selectedCar.price.toLocaleString('fr-FR') : '0'} €
+</div>
+</div>
+
+{/* Быстрые контакты */}
+<div className="grid grid-cols-2 gap-4">
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}?text=${encodeURIComponent(prefilledText)}`}
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center justify-center gap-2 py-4 rounded-xl bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold text-sm tracking-wide transition-all shadow-lg shadow-[#25D366]/10"
+>
+<Icons.WhatsApp />
+WhatsApp
+</a>
+<a 
+href={`tel:${siteSettings.phone.replace(/\s+/g, '')}`} 
+className="flex items-center justify-center gap-2 py-4 rounded-xl bg-neutral-900 hover:bg-[#121214] text-neutral-200 border border-neutral-300 dark:border-neutral-850 hover:border-[#D4AF37]/50 font-bold text-sm tracking-wide transition-all"
+>
+<Icons.Phone />
+{t('callUs')}
+</a>
+</div>
+
+{/* Вкладки деталей */}
+<div className="space-y-6">
+{/* Таб бар */}
+<div className="flex border-b border-neutral-200 dark:border-neutral-900 overflow-x-auto scrollbar-none">
+{['specs', 'finance', 'paperwork', 'testdrive'].map((tab) => (
+<button
+key={tab}
+onClick={() => setActiveDetailsTab(tab)}
+className={`px-4 py-3 text-xs uppercase font-bold tracking-widest border-b-2 whitespace-nowrap transition-all ${
+activeDetailsTab === tab 
+? 'border-[#D4AF37] text-[#D4AF37]' 
+: 'border-transparent text-neutral-600 hover:text-neutral-950 dark:text-neutral-450 dark:hover:text-white'
+}`}
+>
+{tab === 'specs' ? t('specifications') : tab === 'finance' ? t('financing') : tab === 'paperwork' ? t('procedures') : t('testDrive')}
+</button>
+))}
+</div>
+
+{/* Содержимое вкладок */}
+<div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-lg min-h-[300px]">
+
+{/* Вкладка 1: Характеристики */}
+{activeDetailsTab === 'specs' && (
+<div className="space-y-6">
+<h3 className="text-sm uppercase tracking-widest text-[#D4AF37] font-bold mb-4">{t('techSpecs')}</h3>
+<div className="grid grid-cols-2 gap-y-5 gap-x-6 text-xs">
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('modelYear')}</span>
+<span className="font-semibold text-white text-sm">{selectedCar.year}</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('mileage')}</span>
+<span className="font-semibold text-white text-sm">{selectedCar.km ? selectedCar.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('fuel')}</span>
+<span className="font-semibold text-white text-sm">{t(selectedCar.fuel)}</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('transmission')}</span>
+<span className="font-semibold text-white text-sm">{t(selectedCar.transmission)}</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('enginePower')}</span>
+<span className="font-semibold text-white text-sm">{selectedCar.hp} {lang === 'ru' ? 'л.с.' : 'ch'}</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-450 block uppercase tracking-wider text-[9px]">{t('co2Emissions')}</span>
+<span className="font-semibold text-white text-sm">{selectedCar.co2 || 150} g/km</span>
+</div>
+</div>
+
+{selectedCar.vin && (
+<div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-850 flex items-center justify-between gap-3 mt-4">
+<div>
+<div className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-bold">{t('vinCertified')}</div>
+<div className="text-xs font-mono font-bold text-neutral-900 dark:text-white tracking-wider uppercase mt-0.5">{selectedCar.vin}</div>
+</div>
+<button 
+onClick={() => handleCopyVIN(selectedCar.vin)}
+className="text-[10px] font-bold text-[#D4AF37] hover:underline"
+>
+{lang === 'ru' ? 'Копировать' : 'Copier'}
+</button>
+</div>
+)}
+
+<p className="text-neutral-350 text-xs font-light leading-relaxed pt-2">
+{selectedCar.description || "Aucune description de présentation n'a été spécifiée."}
+</p>
+</div>
+)}
+
+{/* Вкладка 2: Финансирование */}
+{activeDetailsTab === 'finance' && (
+<form onSubmit={handleFinanceSubmit} className="space-y-6">
+<div>
+<span className="text-neutral-500 dark:text-neutral-400 block uppercase tracking-wider text-[9px]">{t('fuel')}</span>
+<span className="font-semibold text-neutral-900 dark:text-white text-sm">{t(selectedCar.fuel)}</span>
+</div>
+<div className="space-y-1">
+<span className="text-neutral-500 dark:text-neutral-400 block uppercase tracking-wider text-[9px]">{t('transmission')}</span>
+<span className="font-semibold text-neutral-900 dark:text-white text-sm">{t(selectedCar.transmission)}</span>
+</div>
+                      <div className="space-y-1">
+                        <span className="text-neutral-500 dark:text-neutral-400 block uppercase tracking-wider text-[9px]">{t('enginePower')}</span>
+                        <span className="font-semibold text-neutral-900 dark:text-white text-sm">{selectedCar.hp} {t('hp')}</span>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-neutral-500 dark:text-neutral-400 block uppercase tracking-wider text-[9px]">{t('co2Emissions')}</span>
+                        <span className="font-semibold text-neutral-900 dark:text-white text-sm">{selectedCar.co2 || 150} g/km</span>
+                      </div>
+                    </div>
+
+                    {selectedCar.vin && (
+                      <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 mt-4">
+                        <div>
+                          <div className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">{t('vinCertified')}</div>
+                          <div className="text-xs font-mono font-bold text-neutral-900 dark:text-white tracking-wider uppercase mt-0.5">{selectedCar.vin}</div>
+                        </div>
+                        <button 
+                          onClick={() => handleCopyVIN(selectedCar.vin)}
+                          className="text-[10px] font-bold text-[#D4AF37] hover:underline"
+>
+{t('copy')}
+</button>
+</div>
+)}
+
+                    <p className="text-neutral-700 dark:text-neutral-300 text-xs font-light leading-relaxed pt-2">
+                      {selectedCar.description || t('noDescription')}
+                    </p>
+</div>
+)}
+
+{/* Вкладка 2: Финансирование */}
+{activeDetailsTab === 'finance' && (
+<form onSubmit={handleFinanceSubmit} className="space-y-6">
+<div>
+))}
+</div>
+</div>
+
+{/* Отображение цены */}
+<div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 text-center">
+<div className="text-[9px] uppercase tracking-widest text-neutral-550 font-bold mb-1">Loyers mensuels estimés</div>
+<div className="text-3xl font-serif font-black text-[#D4AF37]">
+{monthlyLOA.toLocaleString('fr-FR')} € <span className="text-xs font-sans font-light text-neutral-450">/ mois</span>
+</div>
+<div className="text-[8px] text-neutral-500 dark:text-neutral-450 mt-1 uppercase tracking-widest">Calculé avec option d'achat (LOA) • Taux d'intérêt de 4%</div>
+</div>
+
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-2xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-sm tracking-wide transition-all shadow-lg"
+>
+Demander un financement
+</button>
+</form>
+)}
+
+{/* Вкладка 3: Оформление Carte Grise */}
+{activeDetailsTab === 'paperwork' && (
+<form onSubmit={handleCarteGriseSubmit} className="space-y-6">
+<div>
+<h3 className="text-sm uppercase tracking-widest text-[#D4AF37] font-bold mb-1">Immatriculation & Carte Grise</h3>
+<p className="text-[10px] text-neutral-500 dark:text-neutral-450">Service administratif officiel français.</p>
+</div>
+
+{/* Malus Écologique */}
+<div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-850 flex items-center justify-between gap-4">
+<div className="space-y-1">
+<div className="flex items-center gap-1.5 text-xs font-bold text-neutral-300">
+<Icons.Sparkles />
+Malus Écologique Estimé
+</div>
+<div className="text-[9px] text-neutral-500 dark:text-neutral-450 uppercase tracking-wider">Calculé selon la réglementation française</div>
+</div>
+{/* Вкладка 3: Оформление Carte Grise */}
+{activeDetailsTab === 'paperwork' && (
+<form onSubmit={handleCarteGriseSubmit} className="space-y-6">
+<div>
+<h3 className="text-sm uppercase tracking-widest text-[#D4AF37] font-bold mb-1">Immatriculation & Carte Grise</h3>
+<p className="text-[10px] text-neutral-500 dark:text-neutral-400">Service administratif officiel français.</p>
+</div>
+
+{/* Malus Écologique */}
+<div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-4">
+<div className="space-y-1">
+<div className="flex items-center gap-1.5 text-xs font-bold text-neutral-750 dark:text-neutral-300">
+<Icons.Sparkles />
+Malus Écologique Estimé
+</div>
+<div className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Calculé selon la réglementation française</div>
+</div>
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Téléphone *</label>
+<input required type="tel" placeholder="ex: +33..." value={cgForm.phone} onChange={(e) => setCgForm({...cgForm, phone: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+</div>
+
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Adresse de livraison complète *</label>
+<input required type="text" placeholder="ex: 15 Rue de la Paix, 75002 Paris" value={cgForm.address} onChange={(e) => setCgForm({...cgForm, address: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+</div>
+
+{/* Justificatifs */}
+<div className="space-y-2">
+<label className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-bold">Justificatifs obligatoires</label>
+<div className="grid grid-cols-2 gap-4">
+
+{/* Domicile */}
+<div 
+onClick={() => setCgForm({...cgForm, docDomicileName: "justificatif_domicile.pdf"})}
+className="border border-dashed border-neutral-300 dark:border-neutral-800 hover:border-[#D4AF37] bg-white dark:bg-[#0D0D0D] hover:bg-neutral-50 dark:hover:bg-[#161618]/55 rounded-xl p-3 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[90px]"
+>
+<Icons.FileText />
+<span className="text-[9px] uppercase tracking-wider font-semibold text-neutral-400 mt-2 block">Justif. domicile</span>
+<span className="text-[8px] text-[#D4AF37] mt-1 truncate max-w-full">
+{cgForm.docDomicileName || "Glisser ou cliquer"}
+</span>
+</div>
+
+{/* Permis */}
+<div 
+onClick={() => setCgForm({...cgForm, docPermisName: "permis_de_conduire.jpg"})}
+className="border border-dashed border-neutral-300 dark:border-neutral-800 hover:border-[#D4AF37] bg-white dark:bg-[#0D0D0D] hover:bg-neutral-50 dark:hover:bg-[#161618]/55 rounded-xl p-3 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[90px]"
+>
+<Icons.FileText />
+<span className="text-[9px] uppercase tracking-wider font-semibold text-neutral-400 mt-2 block">Permis de conduire</span>
+<span className="text-[8px] text-[#D4AF37] mt-1 truncate max-w-full">
+{cgForm.docPermisName || "Glisser ou cliquer"}
+</span>
+</div>
+
+</div>
+</div>
+
+{/* Trade-In */}
+<div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 space-y-4">
+<div className="flex items-center gap-2">
+<input 
+type="checkbox" 
+id="hasTradeIn" 
+checked={cgForm.hasTradeIn} 
+onChange={(e) => setCgForm({...cgForm, hasTradeIn: e.target.checked})} 
+className="rounded bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-800 text-[#D4AF37] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+/>
+<label htmlFor="hasTradeIn" className="text-[10px] text-neutral-700 dark:text-neutral-300 uppercase tracking-wider font-bold cursor-pointer select-none">
+Faire reprendre mon véhicule actuel ?
+</label>
+</div>
+
+{cgForm.hasTradeIn && (
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-neutral-850 animate-slideDown">
+<div className="space-y-1">
+<label className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-bold">Marque & Modèle</label>
+<input type="text" placeholder="ex: Golf 7" value={cgForm.tradeInBrandModel} onChange={(e) => setCgForm({...cgForm, tradeInBrandModel: e.target.value})} className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 px-2 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-[8px] uppercase tracking-widest text-neutral-500 dark:text-neutral-450 font-bold">Année</label>
+<input type="number" placeholder="ex: 2018" value={cgForm.tradeInYear} onChange={(e) => setCgForm({...cgForm, tradeInYear: e.target.value})} className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 px-2 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-[8px] uppercase tracking-widest text-neutral-550 font-bold">Kilométrage (km)</label>
+<input type="number" placeholder="ex: 85000" value={cgForm.tradeInKm} onChange={(e) => setCgForm({...cgForm, tradeInKm: e.target.value})} className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 px-2 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-[8px] uppercase tracking-widest text-neutral-550 font-bold">État général</label>
+<input type="text" placeholder="ex: Excellent état" value={cgForm.tradeInCondition} onChange={(e) => setCgForm({...cgForm, tradeInCondition: e.target.value})} className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1.5 px-2 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+</div>
+)}
+</div>
+
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-sm tracking-wide transition-all shadow-lg"
+>
+Valider mon dossier d'immatriculation
+</button>
+</form>
+)}
+
+{/* Вкладка 4: Заказ тест-драйва */}
+{activeDetailsTab === 'testdrive' && (
+<form onSubmit={handleTestDriveSubmit} className="space-y-6">
+<div>
+<h3 className="text-sm uppercase tracking-widest text-[#D4AF37] font-bold mb-1">Planifier un essai</h3>
+<p className="text-[10px] text-neutral-500 dark:text-neutral-450">Réservez un essai exclusif sur route ou sur piste.</p>
+</div>
+
+<div className="space-y-3">
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Nom complet *</label>
+<input required type="text" placeholder="ex: Jean Dupont" value={testDriveForm.name} onChange={(e) => setTestDriveForm({...testDriveForm, name: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">E-mail *</label>
+<input required type="email" placeholder="ex: jean@email.com" value={testDriveForm.email} onChange={(e) => setTestDriveForm({...testDriveForm, email: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Téléphone *</label>
+<input required type="tel" placeholder="ex: +33..." value={testDriveForm.phone} onChange={(e) => setTestDriveForm({...testDriveForm, phone: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none" />
+</div>
+</div>
+
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Date souhaitée *</label>
+<input required type="date" value={testDriveForm.date} onChange={(e) => setTestDriveForm({...testDriveForm, date: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Heure souhaitée *</label>
+<input required type="time" value={testDriveForm.time} onChange={(e) => setTestDriveForm({...testDriveForm, time: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Message (facultatif)</label>
+<textarea rows={3} placeholder="Options souhaitées, questions particulières..." value={testDriveForm.message} onChange={(e) => setTestDriveForm({...testDriveForm, message: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-855 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none resize-none"></textarea>
+</div>
+</div>
+
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-sm tracking-wide transition-all shadow-lg"
+>
+Confirmer le rendez-vous
+</button>
+</form>
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Message (facultatif)</label>
+<textarea rows={3} placeholder="Options souhaitées, questions particulières..." value={testDriveForm.message} onChange={(e) => setTestDriveForm({...testDriveForm, message: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none resize-none"></textarea>
+</div>
+</div>
+
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-sm tracking-wide transition-all shadow-lg"
+>
+Confirmer le rendez-vous
+</button>
+</form>
+)}
+
+</button>
+</form>
+)}
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+);
+};
+
+// Save CMS settings to Firestore
+const handleSaveSettings = async (e: React.FormEvent) => {
+e.preventDefault();
+try {
+const isMockFirebase = !firebaseConfig || 
+!firebaseConfig.apiKey || 
+firebaseConfig.apiKey.includes('mock') || 
+firebaseConfig.projectId === 'mock-project';
+
+if (isMockFirebase) {
+throw new Error("Mock Firebase detected");
+}
+
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+await withTimeout(setDoc(settingsDocRef, siteSettings), 3000);
+showNotification(lang === 'ru' ? "Настройки успешно сохранены!" : "Paramètres enregistrés !", "success");
+} catch (err) {
+console.error("Error saving settings: ", err);
+showNotification(lang === 'ru' ? "Настройки сохранены локально." : "Paramètres enregistrés (mode hors ligne).", "success");
+}
+};
+
+const renderAdminSettings = () => {
+return (
+<form onSubmit={handleSaveSettings} className="space-y-8 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-xl animate-fadeIn mb-12">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide mb-2">Configuration Globale du Site</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">Modifiez tous les textes, titres, statistiques et coordonnées de contact affichés publiquement.</p>
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Section Véhicules Phares</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Sélection exclusive)</label>
+<input type="text" value={siteSettings.featuredCategory || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredCategory: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+}
+
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+await withTimeout(setDoc(settingsDocRef, siteSettings), 3000);
+showNotification(lang === 'ru' ? "Настройки успешно сохранены!" : "Paramètres enregistrés !", "success");
+} catch (err) {
+console.error("Error saving settings: ", err);
+showNotification(lang === 'ru' ? "Настройки сохранены локально." : "Paramètres enregistrés (mode hors ligne).", "success");
+}
+};
+
+const renderAdminSettings = () => {
+return (
+<form onSubmit={handleSaveSettings} className="space-y-8 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-xl animate-fadeIn mb-12">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide mb-2">Configuration Globale du Site</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">Modifiez tous les textes, titres, statistiques et coordonnées de contact affichés publiquement.</p>
+</div>
+
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+{/* Левая колонка: Баннер и Фичед Секция */}
+<div className="space-y-8 lg:border-r lg:border-neutral-900 lg:pr-8">
+{/* Bannière */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Bannière d'accueil</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre principal</label>
+<input type="text" value={siteSettings.bannerTitle} onChange={(e) => setSiteSettings({...siteSettings, bannerTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre (italique)</label>
+<input type="text" value={siteSettings.bannerSubtitle} onChange={(e) => setSiteSettings({...siteSettings, bannerSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Description</label>
+<textarea rows={3} value={siteSettings.bannerDescription} onChange={(e) => setSiteSettings({...siteSettings, bannerDescription: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+</div>
+</div>
+
+{/* Véhicules Phares */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Section Véhicules Phares</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Sélection exclusive)</label>
+<input type="text" value={siteSettings.featuredCategory || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredCategory: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.featuredTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre / Description courte</label>
+<input type="text" value={siteSettings.featuredSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+</div>
+</div>
+
+{/* Правая колонка: О нас, Статистика, Контакты */}
+<div className="space-y-8">
+{/* À Propos & Stats */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Présentation (À Propos) & Stats</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Une relation...)</label>
+<input type="text" value={siteSettings.aboutSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, aboutSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre principal</label>
+<input type="text" value={siteSettings[lang]?.aboutTitle || DEFAULT_SETTINGS[lang].aboutTitle} onChange={(e) => setSiteSettings({...siteSettings, aboutTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Texte complet de présentation</label>
+<textarea rows={3} value={siteSettings[lang]?.aboutText || DEFAULT_SETTINGS[lang].aboutText} onChange={(e) => setSiteSettings({...siteSettings, aboutText: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+
+{/* Stats */}
+<div className="grid grid-cols-3 gap-3 pt-2">
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 1 Valeur</label>
+<input type="text" placeholder="30+" value={siteSettings.stat1Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat1Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 2 Valeur</label>
+<input type="text" placeholder="100%" value={siteSettings.stat2Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat2Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 3 Valeur</label>
+<input type="text" placeholder="24/7" value={siteSettings.stat3Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat3Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+</div>
+</div>
+</div>
+
+{/* Coordonnées & Section Contact */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Coordonnées de Contact & Formulaire</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Nom de l'entreprise</label>
+<input type="text" value={siteSettings.companyName || ''} onChange={(e) => setSiteSettings({...siteSettings, companyName: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Téléphone</label>
+<input type="text" value={siteSettings.phone || ''} onChange={(e) => setSiteSettings({...siteSettings, phone: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse E-mail</label>
+<input type="email" value={siteSettings.email || ''} onChange={(e) => setSiteSettings({...siteSettings, email: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse Physique</label>
+<input type="text" value={siteSettings.address || ''} onChange={(e) => setSiteSettings({...siteSettings, address: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="space-y-3 pt-2">
+<h5 className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 font-bold">Textes d'appel à l'action (Contact)</h5>
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.contactTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre de la section</label>
+<input type="text" value={siteSettings.contactSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Description courte</label>
+<textarea rows={2} value={siteSettings.contactDescription || ''} onChange={(e) => setSiteSettings({...siteSettings, contactDescription: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{/* Section 5: Traductions et Libellés */}
+<div className="space-y-6 col-span-1 lg:col-span-2 pt-8 border-t border-neutral-200 dark:border-neutral-900">
+<div>
+<h4 className="text-sm font-serif tracking-wide text-neutral-900 dark:text-white mb-1">Libellés & Traductions du Site (CMS)</h4>
+<p className="text-neutral-500 dark:text-neutral-400 text-xs">Personnalisez n'importe quel texte ou étiquette sur l'ensemble du site dans les deux langues.</p>
+</div>
+
+<div className="flex flex-wrap gap-4 items-center justify-between border-b border-neutral-200 dark:border-neutral-900 pb-3">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTranslationEditLang('fr')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${translationEditLang === 'fr' ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+                  >
+                    FR
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTranslationEditLang('en')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${translationEditLang === 'en' ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTranslationEditLang('ru')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${translationEditLang === 'ru' ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+                  >
+                    RU
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap gap-1 bg-neutral-100 dark:bg-neutral-950 p-1 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  {[
+                    { id: 'general', label: lang === 'ru' ? 'Общие / Кнопки' : lang === 'en' ? 'General & Buttons' : 'Général & Boutons' },
+                    { id: 'catalog', label: lang === 'ru' ? 'Каталог / Фильтры' : lang === 'en' ? 'Catalogue & Filters' : 'Catalogue & Filtres' },
+                    { id: 'vehicle', label: lang === 'ru' ? 'Характеристики' : lang === 'en' ? 'Technical Specifications' : 'Fiche Technique' },
+                    { id: 'forms', label: lang === 'ru' ? 'Формы / Лизинг' : lang === 'en' ? 'Forms & Leasing' : 'Formulaires & LOA' }
+                  ].map(tab => (
+<button
+key={tab.id}
+type="button"
+onClick={() => setTranslationActiveTab(tab.id)}
+className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${translationActiveTab === tab.id ? 'bg-white dark:bg-[#121214] text-neutral-950 dark:text-white shadow-sm border border-neutral-200 dark:border-neutral-800/60' : 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'}`}
+>
+{tab.label}
+</button>
+))}
+</div>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+{(() => {
+const categories = {
+general: [
+{ key: 'catalog', label: 'Lien: Catalogue / Каталог' },
+{ key: 'about', label: 'Lien: À Propos / О нас' },
+{ key: 'contact', label: 'Lien: Contact / Контакты' },
+{ key: 'adminPanel', label: 'Lien: Admin / Панель админа' },
+{ key: 'nousContacter', label: 'Bouton: Nous contacter / Связаться с нами' },
+{ key: 'whatsapp', label: 'Bouton: WhatsApp' },
+{ key: 'callUs', label: 'Bouton: Nous appeler / Позвонить нам' },
+{ key: 'backToCatalog', label: 'Bouton: Retour au catalogue / Назад в каталог' },
+{ key: 'backToHome', label: 'Bouton: Retour à l\'accueil / Назад на главную' },
+{ key: 'details', label: 'Bouton: Détails du véhicule / Подробнее' }
+],
+catalog: [
+{ key: 'filterBrandModel', label: 'Filtre: Marque, modèle... / Марка, модель...' },
+{ key: 'filterPriceMax', label: 'Filtre: Prix max / Макс. цена' },
+{ key: 'allTransmissions', label: 'Filtre: Toutes transmissions / Все коробки' },
+{ key: 'allStatuses', label: 'Filtre: Tous statuts / Все статусы' },
+{ key: 'clearFilters', label: 'Bouton: Effacer filtres / Сбросить фильтры' },
+{ key: 'available', label: 'Statut: Disponible / В наличии' },
+{ key: 'incoming', label: 'Statut: En arrivage / В пути' },
+{ key: 'sold', label: 'Statut: Vendu / Продано' },
+{ key: 'vinVerified', label: 'Badge: VIN vérifié / VIN проверен' }
+],
+vehicle: [
+{ key: 'techSpecs', label: 'Titre: Caractéristiques / Характеристики' },
+{ key: 'specifications', label: 'Onglet: Spécifications / Спецификации' },
+{ key: 'modelYear', label: 'Label: Année modèle / Год выпуска' },
+{ key: 'mileage', label: 'Label: Kilométrage / Пробег' },
+{ key: 'fuel', label: 'Label: Carburant / Тип топлива' },
+{ key: 'transmission', label: 'Label: Transmission / Коробка передач' },
+{ key: 'enginePower', label: 'Label: Puissance / Мощность двигателя' },
+{ key: 'co2Emissions', label: 'Label: Émissions CO2 / Выбросы CO₂' },
+{ key: 'vinCertified', label: 'Label: VIN certifié / Сертифицированный VIN' },
+{ key: 'Essence', label: 'Carburant: Essence / Бензин' },
+{ key: 'Diesel', label: 'Carburant: Diesel / Дизель' },
+{ key: 'Hybride', label: 'Carburant: Hybride / Гибрид' },
+{ key: 'Automatique', label: 'Transmission: Automatique / Автомат' },
+{ key: 'Manuelle', label: 'Transmission: Manuelle / Механика' }
+],
+forms: [
+{ key: 'financing', label: 'Onglet: Financement / Кредит и Лизинг' },
+{ key: 'procedures', label: 'Onglet: Démarches / Оформление документов' },
+{ key: 'simulatedLoa', label: 'Titre: Mensualité LOA / Оценочный лизинг' },
+{ key: 'apport', label: 'Label: Apport / Первоначальный взнос' },
+{ key: 'duration', label: 'Label: Durée / Срок лизинга' },
+{ key: 'months', label: 'Suffixe: Mois / мес' },
+{ key: 'monthlyPayment', label: 'Label: Mensualité / Ежемесячный платеж' },
+{ key: 'applyCG', label: 'Bouton: Demande CG / Подать заявку' },
+{ key: 'testDrive', label: 'Onglet: Essai / Тест-драйв' },
+{ key: 'bookTestDrive', label: 'Titre: Planifier essai / Записаться' },
+{ key: 'clientInfo', label: 'Titre: Infos titulaire / Данные владельца' },
+{ key: 'fullName', label: 'Label: Nom complet / ФИО' },
+{ key: 'email', label: 'Label: E-mail / Эл. почта' },
+{ key: 'phone', label: 'Label: Téléphone / Телефон' },
+{ key: 'address', label: 'Label: Adresse / Почтовый адрес' },
+{ key: 'tradeInQuestion', label: 'Question: Reprise ? / Хотите в трейд-ин?' },
+{ key: 'tradeInInfo', label: 'Titre: Détails reprise / Детали авто' },
+{ key: 'tradeInBrandModel', label: 'Label: Marque & Modèle / Марка и Модель' },
+{ key: 'tradeInYear', label: 'Label: Année / Год выпуска' },
+{ key: 'tradeInKm', label: 'Label: Kilométrage / Пробег' },
+{ key: 'tradeInCondition', label: 'Label: État / Состояние' },
+{ key: 'selectDateTime', label: 'Label: Date & Heure / Дата и время' },
+{ key: 'preferredDate', label: 'Label: Date / Желаемая дата' },
+{ key: 'preferredTime', label: 'Label: Heure / Желаемое время' },
+{ key: 'specialRequest', label: 'Label: Demande / Пожелания' },
+{ key: 'sendRequest', label: 'Bouton: Envoyer / Отправить запрос' },
+{ key: 'formSuccess', label: 'Message: Succès / Успешно отправлено' },
+{ key: 'formError', label: 'Message: Erreur / Ошибка отправки' }
+]
+};
+
+const activeKeys = categories[translationActiveTab as keyof typeof categories] || [];
+
+return activeKeys.map((item) => (
+<div key={item.key} className="space-y-1 animate-fadeIn">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">{item.label}</label>
+<input 
+type="text" 
+value={siteSettings?.translations?.[translationEditLang]?.[item.key] !== undefined 
+? siteSettings.translations[translationEditLang][item.key] 
+: (translations[translationEditLang as 'fr'|'ru']?.[item.key as keyof typeof translations['fr']] || '')} 
+onChange={(e) => {
+const updatedTranslations = {
+...siteSettings.translations,
+[translationEditLang]: {
+...(siteSettings.translations?.[translationEditLang] || {}),
+[item.key]: e.target.value
+}
+};
+setSiteSettings({
+...siteSettings,
+translations: updatedTranslations
+});
+}} 
+className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" 
+/>
+</div>
+));
+})()}
+</div>
+</div>
+
+
+<div className="pt-6 border-t border-neutral-900 flex justify-end">
+<button
+type="submit"
+className="px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg"
+>
+Enregistrer les modifications
+</button>
+</div>
+</form>
+);
+};
+
+const renderAdminInquiries = () => {
+if (inquiries.length === 0) {
+return (
+);
+})}
+</div>
+</div>
+);
+};
+
+return (
+<div className="min-h-screen bg-[#F8F9FA] dark:bg-[#080809] text-neutral-800 dark:text-neutral-200 font-sans selection:bg-[#D4AF37]/30 selection:text-[#D4AF37] overflow-x-hidden">
+>
+<Icons.Trash />
+</button>
+</div>
+
+<div className="flex gap-2">
+{cleanPhone && (
+<a 
+href={waLink}
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white border border-[#25D366]/30 text-xs font-bold transition-all"
+>
+<Icons.WhatsApp />
+WhatsApp
+</a>
+)}
+{inq.clientPhone && (
+<a 
+href={`tel:${inq.clientPhone}`}
+className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#0D0D0D] hover:bg-neutral-800 text-[#D4AF37] border border-neutral-850 text-xs font-bold transition-all"
+>
+<Icons.Phone />
+Appeler
+</a>
+)}
+</div>
+</div>
+</div>
+)}
+
+{}
+{/* Главная навигация */}
+<header className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#080809]/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900 shadow-lg transition-all duration-300">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<div 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="flex items-center gap-3 cursor-pointer"
+>
+<span className="text-xl sm:text-2xl tracking-widest font-serif font-bold bg-gradient-to-r from-white via-neutral-300 to-[#D4AF37] bg-clip-text text-transparent">
+{siteSettings.companyName || "Ligo Automobiles"}
+</span>
+</div>
+
+<nav className="hidden md:flex items-center gap-8 text-sm tracking-widest uppercase font-semibold">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`pb-1 transition-colors ${currentView === 'catalog' ? 'text-[#D4AF37] border-b border-[#D4AF37]' : 'text-neutral-400 hover:text-[#D4AF37] champagne-hover'}`}
+>
+          <nav className="hidden md:flex items-center gap-8 text-sm tracking-widest uppercase font-semibold">
+            <button 
+              onClick={() => {
+                setCurrentView('catalog');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }} 
+              className={`pb-1 transition-colors ${currentView === 'catalog' ? 'text-[#D4AF37] border-b border-[#D4AF37]' : 'text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37] champagne-hover'}`}
+            >
+              {t('catalog')}
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentView('home');
+                setTimeout(() => {
+                  document.getElementById('propos')?.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+              }} 
+              className="pb-1 text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+            >
+              {t('about')}
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentView('home');
+                setTimeout(() => {
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+              }} 
+              className="pb-1 text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+            >
+              {t('contact')}
+            </button>
+            {isAdmin && (
+              <button 
+                onClick={() => {
+                  setPreviousView(currentView);
+                  setCurrentView('admin');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }} 
+                className={`transition-colors ${currentView === 'admin' ? 'text-[#D4AF37]' : 'text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37]'}`}
+              >
+                {t('adminPanel')}
+              </button>
+            )}
+          </nav>
+}}
+className={`hidden sm:inline-block px-3 py-1.5 rounded bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 text-xs font-mono tracking-wider uppercase transition-all`}
+>
+{t('adminPanel')}
+</button>
+<button 
+onClick={() => {
+setIsAdmin(false);
+setCurrentView('home');
+}}
+className="p-2 rounded-lg bg-neutral-900 hover:bg-red-950 border border-neutral-800 hover:border-red-900 text-red-400 hover:text-red-300 transition-all"
+title={t('logout')}
+>
+<Icons.Lock />
+</button>
+</div>
+) : (
+<button 
+onClick={() => setShowAdminLoginModal(true)}
+className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]/50 text-neutral-500 dark:text-neutral-450 dark:text-neutral-450 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all"
+title={t('adminTitle')}
+>
+<Icons.Unlock />
+</button>
+)}
+<header className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#080809]/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900 shadow-lg transition-all duration-300">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<div 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="flex items-center gap-3 cursor-pointer"
+>
+<span className={`text-xl sm:text-2xl tracking-widest font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r ${theme === 'dark' ? 'from-white via-neutral-300' : 'from-neutral-900 via-neutral-600'} to-[#D4AF37]`}>
+{siteSettings.companyName || "Ligo Automobiles"}
+</span>
+</div>
+
+<nav className="hidden md:flex items-center gap-8 text-sm tracking-widest uppercase font-semibold">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`pb-1 transition-colors ${currentView === 'catalog' ? 'text-[#D4AF37] border-b border-[#D4AF37]' : 'text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] champagne-hover'}`}
+>
+{t('catalog')}
+</button>
+<button 
+onClick={() => {
+setCurrentView('home');
+setTimeout(() => {
+document.getElementById('propos')?.scrollIntoView({ behavior: 'smooth' });
+}, 50);
+}} 
+className="pb-1 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+>
+{t('about')}
+</button>
+<button 
+onClick={() => {
+setCurrentView('home');
+setTimeout(() => {
+document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+}, 50);
+}} 
+className="pb-1 text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+>
+{t('contact')}
+</button>
+{isAdmin && (
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`transition-colors ${currentView === 'admin' ? 'text-[#D4AF37]' : 'text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37]'}`}
+>
+{t('adminPanel')}
+</button>
+)}
+</nav>
+
+<div className="flex items-center gap-4">
+{isAdmin ? (
+<div className="flex items-center gap-2">
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className={`hidden sm:inline-block px-3 py-1.5 rounded bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 text-xs font-mono tracking-wider uppercase transition-all`}
+>
+{t('adminPanel')}
+</button>
+<button 
+onClick={() => {
+setIsAdmin(false);
+setCurrentView('home');
+}}
+className="p-2 rounded-lg bg-neutral-900 hover:bg-red-950 border border-neutral-800 hover:border-red-900 text-red-400 hover:text-red-300 transition-all"
+title={t('logout')}
+>
+<Icons.Lock />
+</button>
+</div>
+) : (
+<button 
+onClick={() => setShowAdminLoginModal(true)}
+className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]/50 text-neutral-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all"
+title={t('adminTitle')}
+>
+<Icons.Unlock />
+</button>
+)}
+
+{/* Переключатель темы */}
+<button
+onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] transition-all flex items-center justify-center"
+title={theme === 'dark' ? (lang === 'fr' ? 'Mode Clair' : 'Светлая тема') : (lang === 'fr' ? 'Mode Sombre' : 'Тёмная тема')}
+>
+</button>
+
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}`} 
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-semibold text-sm transition-all shadow-lg shadow-[#D4AF37]/20"
+>
+<Icons.WhatsApp />
+<span className="hidden sm:inline">{t('nousContacter')}</span>
+</a>
+
+{/* Переключатель языка */}
+<button
+onClick={() => setLang(lang === 'fr' ? 'ru' : 'fr')}
+className="px-3 py-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-xs font-bold text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] tracking-wider uppercase transition-all flex items-center justify-center gap-1.5"
+title={lang === 'fr' ? 'Русская версия' : 'Version Française'}
+>
+<span>{lang === 'fr' ? '🇷🇺 RU' : '🇫🇷 FR'}</span>
+</button>
+</div>
+</div>
+</header>
+
+{currentView === 'car-details' && renderCarDetails()}
+
+{currentView === 'home' && (
+<>
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}`} 
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-semibold text-sm transition-all shadow-lg shadow-[#D4AF37]/20"
+>
+<Icons.WhatsApp />
+<span className="hidden sm:inline">{t('nousContacter')}</span>
+</a>
+
+            {/* Переключатель языка */}
+            <div className="flex gap-1">
+              {[
+                { code: 'fr', flag: '🇫🇷', title: 'Français' },
+                { code: 'en', flag: '🇬🇧', title: 'English' },
+                { code: 'ru', flag: '🇷🇺', title: 'Русский' }
+              ].map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setLang(l.code)}
+                  className={`px-2 py-1.5 rounded-lg border text-xs font-bold transition-all ${lang === l.code ? 'bg-[#D4AF37] border-[#D4AF37] text-neutral-950' : 'bg-neutral-100 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37]'}`}
+                  title={l.title}
+                >
+                  <span>{l.flag} {l.code.toUpperCase()}</span>
+                </button>
+              ))}
+            </div>
+</div>
+</div>
+</header>
+{siteSettings.bannerTitle || (lang === 'ru' ? 'Покупка и продажа б/у и новых автомобилей во Франции' : 'Achat & Vente de Véhicules d\'Occasion et Neufs')}
+</h1>
+<p className="max-w-2xl mx-auto text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+{siteSettings.bannerDescription || (lang === 'ru' ? 'Профессиональный подбор, проверка истории и технического состояния каждого автомобиля. Оформление сделки под ключ.' : 'Sélection rigoureuse, historique transparent et accompagnement administratif complet.')}
+</p>
+
+{/* Простые, четкие факты преимуществ */}
+<div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings.stat1Label || (lang === 'ru' ? 'Гарантия на все авто' : 'Garantie sur tous les véhicules')}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings.stat2Label || (lang === 'ru' ? 'Проверенный VIN-номер' : 'Numéro VIN vérifié')}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings.stat3Label || (lang === 'ru' ? 'Помощь в оформлении документов' : 'Aide aux démarches')}</span>
+</div>
+</div>
+
+</span>
+</div>
+<h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight text-white leading-[1.15] font-black">
+{siteSettings[lang]?.bannerTitle || DEFAULT_SETTINGS[lang].bannerTitle}
+</h1>
+<p className="max-w-2xl mx-auto text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+{siteSettings[lang]?.bannerDescription || DEFAULT_SETTINGS[lang].bannerDescription}
+</p>
+
+{/* Простые, четкие факты преимуществ */}
+<div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat1Label || DEFAULT_SETTINGS[lang].stat1Label}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat2Label || DEFAULT_SETTINGS[lang].stat2Label}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat3Label || DEFAULT_SETTINGS[lang].stat3Label}</span>
+</div>
+</div>
+
+<div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-xl transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Открыть каталог' : 'Découvrir le catalogue'}
+</button>
+<button 
+onClick={() => {
+const target = document.getElementById('contact');
+if (target) target.scrollIntoView({ behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-transparent border border-neutral-700 text-neutral-200 hover:bg-[#121214] hover:text-white hover:border-[#D4AF37] px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-md transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Записаться на встречу' : 'Prendre rendez-vous'}
+</button>
+</div>
+</div>
+</section>
+
+{/* Секция избранных автомобилей на главной (6 авто) */}
+<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-[#F8F9FA] dark:bg-[#080809]">
+<div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{siteSettings.featuredCategory || (lang === 'ru' ? 'Наш выбор' : 'Notre sélection')}</span>
+<h2 className="text-4xl font-serif text-neutral-900 dark:text-white tracking-wide">{siteSettings.featuredTitle || (lang === 'ru' ? 'Рекомендуемые модели' : 'Véhicules à la Une')}</h2>
+<p className="text-neutral-600 dark:text-neutral-400 text-sm font-light">{siteSettings.featuredSubtitle || (lang === 'ru' ? 'Автомобили прошли полную предпродажную подготовку и технический контроль.' : 'Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.')}</p>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+{cars.slice(0, 6).map((car) => (
+<div 
+key={car.id}
+className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col gold-glow-hover"
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+{cars.slice(0, 6).map((car) => (
+<div 
+key={car.id}
+className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col gold-glow-hover"
+>
+<div 
+<Icons.Calendar />
+<span>{car.year}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Gauge />
+<span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Fuel />
+<span>{t(car.fuel)}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Activity />
+<span>{car.hp} {lang === 'ru' ? 'л.с.' : 'ch'}</span>
+</div>
+</div>
+</div>
+
+<div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+<button 
+onClick={() => handleSelectCar(car)}
+className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+>
+{t('details')}
+</button>
+</div>
+</div>
+</div>
+))}
+</div>
+
+<div className="text-center mt-12">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-850 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год от */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска от' : 'Année min'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2020"
+value={yearMin}
+onChange={(e) => setYearMin(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-850 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год до */}
+<Icons.Gauge />
+<span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Fuel />
+<span>{t(car.fuel)}</span>
+</div>
+                        <div className="flex items-center gap-2">
+                          <Icons.Activity />
+                          <span>{car.hp} {t('hp')}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+                      <button 
+                        onClick={() => handleSelectCar(car)}
+                        className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+                      >
+                        {t('details')}
+                      </button>
+                    </div>
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="inline-block px-10 py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#e5c158] hover:shadow-[0_0_25px_rgba(212,175,55,0.2)] text-neutral-950 font-bold tracking-wide transition-all duration-300"
+>
+{lang === 'ru' ? `Открыть весь каталог (${cars.length} авто)` : lang === 'en' ? `Browse entire catalogue (${cars.length} cars)` : `Découvrir tout le catalogue (${cars.length} véhicules)`}
+</button>
+</div>
+</section>
+</>
+)}
+
+{currentView === 'catalog' && (
+<>
+{/* Блок фильтров каталога */}
+<section id="catalogue" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+{/* Хлебные крошки */}
+<div className="mb-6">
+<button 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="group flex items-center gap-2 text-xs text-neutral-600 hover:text-[#D4AF37] font-bold tracking-widest uppercase transition-all"
+>
+<Icons.ArrowLeft />
+<span className="group-hover:translate-x-1 transition-transform">{t('backToHome')}</span>
+</button>
+</div>
+<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-8 border-b border-neutral-200 dark:border-neutral-900">
+<div>
+<h2 className="text-3xl font-serif text-neutral-900 dark:text-white mb-2 tracking-wide">
+{lang === 'ru' ? 'Каталог автомобилей' : 'Catalogue des Véhicules'}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">
+{lang === 'ru' ? 'Ознакомьтесь с нашим каталогом б/у и новых автомобилей.' : "Explorez notre catalogue de véhicules d'occasion et neufs."}
+</p>
+</div>
+</div>
+
+{/* Интерактивная плашка фильтров */}
+{(activeAdminTab === 'vehicles' || !isAdmin) && (
+<>
+<div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 mb-12 shadow-lg">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+
+{/* Марка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Марка' : 'Marque'}
+</label>
+<select
+value={selectedBrand}
+onChange={(e) => {
+setSelectedBrand(e.target.value);
+setSelectedModel('');
+}}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все марки' : 'Toutes'}</option>
+{availableBrands.map(b => (
+<option key={b} value={b}>{b}</option>
+))}
+</select>
+</div>
+
+{/* Модель */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Модель' : 'Modèle'}
+</label>
+<select
+value={selectedModel}
+onChange={(e) => setSelectedModel(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все модели' : 'Toutes'}</option>
+{availableModels.map(m => (
+<option key={m} value={m}>{m}</option>
+))}
+</select>
+</div>
+
+{/* Цена от */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Цена от (€)' : 'Prix min (€)'}
+</label>
+<input
+type="number"
+placeholder={lang === 'ru' ? 'от 0' : 'Min'}
+value={priceMin}
+onChange={(e) => setPriceMin(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Цена до */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Цена до (€)' : 'Prix max (€)'}
+</label>
+<input
+type="number"
+placeholder={lang === 'ru' ? 'до любой' : 'Max'}
+value={priceMax}
+onChange={(e) => setPriceMax(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год от */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска от' : 'Année min'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2020"
+value={yearMin}
+onChange={(e) => setYearMin(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год до */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска до' : 'Année max'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2026"
+value={yearMax}
+onChange={(e) => setYearMax(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Топливо */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Топливо' : 'Carburant'}
+</label>
+<select
+value={fuel}
+onChange={(e) => setFuel(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все типы' : 'Tous'}</option>
+{availableFuels.map(f => (
+<option key={f} value={f}>{t(f)}</option>
+))}
+</select>
+</div>
+
+{/* Коробка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{t('transmission')}
+</label>
+<select
+value={transmission}
+onChange={(e) => setTransmission(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allTransmissions')}</option>
+<option value="Automatique">{lang === 'ru' ? 'Автомат' : 'Automatique'}</option>
+<option value="Mécanique">{lang === 'ru' ? 'Механика' : 'Mécanique'}</option>
+</select>
+</div>
+
+{/* Статус */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Статус' : 'Disponibilité'}
+</label>
+<select
+value={status}
+onChange={(e) => setStatus(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allStatuses')}</option>
+<option value="En stock">{t('En stock')}</option>
+<option value="En arrivage">{t('En arrivage')}</option>
+<option value="Vendu">{t('Vendu')}</option>
+</select>
+</div>
+
+{/* Текстовый поиск */}
+<div className="space-y-1.5 sm:col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-3">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Поиск по ключевым словам' : 'Recherche textuelle'}
+</label>
+<div className="relative">
+<input
+type="text"
+placeholder={lang === 'ru' ? 'Например: GT3, Weissach...' : 'Ex: GT3, Weissach...'}
+value={searchQuery}
+onChange={(e) => setSearchQuery(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none transition-all"
+/>
+<div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400">
+<Icons.Search />
+value={searchQuery}
+onChange={(e) => setSearchQuery(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none transition-all"
+/>
+<div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400">
+<Icons.Search />
+</div>
+</div>
+</div>
+
+</div>
+
+{/* Быстрый сброс фильтров */}
+{(searchQuery || selectedBrand || selectedModel || priceMin || priceMax || yearMin || yearMax || transmission || fuel || status) && (
+<div className="flex justify-end mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+<button
+onClick={() => {
+setSearchQuery('');
+setSelectedBrand('');
+setSelectedModel('');
+setPriceMin('');
+setPriceMax('');
+setYearMin('');
+setYearMax('');
+setTransmission('');
+setFuel('');
+setStatus('');
+}}
+className="text-xs text-[#D4AF37] hover:underline font-semibold"
+
+{}
+{/* Индикатор загрузки базы */}
+{loading ? (
+<div className="py-24 text-center space-y-4">
+<div className="inline-block w-8 h-8 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+<p className="text-neutral-600 text-sm font-mono tracking-wider">Mise à jour du catalogue...</p>
+</div>
+) : filteredCars.length === 0 ? (
+<div className="py-24 text-center border border-dashed border-neutral-300 dark:border-neutral-900 rounded-2xl bg-white dark:bg-[#121214]">
+<p className="text-neutral-400 mb-2">{lang === 'ru' ? 'Ни один автомобиль не соответствует вашим критериям поиска.' : 'Aucun véhicule ne correspond à vos critères de recherche.'}</p>
+<button 
+onClick={() => {
+setSearchQuery('');
+setSelectedBrand('');
+setSelectedModel('');
+setPriceMin('');
+setPriceMax('');
+setYearMin('');
+setYearMax('');
+setTransmission('');
+setFuel('');
+setStatus('');
+}}
+className="text-[#D4AF37] hover:underline text-sm font-semibold"
+>
+setTransmission('');
+setFuel('');
+setStatus('');
+}}
+className="text-[#D4AF37] hover:underline text-sm font-semibold"
+>
+{t('clearFilters')}
+</button>
+<textarea required rows="4" placeholder={lang === 'ru' ? 'Я хотел бы получить дополнительную информацию о Porsche 911 GT3 RS...' : 'Je souhaite obtenir des informations complémentaires...'} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-850 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all resize-none"></textarea>
+</div>
+<button type="submit" className="w-full py-4 rounded-2xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold tracking-wide transition-all shadow-lg hover:shadow-[#D4AF37]/20">
+{lang === 'ru' ? 'Отправить запрос' : 'Envoyer ma demande'}
+</button>
+</form>
+</div>
+</div>
+</section>
+</>
+)}
+
+{/* Подвал сайта */}
+<footer className="border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-450">
+<div className="max-w-7xl mx-auto px-4 space-y-4">
+<p className="tracking-widest font-serif font-bold text-neutral-300">{siteSettings.companyName || "Ligo Automobiles"}</p>
+<p>© {new Date().getFullYear()} {siteSettings.companyName || "Ligo Automobiles"}. Tous droits réservés. {siteSettings.address || "Paris, France"}.</p>
+</div>
+</footer>
+
+{/* Модальное окно авторизации админа */}
+{showAdminLoginModal && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div className="w-full max-w-md bg-[#121214] border border-neutral-900 rounded-2xl p-8 shadow-2xl relative">
+<button 
+onClick={() => setShowAdminLoginModal(false)}
+className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white transition-colors"
+>
+<Icons.X />
+</button>
+<div className="text-center mb-6">
+<h3 className="text-2xl font-serif text-white mb-2">Espace Administration</h3>
+<p className="text-neutral-400 text-sm">Veuillez saisir votre mot de passe pour gérer le catalogue.</p>
+</div>
+<form onSubmit={handleAdminLoginSubmit} className="space-y-4">
+<div className="space-y-2">
+<input 
+type="password" 
+placeholder="Mot de passe" 
+value={adminPassword}
+onChange={(e) => setAdminPassword(e.target.value)}
+className="w-full bg-[#0D0D0D] border border-neutral-855 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-center text-white placeholder-neutral-500 focus:outline-none transition-all"
+autoFocus
+/>
+</div>
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold tracking-wide transition-all"
+>
+Se connecter
+</button>
+</form>
+</div>
+</div>
+)}
+
+{/* Краткие технические характеристики */}
+<div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
+<div className="flex items-center gap-2">
+<Icons.Calendar />
+<span>{car.year}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Gauge />
+<span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Fuel />
+<span>{t(car.fuel)}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Activity />
+<span>{car.hp} {lang === 'ru' ? 'л.с.' : 'ch'}</span>
+</div>
+</div>
+</div>
+
+{/* Кнопки управления и просмотра */}
+<div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+<button 
+onClick={() => handleSelectCar(car)}
+className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+>
+{t('details')}
+</button>
+
+{isAdmin && (
+value={formData.brand} 
+onChange={(e) => {
+setFormData({...formData, brand: e.target.value});
+if (formErrors.brand) setFormErrors(prev => ({ ...prev, brand: false }));
+}} 
+className={`w-full bg-neutral-50 border rounded-xl py-2.5 px-4 text-neutral-900 placeholder-neutral-400 focus:outline-none transition-all ${
+formErrors.brand 
+? 'border-red-500/80 focus:border-red-500 focus:ring-1 focus:ring-red-500/20' 
+: 'border-neutral-200 focus:border-[#D4AF37]'
+}`} 
+/>
+{formErrors.brand && <span className="text-[9px] text-red-500 block">La marque est obligatoire.</span>}
+</div>
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-600 font-bold flex items-center">
+Modèle <span className="text-red-500 font-bold ml-1">*</span>
+</label>
+<section id="propos" className="bg-[#F1F3F5] dark:bg-[#0D0D0D] border-y border-neutral-200 dark:border-neutral-900 py-20 text-neutral-900 dark:text-white">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div className="space-y-6">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">{siteSettings.aboutSubtitle || "Ligo Automobiles"}</span>
+<h2 className="text-3xl sm:text-4xl font-serif text-neutral-900 dark:text-white tracking-wide leading-snug">
+{siteSettings.aboutTitle || "Votre partenaire automobile de confiance en France"}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 font-light leading-relaxed">
+{siteSettings.aboutText || "Nous mettons notre expertise à votre service pour vous proposer des véhicules inspectés et garantis. Chaque modèle passe par une vérification administrative et technique rigoureuse."}
+</p>
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+)}
+
+{currentView === 'admin' && isAdmin && renderAdminDashboard()}
+
+{}
+{currentView === 'home' && (
+<>
+{/* Секция о нас */}
+<section id="propos" className="bg-[#F1F3F5] dark:bg-[#0D0D0D] border-y border-neutral-200 dark:border-neutral-900 py-20 text-neutral-900 dark:text-white">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div className="space-y-6">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">{siteSettings.aboutSubtitle || "Ligo Automobiles"}</span>
+<h2 className="text-3xl sm:text-4xl font-serif text-neutral-900 dark:text-white tracking-wide leading-snug">
+{siteSettings.aboutTitle || "Votre partenaire automobile de confiance en France"}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 font-light leading-relaxed">
+{siteSettings.aboutText || "Nous mettons notre expertise à votre service pour vous proposer des véhicules inspectés et garantis. Chaque modèle passe par une vérification administrative et technique rigoureuse."}
+</p>
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat1Number || "✓"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat1Label || "Garantie complète"}</div>
+</div>
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat2Number || "VIN"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat2Label || "Numéro vérifié"}</div>
+</div>
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat3Number || "DOC"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat3Label || "Aide démarches"}</div>
+</div>
+</div>
+</div>
+<div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-200 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
+<img 
+<p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed">
+{siteSettings.contactDescription || (lang === 'ru' ? 'Хотите узнать больше о конкретной модели или запланировать визит? Свяжитесь с нами напрямую.' : 'Vous souhaitez avoir plus d\'informations sur un modèle en particulier ? Contactez-nous directement.')}
+</p>
+<div className="space-y-4 pt-4 text-sm text-neutral-600 dark:text-neutral-300">
+<div className="flex items-center gap-3">
+<span className="text-[#D4AF37]"><Icons.MapPin /></span>
+<span>{siteSettings.address || "Paris, France"}</span>
+</div>
+<div className="flex items-center gap-3">
+<span className="text-[#D4AF37]"><Icons.Phone /></span>
+<span>{siteSettings.phone || "+33 6 00 00 00 00"}</span>
+</div>
+<div className="flex items-center gap-3">
+<span className="text-[#D4AF37]"><Icons.Mail /></span>
+<span>{siteSettings.email || "contact@ligoautomobiles.fr"}</span>
+</div>
+</div>
+{/* Форма контактов */}
+<section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+<div className="lg:col-span-1 space-y-6">
+<div>
+              <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">{siteSettings[lang]?.contactSubtitle || siteSettings.contactSubtitle || t('contactUs')}</span>
+              <h2 className="text-3xl font-serif text-neutral-900 dark:text-white tracking-wide mt-2">{siteSettings[lang]?.contactTitle || siteSettings.contactTitle || t('discussProject')}</h2>
+            </div>
+            <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed">
+              {siteSettings[lang]?.contactDescription || siteSettings.contactDescription || t('contactDesc')}
+            </p>
+            <div className="space-y-4 pt-4 text-sm text-neutral-600 dark:text-neutral-300">
+              <div className="flex items-center gap-3">
+                <span className="text-[#D4AF37]"><Icons.MapPin /></span>
+                <span>{siteSettings.address || "Paris, France"}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[#D4AF37]"><Icons.Phone /></span>
+                <span>{siteSettings.phone || "+33 6 00 00 00 00"}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[#D4AF37]"><Icons.Mail /></span>
+                <span>{siteSettings.email || "contact@ligoautomobiles.fr"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Форма обратной связи */}
+          <div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
+            <form onSubmit={(e) => { e.preventDefault(); showNotification(t('messageSent'), "success"); }} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('fullName')}</label>
+                  <input required type="text" placeholder="Jean Dupont" className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('email')}</label>
+                  <input required type="email" placeholder="jean@email.com" className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('phone')}</label>
+                <input type="tel" placeholder="+33 6..." className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">Message</label>
+</div>
+</div>
+</section>
+</>
+)}
+
+{/* Подвал сайта */}
+<footer className="border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-400">
+<div className="max-w-7xl mx-auto px-4 space-y-4">
+<p className="tracking-widest font-serif font-bold text-neutral-300">{siteSettings.companyName || "Ligo Automobiles"}</p>
+<p>© {new Date().getFullYear()} {siteSettings.companyName || "Ligo Automobiles"}. Tous droits réservés. {siteSettings.address || "Paris, France"}.</p>
+</div>
+</footer>
+
+{/* Модальное окно авторизации админа */}
+{showAdminLoginModal && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div className="w-full max-w-md bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-2xl relative">
+<button 
+onClick={() => setShowAdminLoginModal(false)}
+className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition-colors"
+{showAdminLoginModal && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div className="w-full max-w-md bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-2xl relative">
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+</button>
+</div>
+</form>
+</div>
+</div>
+)}
+
+{}
+{/* Кастомное модальное окно удаления машины (заменяет confirm) */}
+{deleteConfirmCar && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+<div className="w-full max-w-md bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-2xl space-y-6">
+<div className="text-center">
+<h4 className="text-xl font-serif text-white mb-2">Confirmer la suppression</h4>
+<p className="text-neutral-400 text-sm">
+Êtes-vous sûr de vouloir supprimer définitivement le véhicule <span className="text-[#D4AF37] font-semibold">{deleteConfirmCar.brand} {deleteConfirmCar.model}</span> du catalogue ? Cette action est irréversible.
+</p>
+</div>
+<div className="flex gap-4">
+<button 
+onClick={() => setDeleteConfirmCar(null)}
+className="flex-1 py-3 rounded-xl bg-[#0D0D0D] hover:bg-neutral-850 text-neutral-300 font-bold border border-neutral-850 transition-all"
+>
+Annuler
+</button>
+<button 
+onClick={handleDeleteCar}
+className="flex-1 py-3 rounded-xl bg-red-650 hover:bg-red-600 text-white font-bold transition-all shadow-lg shadow-red-650/10"
+>
+Supprimer
+</button>
+</div>
+</div>
+</div>
+)}
+
+{/* Lightbox / Полноэкранный просмотр фотографий */}
+{showLightbox && currentCarGallery.length > 0 && (
+<div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 select-none animate-fadeIn">
+{/* Close button top right */}
+<button 
+onClick={() => setShowLightbox(false)}
+className="absolute top-6 right-6 p-3 rounded-full bg-[#121214] hover:bg-[#D4AF37] border border-neutral-900 hover:border-neutral-800 text-neutral-300 hover:text-neutral-950 shadow-lg shadow-black/50 transition-all z-[110]"
+title="Fermer (Echap)"
+>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+</button>
+
+{/* Large image view */}
+<div className="relative max-w-5xl max-h-[75vh] w-full flex items-center justify-center">
+{/* Left navigation arrow */}
+<button 
+onClick={() => {
+setLightboxIndex(prev => (prev === 0 ? currentCarGallery.length - 1 : prev - 1));
+}}
+className="absolute left-0 sm:left-4 p-3 rounded-full bg-[#121214] hover:bg-[#D4AF37] border border-neutral-900 hover:border-neutral-800 text-neutral-300 hover:text-neutral-950 shadow-lg shadow-black/50 transition-all z-[110]"
+title="Précédent (Gauche)"
+>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+</button>
+
+<img 
+src={currentCarGallery[lightboxIndex]} 
+alt={`${selectedCar.brand} ${selectedCar.model} - ${lightboxIndex + 1}`}
+className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl select-none"
+onError={(e) => {
+const fallback = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="100%" height="100%" fill="%23F5F5F7"/><rect x="10" y="10" width="1180" height="780" fill="none" stroke="%23C5A059" stroke-width="2" opacity="0.3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="32" font-weight="bold" fill="%23C5A059" letter-spacing="4">LIGO AUTOMOBILES</text></svg>';
+if (e.currentTarget.src !== fallback) {
+e.currentTarget.src = fallback;
+}
+}}
+/>
+
+{/* Right navigation arrow */}
+<button 
+onClick={() => {
+setLightboxIndex(prev => (prev === currentCarGallery.length - 1 ? 0 : prev + 1));
+}}
+className="absolute right-0 sm:right-4 p-3 rounded-full bg-[#121214] hover:bg-[#D4AF37] border border-neutral-900 hover:border-neutral-800 text-neutral-300 hover:text-neutral-950 shadow-lg shadow-black/50 transition-all z-[110]"
+title="Suivant (Droite)"
+>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+</button>
+</div>
+
+{/* Image index and navigation guide */}
+<div className="mt-4 text-xs text-neutral-300 font-semibold tracking-wider flex flex-col items-center gap-1">
+<span>{lightboxIndex + 1} / {currentCarGallery.length}</span>
+<span className="text-[10px] text-neutral-500 dark:text-neutral-450 uppercase font-light">Utilisez les touches ◄ et ► pour naviguer, Echap pour fermer</span>
+</div>
+
+{/* Thumbnails strip at the bottom of the lightbox */}
+<div className="flex gap-2 mt-4 max-w-full overflow-x-auto p-2 scrollbar-thin scrollbar-thumb-neutral-800">
+{currentCarGallery.map((img, idx) => (
+<button 
+key={idx}
+onClick={() => setLightboxIndex(idx)}
+className={`relative w-16 h-12 rounded overflow-hidden border transition-all flex-shrink-0 ${
+lightboxIndex === idx ? 'border-[#D4AF37] ring-2 ring-[#D4AF37]/20 scale-105' : 'border-neutral-900 opacity-60 hover:opacity-100'
+}`}
+>
+<img 
+src={img} 
+className="w-full h-full object-cover" 
+onError={(e) => {
+const fallback = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"><rect width="100%" height="100%" fill="%23F5F5F7"/><rect x="5" y="5" width="390" height="240" fill="none" stroke="%23C5A059" stroke-width="1" opacity="0.3"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="%23C5A059" letter-spacing="2">LIGO AUTOMOBILES</text></svg>';
+if (e.currentTarget.src !== fallback) {
+e.currentTarget.src = fallback;
+}
+}}
+/>
+</button>
+))}
+</div>
+</div>
+)}
+</div>
+);
+}
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+// MISSING LINE
+{/* Section 4: Description */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-600 font-bold">Description complète</label>
+<textarea 
+rows="3" 
+placeholder="Présentation, options spécifiques, historique..." 
+value={formData.description} 
+onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                  className="w-full bg-neutral-50 border border-neutral-200 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 placeholder-neutral-400 focus:outline-none transition-all resize-none"
+                ></textarea>
+              </div>
+
+              <div className="flex gap-4 pt-4 border-t border-neutral-200">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddEditModal(false)} 
+                  className="flex-1 py-3 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold transition-all border border-neutral-200"
+>
+Annuler
+</button>
+<button 

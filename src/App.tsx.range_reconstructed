@@ -1,0 +1,3595 @@
+// MISSING LINE 1
+// MISSING LINE 2
+// MISSING LINE 3
+// MISSING LINE 4
+// MISSING LINE 5
+// MISSING LINE 6
+// MISSING LINE 7
+// MISSING LINE 8
+// MISSING LINE 9
+// MISSING LINE 10
+// MISSING LINE 11
+// MISSING LINE 12
+// MISSING LINE 13
+// MISSING LINE 14
+// MISSING LINE 15
+// MISSING LINE 16
+// MISSING LINE 17
+// MISSING LINE 18
+// MISSING LINE 19
+// MISSING LINE 20
+// MISSING LINE 21
+// MISSING LINE 22
+// MISSING LINE 23
+// MISSING LINE 24
+// MISSING LINE 25
+// MISSING LINE 26
+// MISSING LINE 27
+// MISSING LINE 28
+// MISSING LINE 29
+// MISSING LINE 30
+// Client-side image compression utility
+const compressImage = (file: File): Promise<string> => {
+return new Promise((resolve, reject) => {
+const reader = new FileReader();
+reader.readAsDataURL(file);
+reader.onload = (event) => {
+const img = new Image();
+img.src = event.target?.result as string;
+img.onload = () => {
+const canvas = document.createElement('canvas');
+let width = img.width;
+let height = img.height;
+
+// Resize if too large
+const MAX_DIM = 1200;
+if (width > MAX_DIM || height > MAX_DIM) {
+if (width > height) {
+height = Math.round((height * MAX_DIM) / width);
+width = MAX_DIM;
+} else {
+width = Math.round((width * MAX_DIM) / height);
+// MISSING LINE 52
+// MISSING LINE 53
+// MISSING LINE 54
+// MISSING LINE 55
+// MISSING LINE 56
+// MISSING LINE 57
+// MISSING LINE 58
+// MISSING LINE 59
+// MISSING LINE 60
+// MISSING LINE 61
+// MISSING LINE 62
+// MISSING LINE 63
+// MISSING LINE 64
+// MISSING LINE 65
+// MISSING LINE 66
+// MISSING LINE 67
+// MISSING LINE 68
+// MISSING LINE 69
+// MISSING LINE 70
+// MISSING LINE 71
+// MISSING LINE 72
+// MISSING LINE 73
+// MISSING LINE 74
+// MISSING LINE 75
+// MISSING LINE 76
+// MISSING LINE 77
+// MISSING LINE 78
+// MISSING LINE 79
+// MISSING LINE 80
+// MISSING LINE 81
+// MISSING LINE 82
+// MISSING LINE 83
+// MISSING LINE 84
+// MISSING LINE 85
+// MISSING LINE 86
+// MISSING LINE 87
+// MISSING LINE 88
+// MISSING LINE 89
+// MISSING LINE 90
+// MISSING LINE 91
+// MISSING LINE 92
+// MISSING LINE 93
+// MISSING LINE 94
+// MISSING LINE 95
+// MISSING LINE 96
+// MISSING LINE 97
+// MISSING LINE 98
+// MISSING LINE 99
+// MISSING LINE 100
+// MISSING LINE 101
+// MISSING LINE 102
+// MISSING LINE 103
+// MISSING LINE 104
+// MISSING LINE 105
+// MISSING LINE 106
+// MISSING LINE 107
+// MISSING LINE 108
+// MISSING LINE 109
+// MISSING LINE 110
+// MISSING LINE 111
+// MISSING LINE 112
+// MISSING LINE 113
+// MISSING LINE 114
+// MISSING LINE 115
+// MISSING LINE 116
+// MISSING LINE 117
+// MISSING LINE 118
+// MISSING LINE 119
+// MISSING LINE 120
+// MISSING LINE 121
+// MISSING LINE 122
+// MISSING LINE 123
+// MISSING LINE 124
+// MISSING LINE 125
+// MISSING LINE 126
+// MISSING LINE 127
+// MISSING LINE 128
+// MISSING LINE 129
+// MISSING LINE 130
+// MISSING LINE 131
+// MISSING LINE 132
+// MISSING LINE 133
+// MISSING LINE 134
+// MISSING LINE 135
+// MISSING LINE 136
+// MISSING LINE 137
+// MISSING LINE 138
+// MISSING LINE 139
+// MISSING LINE 140
+// MISSING LINE 141
+// MISSING LINE 142
+// MISSING LINE 143
+// MISSING LINE 144
+// MISSING LINE 145
+// MISSING LINE 146
+// MISSING LINE 147
+// MISSING LINE 148
+// MISSING LINE 149
+const DEMO_CARS = [
+{
+id: "demo-1",
+brand: "Porsche",
+model: "911 GT3 RS",
+year: 2023,
+km: 4800,
+price: 289000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 525,
+co2: 290,
+vin: "WP0ZZZ99ZPS240811",
+status: "En stock",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuClvuoUxKQIu-RmKS7kxWdKDQU7g4pTofke_W29SOKrl2Q1zpfNa-82f2MdubRYVCgtf7fY3uZxofApF7_grlRusi7X1YiqOzf6sSjCkug0EyimW0dOSyFP8pzxz1Q6IN9BxQ9l893DsnYEry4D-SJB4j_K-_Y2-mnHNUltlBVqbZp1dckyEbOVDIR5oRm0eFGwKGSLWw2oSiTzS51KjpApor6UZCRhkFxe7M0U9YlAl2VUJgDiqiJN",
+description: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация с пакетом Weissach, карбоно-керамическими тормозами (PCCB), системой подъема передней оси (Lift) и отделкой салона расширенной кожей/Alcantara с контрастной прострочкой цвета Racing Yellow. Активная гарантия Porsche Approved.",
+verifiedVin: true
+},
+{
+id: "demo-2",
+brand: "Ferrari",
+model: "F8 Tributo",
+year: 2022,
+km: 7200,
+price: 315000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 720,
+co2: 280,
+vin: "ZFF81AHA000284561",
+status: "En stock",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDTbmRwZBxvLeWY9FCQrzSC13P-Qss_BKa7Qc8_ObbsE0jBoWhgUgSsrc-CVB3s0Cetf6ClQUG8gfv91j9OyK2NRGJagwp7_kRessWeAIGxAHY1iD52m8tM5_UTomP8KGb6RuhB59kky40dfd5GRULpGKRB707GiWnRtuFPhd-3YKAREzTR6dHeFGVwVTkcTzzG7ZMqPEtdpvjTUkudUZmDwZEtaOXIO8yhWzQRYg3MLEMcwWscKt1D",
+description: "Оригинальная краска Rosso Corsa с контрастной крышей Nero DS. Оснащена 20-дюймовыми коваными дисками, окрашенными в желтый цвет тормозными суппортами, гоночными сиденьями из углеродного волокна Daytona и отделкой салона карбоном. Полностью покрыта прозрачной защитной пленкой (PPF).",
+verifiedVin: true
+},
+{
+id: "demo-3",
+brand: "Audi",
+model: "RS6 Avant Performance",
+year: 2024,
+km: 12000,
+price: 154900,
+fuel: "Hybride",
+transmission: "Automatique",
+hp: 630,
+co2: 215,
+vin: "WAUZZZ4GZPS182455",
+status: "En arrivage",
+image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCUegYAhIi4Tgdh7bIIdSIHMP8BdTXPie_4Ot2mQza2NVN-2mMNXgAlZSZJEyJqf9NCRDruU3lbuCUKKPoTo44eSwyIN6Jme_aG9f7IR03ezODgtdMbvbfM57ue1gECOBoTVy50vjv3ipd0dNjg1NNosiWdIgC-Dxong1pKNojzUw8ic5Vx9Rtyf3Vh9D-cgvgzVhvGnHlH9eUo5jHBWvRZTINSiE8LiYBPcp8A_XHM5Jvl3BDRySKT",
+description: "Первый владелец. Красивейший цвет металлик Mythic Black от Audi Exclusive. Максимальная комплектация, включающая полноуправляемое шасси (подруливающие задние колеса), спортивный выхлоп RS, фары HD Matrix LED с лазерной оптикой последнего поколения и премиальную аудиосистему Bang & Olufsen Advanced 3D.",
+verifiedVin: true
+},
+{
+id: "demo-4",
+brand: "Aston Martin",
+model: "Vantage V8 F1 Edition",
+year: 2023,
+km: 8500,
+price: 179000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 535,
+co2: 263,
+vin: "SCFKS53E8PGC02415",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&q=80&w=1200",
+description: "Специальная серия F1 Edition. Уникальный цвет Satin Aston Martin Racing Green. Оптимизированное шасси, специальный аэродинамический комплект, создающий дополнительную прижимную силу, и эксклюзивные 21-дюймовые диски. Активный спортивный выхлоп.",
+verifiedVin: true
+},
+{
+id: "demo-5",
+brand: "Lamborghini",
+model: "Huracán Tecnica",
+year: 2023,
+km: 3900,
+price: 295000,
+fuel: "Essence",
+transmission: "Automatique",
+hp: 640,
+co2: 328,
+vin: "ZH1UA5ZS4NLA09812",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
+description: "Атмосферный двигатель V10 мощностью 640 лошадиных сил. Задний привод с подруливающей задней осью. Окраска кузова металлик Verde Selvans. Полный карбоновый пакет салона и экстерьера, карбоно-керамические тормоза.",
+verifiedVin: true
+},
+{
+id: "demo-6",
+brand: "Mercedes-Benz",
+model: "AMG GT 63 S E Performance",
+year: 2022,
+km: 14500,
+price: 168000,
+fuel: "Hybride",
+transmission: "Automatique",
+hp: 843,
+co2: 180,
+vin: "WDD1903781A024105",
+status: "En stock",
+image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
+description: "Гибридная технология E Performance, заимствованная из Формулы-1. Суммарная мощность 843 л.с. Матовый цвет Gris Sélénite Magno designo (матовый). Панорамный люк, высокоэффективная тормозная система AMG из керамики.",
+// MISSING LINE 251
+// MISSING LINE 252
+// MISSING LINE 253
+// MISSING LINE 254
+// MISSING LINE 255
+// MISSING LINE 256
+// MISSING LINE 257
+// MISSING LINE 258
+// MISSING LINE 259
+// MISSING LINE 260
+// MISSING LINE 261
+// MISSING LINE 262
+// MISSING LINE 263
+// MISSING LINE 264
+// MISSING LINE 265
+// MISSING LINE 266
+// MISSING LINE 267
+// MISSING LINE 268
+// MISSING LINE 269
+// MISSING LINE 270
+// MISSING LINE 271
+// MISSING LINE 272
+// MISSING LINE 273
+// MISSING LINE 274
+// MISSING LINE 275
+// MISSING LINE 276
+// MISSING LINE 277
+// MISSING LINE 278
+// MISSING LINE 279
+// MISSING LINE 280
+// MISSING LINE 281
+// MISSING LINE 282
+// MISSING LINE 283
+// MISSING LINE 284
+verifiedVin: true
+}
+];
+
+export default function App() {
+// Theme state synced with localStorage, defaulting to 'dark'
+const [theme, setTheme] = useState(() => {
+if (typeof window !== 'undefined') {
+const saved = localStorage.getItem('theme');
+return saved || 'dark';
+}
+return 'dark';
+});
+
+useEffect(() => {
+const root = window.document.documentElement;
+if (theme === 'dark') {
+root.classList.add('dark');
+} else {
+root.classList.remove('dark');
+}
+localStorage.setItem('theme', theme);
+}, [theme]);
+
+// Аутентификация и облачные пользователи
+const [user, setUser] = useState(null);
+
+// Данные каталога автомобилей
+const [cars, setCars] = useState(DEMO_CARS);
+const [loading, setLoading] = useState(false);
+const [globalError, setGlobalError] = useState(null);
+
+// Кастомная система нотификаций (без алертов)
+const [notification, setNotification] = useState(null);
+
+// Фильтрация
+// MISSING LINE 321
+// MISSING LINE 322
+// MISSING LINE 323
+// MISSING LINE 324
+// MISSING LINE 325
+// MISSING LINE 326
+// MISSING LINE 327
+// MISSING LINE 328
+// MISSING LINE 329
+// MISSING LINE 330
+// MISSING LINE 331
+// MISSING LINE 332
+// MISSING LINE 333
+// MISSING LINE 334
+// MISSING LINE 335
+// MISSING LINE 336
+// MISSING LINE 337
+// MISSING LINE 338
+// MISSING LINE 339
+// MISSING LINE 340
+// MISSING LINE 341
+// MISSING LINE 342
+// MISSING LINE 343
+// MISSING LINE 344
+// MISSING LINE 345
+// MISSING LINE 346
+// MISSING LINE 347
+// MISSING LINE 348
+// MISSING LINE 349
+// MISSING LINE 350
+// MISSING LINE 351
+// MISSING LINE 352
+// MISSING LINE 353
+// MISSING LINE 354
+// MISSING LINE 355
+// MISSING LINE 356
+// MISSING LINE 357
+// MISSING LINE 358
+// MISSING LINE 359
+// MISSING LINE 360
+// MISSING LINE 361
+// MISSING LINE 362
+// MISSING LINE 363
+// MISSING LINE 364
+// MISSING LINE 365
+// MISSING LINE 366
+// MISSING LINE 367
+// MISSING LINE 368
+// MISSING LINE 369
+// MISSING LINE 370
+// MISSING LINE 371
+// MISSING LINE 372
+// MISSING LINE 373
+// MISSING LINE 374
+
+// Маршрутизация и детальный вид машины (SPA)
+const [currentView, setCurrentView] = useState('home'); // 'home' | 'catalog' | 'car-details'
+const [previousView, setPreviousView] = useState('home');
+const [activeDetailsTab, setActiveDetailsTab] = useState('specs'); // 'specs' | 'finance' | 'paperwork' | 'testdrive'
+const [activeImage, setActiveImage] = useState('');
+
+// Полноэкранный просмотр фотографий (лайтбокс)
+const [showLightbox, setShowLightbox] = useState(false);
+const [lightboxIndex, setLightboxIndex] = useState(0);
+
+// Локализация и языковые настройки (по умолчанию русский)
+const [lang, setLang] = useState('ru'); // 'ru' | 'fr'
+const [translationEditLang, setTranslationEditLang] = useState('fr'); // 'fr' | 'ru' for editing
+const [translationActiveTab, setTranslationActiveTab] = useState('general'); // 'general' | 'catalog' | 'vehicle' | 'forms'
+return saved || 'fr';
+}
+return 'fr';
+});
+
+useEffect(() => {
+localStorage.setItem('lang', lang);
+}, [lang]);
+
+const [translationEditLang, setTranslationEditLang] = useState('fr'); // 'fr' | 'ru' for editing
+const [translationActiveTab, setTranslationActiveTab] = useState('general'); // 'general' | 'catalog' | 'vehicle' | 'forms'
+
+const translations = {
+fr: {
+catalog: "Catalogue",
+about: "À Propos",
+contact: "Contact",
+adminPanel: "Admin Panel",
+nousContacter: "Nous Contacter",
+vinVerified: "VIN vérifié",
+available: "Disponible",
+incoming: "En arrivage",
+sold: "Vendu",
+details: "Détails du véhicule",
+specifications: "Spécifications",
+financing: "Financement",
+procedures: "Démarches",
+testDrive: "Essai",
+techSpecs: "Caractéristiques techniques",
+modelYear: "Année modèle",
+mileage: "Kilométrage",
+fuel: "Carburant",
+transmission: "Transmission",
+enginePower: "Puissance moteur",
+co2Emissions: "Émissions CO₂",
+vinCertified: "Numéro VIN certifié",
+backToCatalog: "Retour au catalogue",
+backToHome: "Retour à l'accueil",
+brand: "Marque",
+model: "Modèle",
+year: "Année",
+price: "Prix",
+allTransmissions: "Toutes les transmissions",
+allStatuses: "Tous les statuts",
+clearFilters: "Effacer les filtres",
+filterBrandModel: "Marque, modèle...",
+filterPriceMax: "Prix max",
+whatsapp: "WhatsApp",
+callUs: "Nous appeler",
+copySuccess: "Copié !",
+copiedToClipboard: "Copié dans le presse-papiers !",
+simulatedLoa: "Mensualité LOA estimée",
+apport: "Apport personnel",
+duration: "Durée de location",
+months: "mois",
+monthlyPayment: "Mensualité",
+applyCG: "Faire ma demande de Carte Grise",
+clientInfo: "Informations du titulaire",
+fullName: "Nom complet",
+email: "Adresse e-mail",
+phone: "Numéro de téléphone",
+address: "Adresse postale",
+tradeInQuestion: "Avez-vous un véhicule à faire reprendre ?",
+tradeInInfo: "Détails du véhicule à reprendre",
+tradeInBrandModel: "Marque & Modèle",
+tradeInYear: "Année",
+tradeInKm: "Kilométrage",
+tradeInCondition: "État général",
+bookTestDrive: "Planifier mon essai routier",
+selectDateTime: "Sélectionnez la date et l'heure",
+preferredDate: "Date souhaitée",
+preferredTime: "Heure souhaitée",
+specialRequest: "Demande particulière",
+sendRequest: "Envoyer ma demande",
+formSuccess: "Votre demande a été enregistrée avec succès !",
+formError: "Une erreur est survenue, veuillez réessayer.",
+adminTitle: "Administration",
+logout: "Se déconnecter",
+addCar: "Ajouter un véhicule",
+editCar: "Modifier le véhicule",
+carSaved: "Véhicule enregistré !",
+carDeleted: "Véhicule supprimé !",
+deleteConfirm: "Êtes-vous sûr de vouloir supprimer ce véhicule ?",
+cancel: "Annuler",
+save: "Enregistrer",
+companyName: "Nom de l'entreprise",
+settingsSaved: "Paramètres mis à jour !",
+inquiries: "Demandes clients",
+Essence: "Essence",
+Diesel: "Diesel",
+Hybride: "Hybride",
+Automatique: "Automatique",
+Manuelle: "Manuelle",
+"En stock": "Disponible",
+"En arrivage": "En arrivage",
+Vendu: "Vendu",
+hp: "ch",
+copy: "Copier",
+settingsSavedOffline: "Paramètres enregistrés (mode hors ligne).",
+discoverCatalog: "Découvrir le catalogue",
+bookAppointment: "Prendre rendez-vous",
+ourSelection: "Notre sélection",
+featuredVehicles: "Véhicules à la Une",
+featuredDescription: "Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.",
+vehicleCatalogue: "Catalogue des Véhicules",
+vehicleCatalogueDesc: "Explorez notre catalogue de véhicules d'occasion et neufs.",
+all: "Toutes",
+priceMin: "Prix min (€)",
+priceMax: "Prix max (€)",
+minYear: "Année min",
+maxYear: "Année max",
+allTypes: "Tous",
+availability: "Disponibilité",
+searchText: "Recherche textuelle",
+searchPlaceholder: "Ex: GT3, Weissach...",
+noVehicles: "Aucun véhicule ne correspond à vos critères de recherche.",
+contactUs: "Contactez-nous",
+discussProject: "Discutons de votre projet",
+contactDesc: "Vous souhaitez avoir plus d'informations sur un modèle en particulier ? Contactez-nous directement.",
+messageSent: "Message envoyé avec succès !",
+specialRequestPlaceholder: "Je souhaite obtenir des informations complémentaires..."
+},
+en: {
+catalog: "Catalogue",
+about: "About Us",
+contact: "Contact",
+adminPanel: "Admin Panel",
+nousContacter: "Contact Us",
+vinVerified: "VIN verified",
+available: "In stock",
+incoming: "In transit",
+sold: "Sold",
+details: "Details",
+specifications: "Specifications",
+financing: "Financing",
+procedures: "Procedures",
+testDrive: "Test Drive",
+techSpecs: "Technical Specs",
+modelYear: "Model Year",
+mileage: "Mileage",
+fuel: "Fuel",
+transmission: "Transmission",
+enginePower: "Engine Power",
+co2Emissions: "CO₂ Emissions",
+vinCertified: "Certified VIN",
+backToCatalog: "Back to catalogue",
+backToHome: "Back to home",
+brand: "Brand",
+model: "Model",
+year: "Year",
+price: "Price",
+allTransmissions: "All Transmissions",
+allStatuses: "All Statuses",
+clearFilters: "Clear Filters",
+filterBrandModel: "Brand, model...",
+filterPriceMax: "Max Price",
+whatsapp: "WhatsApp",
+callUs: "Call Us",
+copySuccess: "Copied!",
+copiedToClipboard: "Copied to clipboard!",
+simulatedLoa: "Estimated Monthly Payment",
+apport: "Down Payment",
+duration: "Leasing Duration",
+months: "months",
+monthlyPayment: "Monthly Payment",
+applyCG: "Apply for Registration (Carte Grise)",
+clientInfo: "Owner Information",
+fullName: "Full Name",
+email: "Email Address",
+phone: "Phone Number",
+address: "Postal Address",
+tradeInQuestion: "Do you have a vehicle to trade in?",
+tradeInInfo: "Trade-in Vehicle Details",
+tradeInBrandModel: "Brand & Model",
+tradeInYear: "Year",
+tradeInKm: "Mileage",
+tradeInCondition: "General Condition",
+bookTestDrive: "Schedule a Test Drive",
+selectDateTime: "Select Date & Time",
+preferredDate: "Preferred Date",
+preferredTime: "Preferred Time",
+specialRequest: "Special Requests",
+sendRequest: "Send Request",
+formSuccess: "Your request has been successfully submitted!",
+formError: "An error occurred, please try again.",
+adminTitle: "Admin Panel",
+logout: "Log Out",
+addCar: "Add Vehicle",
+editCar: "Edit Vehicle",
+carSaved: "Vehicle saved!",
+carDeleted: "Vehicle deleted!",
+deleteConfirm: "Are you sure you want to delete this vehicle?",
+cancel: "Cancel",
+save: "Save",
+companyName: "Company Name",
+settingsSaved: "Settings saved successfully!",
+inquiries: "Client Inquiries",
+Essence: "Petrol",
+Diesel: "Diesel",
+Hybride: "Hybrid",
+Automatique: "Automatic",
+Manuelle: "Manual",
+"En stock": "In stock",
+"En arrivage": "In transit",
+Vendu: "Sold",
+hp: "hp",
+copy: "Copy",
+settingsSavedOffline: "Settings saved locally (offline mode).",
+discoverCatalog: "Browse catalogue",
+bookAppointment: "Book an appointment",
+ourSelection: "Our Selection",
+featuredVehicles: "Featured Vehicles",
+featuredDescription: "All vehicles are rigorously inspected and ready for delivery.",
+vehicleCatalogue: "Vehicle Catalogue",
+vehicleCatalogueDesc: "Explore our catalogue of new and pre-owned vehicles.",
+all: "All",
+priceMin: "Min Price (€)",
+priceMax: "Max Price (€)",
+minYear: "Min Year",
+maxYear: "Max Year",
+allTypes: "All",
+availability: "Availability",
+searchText: "Search keywords",
+searchPlaceholder: "Ex: GT3, Weissach...",
+noVehicles: "No vehicles match your search criteria.",
+contactUs: "Contact Us",
+discussProject: "Let's discuss your project",
+contactDesc: "Want more information about a specific model or to schedule a visit? Contact us directly.",
+messageSent: "Message sent successfully! We will contact you.",
+specialRequestPlaceholder: "I would like to get more information about..."
+},
+ru: {
+catalog: "Каталог",
+about: "О нас",
+contact: "Контакты",
+adminPanel: "Панель администратора",
+nousContacter: "Связаться с нами",
+vinVerified: "VIN проверен",
+available: "В наличии",
+incoming: "В пути",
+sold: "Продано",
+details: "Подробнее",
+specifications: "Характеристики",
+financing: "Кредит / Лизинг",
+procedures: "Оформление документов",
+testDrive: "Тест-драйв",
+techSpecs: "Технические характеристики",
+modelYear: "Год выпуска",
+mileage: "Пробег",
+fuel: "Тип топлива",
+transmission: "Коробка передач",
+enginePower: "Мощность двигателя",
+co2Emissions: "Выбросы CO₂",
+vinCertified: "Сертифицированный VIN",
+backToCatalog: "Назад в каталог",
+backToHome: "Назад на главную",
+brand: "Марка",
+model: "Модель",
+year: "Год",
+price: "Цена",
+allTransmissions: "Все коробки передач",
+allStatuses: "Все статусы",
+clearFilters: "Сбросить фильтры",
+filterBrandModel: "Марка, модель...",
+filterPriceMax: "Макс. цена",
+whatsapp: "WhatsApp",
+callUs: "Позвонить нам",
+copySuccess: "Скопировано!",
+copiedToClipboard: "Скопировано в буфер обмена!",
+simulatedLoa: "Оценочный лизинг",
+apport: "Первоначальный взнос",
+duration: "Срок лизинга",
+months: "мес",
+monthlyPayment: "Ежемесячный платеж",
+applyCG: "Подать заявку на Carte Grise",
+clientInfo: "Информация о владельце",
+fullName: "ФИО владельца",
+email: "Адрес эл. почты",
+phone: "Номер телефона",
+address: "Почтовый адрес",
+tradeInQuestion: "Хотите сдать старый автомобиль в трейд-ин?",
+tradeInInfo: "Детали старого автомобиля",
+tradeInBrandModel: "Марка и Модель",
+tradeInYear: "Год выпуска",
+tradeInKm: "Пробег",
+tradeInCondition: "Общее состояние",
+bookTestDrive: "Записаться на тест-драйв",
+selectDateTime: "Выберите дату и время",
+preferredDate: "Желаемая дата",
+preferredTime: "Желаемое время",
+specialRequest: "Особые пожелания",
+sendRequest: "Отправить запрос",
+formSuccess: "Ваш запрос успешно отправлен!",
+formError: "Произошла ошибка, попробуйте еще раз.",
+adminTitle: "Панель администратора",
+logout: "Выйти",
+addCar: "Добавить автомобиль",
+editCar: "Редактировать автомобиль",
+carSaved: "Автомобиль сохранен!",
+carDeleted: "Автомобиль удален!",
+deleteConfirm: "Вы уверены, что хотите удалить этот автомобиль?",
+cancel: "Отмена",
+save: "Сохранить",
+companyName: "Название компании",
+settingsSaved: "Настройки успешно сохранены!",
+inquiries: "Запросы клиентов",
+Essence: "Бензин",
+Diesel: "Дизель",
+Hybride: "Гибрид",
+Automatique: "Автомат",
+Manuelle: "Механика",
+"En stock": "В наличии",
+"En arrivage": "В пути",
+Vendu: "Продано",
+hp: "л.с.",
+copy: "Копировать",
+settingsSavedOffline: "Настройки сохранены локально.",
+discoverCatalog: "Открыть каталог",
+bookAppointment: "Записаться на встречу",
+ourSelection: "Наш выбор",
+featuredVehicles: "Рекомендуемые модели",
+featuredDescription: "Автомобили прошли полную предпродажную подготовку и технический контроль.",
+vehicleCatalogue: "Каталог автомобилей",
+vehicleCatalogueDesc: "Ознакомьтесь с нашим каталогом б/у и новых автомобилей.",
+all: "Все",
+priceMin: "Цена от (€)",
+priceMax: "Цена до (€)",
+minYear: "Год выпуска от",
+maxYear: "Год выпуска до",
+allTypes: "Все типы",
+availability: "Статус",
+searchText: "Поиск по ключевым словам",
+searchPlaceholder: "Например: GT3, Weissach...",
+noVehicles: "Ни один автомобиль не соответствует вашим критериям поиска.",
+contactUs: "Связаться с нами",
+discussProject: "Обсудим ваш проект",
+contactDesc: "Хотите узнать больше о конкретной модели или запланировать визит? Свяжитесь с нами напрямую.",
+messageSent: "Сообщение успешно отправлено! Мы свяжемся с вами.",
+specialRequestPlaceholder: "Я хотел бы получить дополнительную информацию о Porsche 911 GT3..."
+}
+};
+
+const t = (key: string) => {
+if (siteSettings?.translations?.[lang]?.[key]) {
+return siteSettings.translations[lang][key];
+}
+return translations[lang][key] || key;
+};
+
+// Images de la galerie de la voiture sélectionnée (для клавиатурной навигации лайтбокса)
+const currentCarGallery = useMemo(() => {
+if (!selectedCar) return [];
+return selectedCar.images && selectedCar.images.length > 0
+? selectedCar.images
+: [
+selectedCar.image || 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&q=80&w=1200',
+selectedCar.image2 || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
+selectedCar.image3 || "https://images.unsplash.com/photo-1611566141071-1a3b96d8373a?auto=format&fit=crop&q=80&w=1200"
+].filter(Boolean);
+}, [selectedCar]);
+
+// MISSING LINE 751
+// MISSING LINE 752
+// MISSING LINE 753
+// MISSING LINE 754
+const DEFAULT_SETTINGS = {
+companyName: 'Ligo Automobiles',
+phone: '+33 6 00 00 00 00',
+email: 'contact@ligoautomobiles.fr',
+address: 'Paris, France',
+bannerImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuAWWY8eJuzYiD9GK0tUeHHip6ZeuNT-8wBqp4yXhWopeA8_OLcGVQ8LozxOrbNMIiIVUmQA4wV4q3CauqsJI52tUnUqxxPqPXrT919JL9uw7Zq5Fr3HI_AJUOQ69ZQq8XNkrXaPsQSDo5IaX8rnsIyllDgz-yQ5tt6UxNW5TIIIK-Cch06UzMYWUTudMocVe70WCCxJDFqrWOBbgyARkZR7hZeJahDQcPtXRAQU4W8rICjExbX3FPgH",
+aboutImage: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+ru: {
+bannerTitle: "Покупка и продажа б/у и новых автомобилей во Франции",
+bannerSubtitle: "Ligo Automobiles • Франция",
+bannerDescription: "Профессиональный подбор, проверка истории и технического состояния каждого автомобиля. Оформление сделки под ключ.",
+aboutSubtitle: "Ligo Automobiles",
+aboutTitle: "Ваш надежный партнер по подбору авто во Франции",
+aboutText: "Мы обеспечиваем полную прозрачность на всех этапах сделки. Каждый автомобиль проходит комплексную техническую проверку и юридическую экспертизу.",
+featuredCategory: "Каталог",
+featuredTitle: "Наши автомобили",
+featuredSubtitle: "Проверенные технически и готовые к эксплуатации модели.",
+stat1Number: "✓",
+stat1Label: "Гарантия на все авто",
+stat2Number: "VIN",
+stat2Label: "Проверенный номер",
+stat3Number: "DOC",
+stat3Label: "Помощь с документами",
+contactTitle: "Связаться с нами",
+contactSubtitle: "Обсудим ваш проект",
+contactDescription: "Хотите получить дополнительную информацию о конкретной модели? Свяжитесь с нами напрямую."
+},
+fr: {
+bannerTitle: "Achat & Vente de Véhicules d'Occasion et Neufs",
+bannerSubtitle: "Ligo Automobiles • France",
+bannerDescription: "Sélection rigoureuse, historique transparent et accompagnement administratif complet.",
+aboutSubtitle: "Ligo Automobiles",
+aboutTitle: "Votre partenaire de confiance en France",
+aboutText: "Nous assurons une transparence totale à каждый этап сделки. Chaque véhicule subit une inspection technique et juridique complète.",
+featuredCategory: "Catalogue",
+featuredTitle: "Nos Véhicules",
+featuredSubtitle: "Des modèles techniquement éprouvés et prêts à l'emploi.",
+stat1Number: "✓",
+stat1Label: "Garantie sur tous les véhicules",
+stat2Number: "VIN",
+stat2Label: "Numéro VIN vérifié",
+stat3Number: "DOC",
+stat3Label: "Aide aux démarches",
+contactTitle: "Contactez-nous",
+contactSubtitle: "Discutons de votre projet",
+contactDescription: "Vous souhaitez plus d'informations sur un modèle précis ? Contactez-nous directement."
+},
+en: {
+bannerTitle: "Buy & Sell Used and New Cars in France",
+bannerSubtitle: "Ligo Automobiles • France",
+bannerDescription: "Professional selection, history check, and technical inspection of each vehicle. Turnkey deal support.",
+aboutSubtitle: "Ligo Automobiles",
+aboutTitle: "Your Trusted Car Sourcing Partner in France",
+aboutText: "We ensure complete transparency at every stage of the deal. Every car undergoes a comprehensive technical check and legal inspection.",
+featuredCategory: "Catalogue",
+featuredTitle: "Our Vehicles",
+featuredSubtitle: "Technically proven and ready-to-run models.",
+stat1Number: "✓",
+stat1Label: "Warranty on all cars",
+stat2Number: "VIN",
+stat2Label: "Verified VIN number",
+stat3Number: "DOC",
+stat3Label: "Help with paperwork",
+contactTitle: "Contact Us",
+contactSubtitle: "Discuss your project",
+contactDescription: "Want to get more information about a specific model? Contact us directly."
+setGalleryUploading(false);
+};
+
+
+// Первая фаза: Авторизация в системе (Правило №3)
+useEffect(() => {
+const initAuth = async () => {
+try {
+if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+await signInWithCustomToken(auth, __initial_auth_token);
+} else {
+await signInAnonymously(auth);
+}
+} catch (err) {
+console.error("Auth Exception Error: ", err);
+}
+};
+initAuth();
+
+const unsubscribe = onAuthStateChanged(auth, (usr) => {
+setUser(usr);
+});
+return () => unsubscribe();
+}, []);
+
+// Таймер управления полноэкранным просмотром фотографий с клавиатуры
+useEffect(() => {
+if (!showLightbox || currentCarGallery.length === 0) return;
+const handleKeyDown = (e: KeyboardEvent) => {
+if (e.key === 'Escape') {
+setShowLightbox(false);
+} else if (e.key === 'ArrowRight') {
+setLightboxIndex(prev => (prev === currentCarGallery.length - 1 ? 0 : prev + 1));
+} else if (e.key === 'ArrowLeft') {
+setLightboxIndex(prev => (prev === 0 ? currentCarGallery.length - 1 : prev - 1));
+}
+};
+window.addEventListener('keydown', handleKeyDown);
+return () => window.removeEventListener('keydown', handleKeyDown);
+}, [showLightbox, currentCarGallery]);
+
+// Вторая фаза: Загрузка данных каталога в реальном времени (Правило №1 и №2)
+useEffect(() => {
+if (!user) return;
+
+setLoading(true);
+let isResolved = false;
+
+// Тайм-аут загрузки из сети: если Firestore зависает, переходим на оффлайн демо-режим через 4 секунды
+const loadTimeout = setTimeout(() => {
+if (!isResolved) {
+console.warn("Firestore connection timed out. Activating offline demo mode...");
+setGlobalError("Connexion à la base de données lente. Mode démo hors ligne activé.");
+setCars(DEMO_CARS);
+setLoading(false);
+}
+}, 4000);
+
+// Строгий путь к публичной коллекции автомобилей согласно Правилу №1
+const carsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
+// MISSING LINE 881
+// MISSING LINE 882
+// MISSING LINE 883
+// MISSING LINE 884
+// MISSING LINE 885
+// MISSING LINE 886
+// MISSING LINE 887
+// MISSING LINE 888
+// MISSING LINE 889
+// MISSING LINE 890
+// MISSING LINE 891
+// MISSING LINE 892
+// MISSING LINE 893
+// MISSING LINE 894
+// MISSING LINE 895
+// MISSING LINE 896
+// MISSING LINE 897
+// MISSING LINE 898
+// MISSING LINE 899
+// MISSING LINE 900
+// MISSING LINE 901
+// MISSING LINE 902
+// MISSING LINE 903
+// MISSING LINE 904
+// MISSING LINE 905
+// MISSING LINE 906
+// MISSING LINE 907
+// MISSING LINE 908
+// MISSING LINE 909
+// MISSING LINE 910
+// MISSING LINE 911
+// MISSING LINE 912
+// MISSING LINE 913
+// MISSING LINE 914
+// MISSING LINE 915
+// MISSING LINE 916
+// MISSING LINE 917
+// MISSING LINE 918
+// MISSING LINE 919
+// MISSING LINE 920
+// MISSING LINE 921
+// MISSING LINE 922
+// MISSING LINE 923
+// MISSING LINE 924
+// MISSING LINE 925
+// MISSING LINE 926
+// MISSING LINE 927
+// MISSING LINE 928
+// MISSING LINE 929
+// MISSING LINE 930
+// MISSING LINE 931
+// MISSING LINE 932
+// MISSING LINE 933
+// MISSING LINE 934
+// MISSING LINE 935
+// MISSING LINE 936
+// MISSING LINE 937
+// MISSING LINE 938
+// MISSING LINE 939
+// MISSING LINE 940
+// MISSING LINE 941
+// MISSING LINE 942
+// MISSING LINE 943
+// MISSING LINE 944
+// MISSING LINE 945
+// MISSING LINE 946
+// MISSING LINE 947
+// MISSING LINE 948
+// MISSING LINE 949
+// MISSING LINE 950
+// MISSING LINE 951
+// MISSING LINE 952
+// MISSING LINE 953
+// MISSING LINE 954
+// MISSING LINE 955
+// MISSING LINE 956
+// MISSING LINE 957
+// MISSING LINE 958
+// MISSING LINE 959
+// MISSING LINE 960
+// MISSING LINE 961
+// MISSING LINE 962
+// MISSING LINE 963
+// MISSING LINE 964
+// MISSING LINE 965
+// MISSING LINE 966
+// MISSING LINE 967
+// MISSING LINE 968
+// MISSING LINE 969
+// MISSING LINE 970
+// MISSING LINE 971
+// MISSING LINE 972
+// MISSING LINE 973
+// MISSING LINE 974
+// MISSING LINE 975
+// MISSING LINE 976
+// MISSING LINE 977
+// MISSING LINE 978
+// MISSING LINE 979
+// MISSING LINE 980
+// MISSING LINE 981
+// MISSING LINE 982
+// MISSING LINE 983
+// MISSING LINE 984
+// MISSING LINE 985
+// MISSING LINE 986
+// MISSING LINE 987
+// MISSING LINE 988
+// MISSING LINE 989
+// MISSING LINE 990
+// MISSING LINE 991
+// MISSING LINE 992
+// MISSING LINE 993
+// MISSING LINE 994
+// MISSING LINE 995
+// MISSING LINE 996
+// MISSING LINE 997
+// MISSING LINE 998
+// MISSING LINE 999
+// MISSING LINE 1000
+// MISSING LINE 1001
+// MISSING LINE 1002
+// MISSING LINE 1003
+// MISSING LINE 1004
+// MISSING LINE 1005
+// MISSING LINE 1006
+// MISSING LINE 1007
+// MISSING LINE 1008
+// MISSING LINE 1009
+// MISSING LINE 1010
+// MISSING LINE 1011
+// MISSING LINE 1012
+// MISSING LINE 1013
+// MISSING LINE 1014
+// MISSING LINE 1015
+// MISSING LINE 1016
+// MISSING LINE 1017
+// MISSING LINE 1018
+// MISSING LINE 1019
+// MISSING LINE 1020
+// MISSING LINE 1021
+// MISSING LINE 1022
+// MISSING LINE 1023
+// MISSING LINE 1024
+// MISSING LINE 1025
+// MISSING LINE 1026
+// MISSING LINE 1027
+// MISSING LINE 1028
+// MISSING LINE 1029
+// MISSING LINE 1030
+// MISSING LINE 1031
+// MISSING LINE 1032
+// MISSING LINE 1033
+// MISSING LINE 1034
+// MISSING LINE 1035
+// MISSING LINE 1036
+// MISSING LINE 1037
+// MISSING LINE 1038
+// MISSING LINE 1039
+// MISSING LINE 1040
+// MISSING LINE 1041
+// MISSING LINE 1042
+// MISSING LINE 1043
+// MISSING LINE 1044
+// MISSING LINE 1045
+// MISSING LINE 1046
+// MISSING LINE 1047
+// MISSING LINE 1048
+// MISSING LINE 1049
+// MISSING LINE 1050
+// MISSING LINE 1051
+// MISSING LINE 1052
+// MISSING LINE 1053
+// MISSING LINE 1054
+// MISSING LINE 1055
+// MISSING LINE 1056
+// MISSING LINE 1057
+// MISSING LINE 1058
+// MISSING LINE 1059
+// MISSING LINE 1060
+// MISSING LINE 1061
+// MISSING LINE 1062
+// MISSING LINE 1063
+// MISSING LINE 1064
+// MISSING LINE 1065
+// MISSING LINE 1066
+// MISSING LINE 1067
+// MISSING LINE 1068
+// MISSING LINE 1069
+// MISSING LINE 1070
+// MISSING LINE 1071
+// MISSING LINE 1072
+// MISSING LINE 1073
+// MISSING LINE 1074
+// MISSING LINE 1075
+// MISSING LINE 1076
+// MISSING LINE 1077
+// MISSING LINE 1078
+// MISSING LINE 1079
+// MISSING LINE 1080
+// MISSING LINE 1081
+// MISSING LINE 1082
+// MISSING LINE 1083
+// MISSING LINE 1084
+// MISSING LINE 1085
+// MISSING LINE 1086
+// MISSING LINE 1087
+// MISSING LINE 1088
+// MISSING LINE 1089
+// MISSING LINE 1090
+// MISSING LINE 1091
+// MISSING LINE 1092
+// MISSING LINE 1093
+// MISSING LINE 1094
+// MISSING LINE 1095
+// MISSING LINE 1096
+// MISSING LINE 1097
+// MISSING LINE 1098
+// MISSING LINE 1099
+// MISSING LINE 1100
+// MISSING LINE 1101
+// MISSING LINE 1102
+// MISSING LINE 1103
+// MISSING LINE 1104
+// MISSING LINE 1105
+// MISSING LINE 1106
+// MISSING LINE 1107
+// MISSING LINE 1108
+// MISSING LINE 1109
+// MISSING LINE 1110
+// MISSING LINE 1111
+// MISSING LINE 1112
+// MISSING LINE 1113
+// MISSING LINE 1114
+// MISSING LINE 1115
+// MISSING LINE 1116
+// MISSING LINE 1117
+// MISSING LINE 1118
+// MISSING LINE 1119
+}, 4500);
+};
+
+// Копирование VIN номера автомобиля строго через устаревший execCommand (по требованию ТЗ)
+const handleCopyVIN = (vinText) => {
+const tempInput = document.createElement("input");
+tempInput.value = vinText;
+document.body.appendChild(tempInput);
+tempInput.select();
+document.execCommand("copy");
+document.body.removeChild(tempInput);
+showNotification("Le numéro VIN a été copié dans le presse-papiers !", "success");
+};
+
+// Генерация стартового каталога люксовых спортивных машин
+const seedDemoData = async () => {
+try {
+const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
+for (const car of DEMO_CARS) {
+// Исключаем локальный id при записи в Firestore
+const { id, ...carData } = car;
+await withTimeout(addDoc(carsCollection, carData), 2000);
+}
+showNotification("Catalogue de démonstration initialisé avec succès !", "info");
+} catch (err) {
+console.error("Error seeding catalog:", err);
+}
+};
+
+// Фильтрация каталога в оперативной памяти на клиенте (избегаем сложных индексов Firestore)
+const filteredCars = useMemo(() => {
+carPrice: 315000,
+clientName: "Marc Vasseur",
+clientEmail: "marc.vasseur@example.fr",
+clientPhone: "+33687654321",
+clientAddress: "Showroom",
+hasTradeIn: false,
+tradeInDetails: "",
+status: "Traité",
+createdAt: new Date(Date.now() - 3600000 * 24).toISOString()
+}
+];
+
+// Загрузка запросов от клиентов в реальном времени (для администратора)
+useEffect(() => {
+if (!isAdmin) return;
+
+const inquiriesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+const q = query(inquiriesCollectionRef);
+
+const unsubscribe = onSnapshot(q, (snapshot) => {
+const list = [];
+snapshot.forEach((doc) => {
+list.push({ id: doc.id, ...doc.data() });
+});
+// Сортировка по времени создания
+list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+setInquiries(list);
+}, (err) => {
+console.warn('Firestore inquiries subscription error:', err);
+// Сортировка по времени создания
+list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+setInquiries(list);
+}, (err) => {
+console.warn('Firestore inquiries subscription error:', err);
+});
+
+return () => unsubscribe();
+}, [isAdmin, appId]);
+
+// Загрузка CMS настроек сайта в реальном времени
+useEffect(() => {
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+const unsubscribe = onSnapshot(settingsDocRef, (docSnap) => {
+if (docSnap.exists()) {
+setSiteSettings(prev => ({ ...prev, ...docSnap.data() }));
+}
+}, (err) => {
+console.warn('Firestore settings subscription error (using default config):', err);
+});
+return () => unsubscribe();
+}, [appId]);
+
+const renderAdminVehicles = () => {
+return (
+<div className="space-y-6">
+<div className="flex justify-between items-center pb-4 border-b border-neutral-200 dark:border-neutral-900">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide">Gestion du Parc Automobile</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-xs mt-1">Ajoutez, modifiez ou supprimez des véhicules du catalogue.</p>
+</div>
+// MISSING LINE 1211
+// MISSING LINE 1212
+// MISSING LINE 1213
+// MISSING LINE 1214
+// MISSING LINE 1215
+// MISSING LINE 1216
+// MISSING LINE 1217
+// MISSING LINE 1218
+// MISSING LINE 1219
+// MISSING LINE 1220
+// MISSING LINE 1221
+// MISSING LINE 1222
+// MISSING LINE 1223
+// MISSING LINE 1224
+// MISSING LINE 1225
+// MISSING LINE 1226
+// MISSING LINE 1227
+// MISSING LINE 1228
+// MISSING LINE 1229
+// MISSING LINE 1230
+// MISSING LINE 1231
+// MISSING LINE 1232
+// MISSING LINE 1233
+// MISSING LINE 1234
+// MISSING LINE 1235
+// MISSING LINE 1236
+// MISSING LINE 1237
+// MISSING LINE 1238
+// MISSING LINE 1239
+// MISSING LINE 1240
+// MISSING LINE 1241
+// MISSING LINE 1242
+// MISSING LINE 1243
+// MISSING LINE 1244
+// MISSING LINE 1245
+// MISSING LINE 1246
+// MISSING LINE 1247
+// MISSING LINE 1248
+// MISSING LINE 1249
+// MISSING LINE 1250
+// MISSING LINE 1251
+// MISSING LINE 1252
+// MISSING LINE 1253
+// MISSING LINE 1254
+// MISSING LINE 1255
+// MISSING LINE 1256
+// MISSING LINE 1257
+// MISSING LINE 1258
+// MISSING LINE 1259
+// MISSING LINE 1260
+// MISSING LINE 1261
+// MISSING LINE 1262
+// MISSING LINE 1263
+// MISSING LINE 1264
+// MISSING LINE 1265
+// MISSING LINE 1266
+// MISSING LINE 1267
+// MISSING LINE 1268
+// MISSING LINE 1269
+// MISSING LINE 1270
+// MISSING LINE 1271
+// MISSING LINE 1272
+// MISSING LINE 1273
+// MISSING LINE 1274
+// MISSING LINE 1275
+// MISSING LINE 1276
+// MISSING LINE 1277
+// MISSING LINE 1278
+// MISSING LINE 1279
+// MISSING LINE 1280
+// MISSING LINE 1281
+// MISSING LINE 1282
+// MISSING LINE 1283
+// MISSING LINE 1284
+// MISSING LINE 1285
+// MISSING LINE 1286
+// MISSING LINE 1287
+// MISSING LINE 1288
+// MISSING LINE 1289
+// MISSING LINE 1290
+// MISSING LINE 1291
+// MISSING LINE 1292
+// MISSING LINE 1293
+// MISSING LINE 1294
+// MISSING LINE 1295
+// MISSING LINE 1296
+// MISSING LINE 1297
+// MISSING LINE 1298
+// MISSING LINE 1299
+// MISSING LINE 1300
+// MISSING LINE 1301
+// MISSING LINE 1302
+// MISSING LINE 1303
+// MISSING LINE 1304
+// MISSING LINE 1305
+// MISSING LINE 1306
+// MISSING LINE 1307
+// MISSING LINE 1308
+// MISSING LINE 1309
+// MISSING LINE 1310
+// MISSING LINE 1311
+// MISSING LINE 1312
+// MISSING LINE 1313
+// MISSING LINE 1314
+// MISSING LINE 1315
+// MISSING LINE 1316
+// MISSING LINE 1317
+// MISSING LINE 1318
+// MISSING LINE 1319
+// MISSING LINE 1320
+// MISSING LINE 1321
+// MISSING LINE 1322
+// MISSING LINE 1323
+// MISSING LINE 1324
+// MISSING LINE 1325
+// MISSING LINE 1326
+// MISSING LINE 1327
+// MISSING LINE 1328
+// MISSING LINE 1329
+// MISSING LINE 1330
+// MISSING LINE 1331
+// MISSING LINE 1332
+// MISSING LINE 1333
+// MISSING LINE 1334
+// MISSING LINE 1335
+// MISSING LINE 1336
+// MISSING LINE 1337
+// MISSING LINE 1338
+// MISSING LINE 1339
+// MISSING LINE 1340
+// MISSING LINE 1341
+// MISSING LINE 1342
+// MISSING LINE 1343
+// MISSING LINE 1344
+// MISSING LINE 1345
+// MISSING LINE 1346
+// MISSING LINE 1347
+// MISSING LINE 1348
+// MISSING LINE 1349
+// MISSING LINE 1350
+// MISSING LINE 1351
+// MISSING LINE 1352
+// MISSING LINE 1353
+// MISSING LINE 1354
+// MISSING LINE 1355
+// MISSING LINE 1356
+// MISSING LINE 1357
+// MISSING LINE 1358
+// MISSING LINE 1359
+// MISSING LINE 1360
+// MISSING LINE 1361
+// MISSING LINE 1362
+// MISSING LINE 1363
+// MISSING LINE 1364
+// MISSING LINE 1365
+// MISSING LINE 1366
+// MISSING LINE 1367
+// MISSING LINE 1368
+// MISSING LINE 1369
+// MISSING LINE 1370
+// MISSING LINE 1371
+// MISSING LINE 1372
+// MISSING LINE 1373
+// MISSING LINE 1374
+// MISSING LINE 1375
+// MISSING LINE 1376
+// MISSING LINE 1377
+// MISSING LINE 1378
+// MISSING LINE 1379
+// MISSING LINE 1380
+// MISSING LINE 1381
+// MISSING LINE 1382
+// MISSING LINE 1383
+// MISSING LINE 1384
+// MISSING LINE 1385
+// MISSING LINE 1386
+// MISSING LINE 1387
+// MISSING LINE 1388
+// MISSING LINE 1389
+// MISSING LINE 1390
+// MISSING LINE 1391
+// MISSING LINE 1392
+// MISSING LINE 1393
+// MISSING LINE 1394
+// MISSING LINE 1395
+// MISSING LINE 1396
+// MISSING LINE 1397
+// MISSING LINE 1398
+// MISSING LINE 1399
+// MISSING LINE 1400
+// MISSING LINE 1401
+// MISSING LINE 1402
+// MISSING LINE 1403
+// MISSING LINE 1404
+// MISSING LINE 1405
+// MISSING LINE 1406
+// MISSING LINE 1407
+// MISSING LINE 1408
+// MISSING LINE 1409
+// MISSING LINE 1410
+// MISSING LINE 1411
+// MISSING LINE 1412
+// MISSING LINE 1413
+// MISSING LINE 1414
+// MISSING LINE 1415
+// MISSING LINE 1416
+// MISSING LINE 1417
+// MISSING LINE 1418
+// MISSING LINE 1419
+// MISSING LINE 1420
+// MISSING LINE 1421
+// MISSING LINE 1422
+// MISSING LINE 1423
+// MISSING LINE 1424
+// MISSING LINE 1425
+// MISSING LINE 1426
+// MISSING LINE 1427
+// MISSING LINE 1428
+// MISSING LINE 1429
+// MISSING LINE 1430
+// MISSING LINE 1431
+// MISSING LINE 1432
+// MISSING LINE 1433
+// MISSING LINE 1434
+// MISSING LINE 1435
+// MISSING LINE 1436
+// MISSING LINE 1437
+// MISSING LINE 1438
+// MISSING LINE 1439
+// MISSING LINE 1440
+// MISSING LINE 1441
+// MISSING LINE 1442
+// MISSING LINE 1443
+// MISSING LINE 1444
+// MISSING LINE 1445
+// MISSING LINE 1446
+// MISSING LINE 1447
+// MISSING LINE 1448
+// MISSING LINE 1449
+// MISSING LINE 1450
+// MISSING LINE 1451
+// MISSING LINE 1452
+// MISSING LINE 1453
+// MISSING LINE 1454
+// MISSING LINE 1455
+// MISSING LINE 1456
+// MISSING LINE 1457
+// MISSING LINE 1458
+// MISSING LINE 1459
+// MISSING LINE 1460
+// MISSING LINE 1461
+// MISSING LINE 1462
+// MISSING LINE 1463
+// MISSING LINE 1464
+}}
+/>
+<button 
+onClick={() => {
+const idx = galleryImages.indexOf(activeImage || galleryImages[0]);
+setLightboxIndex(idx >= 0 ? idx : 0);
+setShowLightbox(true);
+}}
+className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 dark:bg-neutral-900/90 hover:bg-[#D4AF37] border border-neutral-200 dark:border-neutral-800 hover:border-neutral-950 text-neutral-750 dark:text-neutral-300 hover:text-neutral-950 shadow-lg transition-all group z-10"
+title="Plein écran"
+>
+<Icons.Maximize />
+</button>
+<div className="absolute top-4 left-4 flex flex-col gap-2">
+{selectedCar.verifiedVin && (
+<span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
+// MISSING LINE 1481
+// MISSING LINE 1482
+// MISSING LINE 1483
+// MISSING LINE 1484
+// MISSING LINE 1485
+// MISSING LINE 1486
+// MISSING LINE 1487
+// MISSING LINE 1488
+// MISSING LINE 1489
+// MISSING LINE 1490
+// MISSING LINE 1491
+// MISSING LINE 1492
+// MISSING LINE 1493
+// MISSING LINE 1494
+// MISSING LINE 1495
+// MISSING LINE 1496
+// MISSING LINE 1497
+// MISSING LINE 1498
+// MISSING LINE 1499
+// MISSING LINE 1500
+// MISSING LINE 1501
+// MISSING LINE 1502
+// MISSING LINE 1503
+// MISSING LINE 1504
+// MISSING LINE 1505
+// MISSING LINE 1506
+// MISSING LINE 1507
+// MISSING LINE 1508
+// MISSING LINE 1509
+// MISSING LINE 1510
+// MISSING LINE 1511
+// MISSING LINE 1512
+// MISSING LINE 1513
+// MISSING LINE 1514
+// MISSING LINE 1515
+// MISSING LINE 1516
+// MISSING LINE 1517
+// MISSING LINE 1518
+// MISSING LINE 1519
+// MISSING LINE 1520
+// MISSING LINE 1521
+// MISSING LINE 1522
+// MISSING LINE 1523
+// MISSING LINE 1524
+// MISSING LINE 1525
+// MISSING LINE 1526
+// MISSING LINE 1527
+// MISSING LINE 1528
+// MISSING LINE 1529
+// MISSING LINE 1530
+// MISSING LINE 1531
+// MISSING LINE 1532
+// MISSING LINE 1533
+// MISSING LINE 1534
+// MISSING LINE 1535
+// MISSING LINE 1536
+// MISSING LINE 1537
+// MISSING LINE 1538
+// MISSING LINE 1539
+// MISSING LINE 1540
+// MISSING LINE 1541
+// MISSING LINE 1542
+// MISSING LINE 1543
+// MISSING LINE 1544
+// MISSING LINE 1545
+// MISSING LINE 1546
+// MISSING LINE 1547
+// MISSING LINE 1548
+// MISSING LINE 1549
+// MISSING LINE 1550
+// MISSING LINE 1551
+// MISSING LINE 1552
+// MISSING LINE 1553
+// MISSING LINE 1554
+// MISSING LINE 1555
+// MISSING LINE 1556
+// MISSING LINE 1557
+// MISSING LINE 1558
+// MISSING LINE 1559
+// MISSING LINE 1560
+// MISSING LINE 1561
+// MISSING LINE 1562
+// MISSING LINE 1563
+// MISSING LINE 1564
+// MISSING LINE 1565
+// MISSING LINE 1566
+// MISSING LINE 1567
+// MISSING LINE 1568
+// MISSING LINE 1569
+// MISSING LINE 1570
+// MISSING LINE 1571
+// MISSING LINE 1572
+// MISSING LINE 1573
+// MISSING LINE 1574
+// MISSING LINE 1575
+// MISSING LINE 1576
+// MISSING LINE 1577
+// MISSING LINE 1578
+// MISSING LINE 1579
+// MISSING LINE 1580
+// MISSING LINE 1581
+// MISSING LINE 1582
+// MISSING LINE 1583
+// MISSING LINE 1584
+// MISSING LINE 1585
+// MISSING LINE 1586
+// MISSING LINE 1587
+// MISSING LINE 1588
+// MISSING LINE 1589
+// MISSING LINE 1590
+// MISSING LINE 1591
+// MISSING LINE 1592
+// MISSING LINE 1593
+// MISSING LINE 1594
+// MISSING LINE 1595
+// MISSING LINE 1596
+// MISSING LINE 1597
+// MISSING LINE 1598
+// MISSING LINE 1599
+// MISSING LINE 1600
+// MISSING LINE 1601
+// MISSING LINE 1602
+// MISSING LINE 1603
+// MISSING LINE 1604
+// MISSING LINE 1605
+// MISSING LINE 1606
+// MISSING LINE 1607
+// MISSING LINE 1608
+// MISSING LINE 1609
+
+// Soumettre la carte grise / reprise
+const handleCarteGriseSubmit = (e) => {
+e.preventDefault();
+if (!cgForm.name || !cgForm.email || !cgForm.phone || !cgForm.address) {
+showNotification("Veuillez remplir tous les champs du dossier.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Carte Grise & Immatriculation",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: cgForm.name,
+clientEmail: cgForm.email,
+clientPhone: cgForm.phone,
+clientAddress: cgForm.address,
+hasTradeIn: cgForm.hasTradeIn,
+tradeInDetails: cgForm.hasTradeIn ? `${cgForm.tradeInBrandModel} (${cgForm.tradeInYear}) - ${cgForm.tradeInKm} km - État: ${cgForm.tradeInCondition}` : ""
+});
+};
+
+// Soumettre la demande d'essai
+const handleTestDriveSubmit = (e) => {
+e.preventDefault();
+if (!testDriveForm.name || !testDriveForm.email || !testDriveForm.phone || !testDriveForm.date || !testDriveForm.time) {
+showNotification("Veuillez remplir toutes les informations pour le rendez-vous.", "error");
+return;
+}
+handleInquirySubmit({
+type: "Demande d'essai / RDV",
+carBrand: selectedCar.brand,
+carModel: selectedCar.model,
+carPrice: selectedCar.price,
+clientName: testDriveForm.name,
+clientEmail: testDriveForm.email,
+
+{selectedCar.vin && (
+<div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3 mt-4">
+<div>
+<div className="text-[9px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-bold">{t('vinCertified')}</div>
+<div className="text-xs font-mono font-bold text-neutral-900 dark:text-white tracking-wider uppercase mt-0.5">{selectedCar.vin}</div>
+</div>
+<button 
+onClick={() => handleCopyVIN(selectedCar.vin)}
+className="text-[10px] font-bold text-[#D4AF37] hover:underline"
+>
+{lang === 'ru' ? 'Копировать' : 'Copier'}
+</button>
+</div>
+)}
+
+<p className="text-neutral-700 dark:text-neutral-300 text-xs font-light leading-relaxed pt-2">
+{selectedCar.description || "Aucune description de présentation n'a été spécifiée."}
+</p>
+</div>
+// MISSING LINE 1666
+// MISSING LINE 1667
+// MISSING LINE 1668
+// MISSING LINE 1669
+// MISSING LINE 1670
+// MISSING LINE 1671
+// MISSING LINE 1672
+// MISSING LINE 1673
+// MISSING LINE 1674
+// MISSING LINE 1675
+// MISSING LINE 1676
+// MISSING LINE 1677
+// MISSING LINE 1678
+// MISSING LINE 1679
+// MISSING LINE 1680
+// MISSING LINE 1681
+// MISSING LINE 1682
+// MISSING LINE 1683
+// MISSING LINE 1684
+// MISSING LINE 1685
+// MISSING LINE 1686
+// MISSING LINE 1687
+// MISSING LINE 1688
+// MISSING LINE 1689
+// MISSING LINE 1690
+// MISSING LINE 1691
+// MISSING LINE 1692
+// MISSING LINE 1693
+// MISSING LINE 1694
+// MISSING LINE 1695
+// MISSING LINE 1696
+// MISSING LINE 1697
+// MISSING LINE 1698
+// MISSING LINE 1699
+{/* Вкладка 3: Оформление Carte Grise */}
+{activeDetailsTab === 'paperwork' && (
+<form onSubmit={handleCarteGriseSubmit} className="space-y-6">
+<div>
+<h3 className="text-sm uppercase tracking-widest text-[#D4AF37] font-bold mb-1">Immatriculation & Carte Grise</h3>
+<p className="text-[10px] text-neutral-500 dark:text-neutral-400">Service administratif officiel français.</p>
+</div>
+
+{/* Malus Écologique */}
+<div className="p-4 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-4">
+<div className="space-y-1">
+<div className="flex items-center gap-1.5 text-xs font-bold text-neutral-750 dark:text-neutral-300">
+<Icons.Sparkles />
+Malus Écologique Estimé
+</div>
+<div className="text-[9px] text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Calculé selon la réglementation française</div>
+// MISSING LINE 1716
+// MISSING LINE 1717
+// MISSING LINE 1718
+// MISSING LINE 1719
+// MISSING LINE 1720
+// MISSING LINE 1721
+// MISSING LINE 1722
+// MISSING LINE 1723
+// MISSING LINE 1724
+// MISSING LINE 1725
+// MISSING LINE 1726
+// MISSING LINE 1727
+// MISSING LINE 1728
+// MISSING LINE 1729
+// MISSING LINE 1730
+// MISSING LINE 1731
+// MISSING LINE 1732
+// MISSING LINE 1733
+// MISSING LINE 1734
+// MISSING LINE 1735
+// MISSING LINE 1736
+// MISSING LINE 1737
+// MISSING LINE 1738
+// MISSING LINE 1739
+// MISSING LINE 1740
+// MISSING LINE 1741
+// MISSING LINE 1742
+// MISSING LINE 1743
+// MISSING LINE 1744
+// MISSING LINE 1745
+// MISSING LINE 1746
+// MISSING LINE 1747
+// MISSING LINE 1748
+// MISSING LINE 1749
+// MISSING LINE 1750
+// MISSING LINE 1751
+// MISSING LINE 1752
+// MISSING LINE 1753
+// MISSING LINE 1754
+// MISSING LINE 1755
+// MISSING LINE 1756
+// MISSING LINE 1757
+// MISSING LINE 1758
+// MISSING LINE 1759
+// MISSING LINE 1760
+// MISSING LINE 1761
+// MISSING LINE 1762
+// MISSING LINE 1763
+// MISSING LINE 1764
+// MISSING LINE 1765
+// MISSING LINE 1766
+// MISSING LINE 1767
+// MISSING LINE 1768
+// MISSING LINE 1769
+// MISSING LINE 1770
+// MISSING LINE 1771
+// MISSING LINE 1772
+// MISSING LINE 1773
+// MISSING LINE 1774
+// MISSING LINE 1775
+// MISSING LINE 1776
+// MISSING LINE 1777
+// MISSING LINE 1778
+// MISSING LINE 1779
+// MISSING LINE 1780
+// MISSING LINE 1781
+// MISSING LINE 1782
+// MISSING LINE 1783
+// MISSING LINE 1784
+// MISSING LINE 1785
+// MISSING LINE 1786
+// MISSING LINE 1787
+// MISSING LINE 1788
+// MISSING LINE 1789
+// MISSING LINE 1790
+// MISSING LINE 1791
+// MISSING LINE 1792
+// MISSING LINE 1793
+// MISSING LINE 1794
+// MISSING LINE 1795
+// MISSING LINE 1796
+// MISSING LINE 1797
+// MISSING LINE 1798
+// MISSING LINE 1799
+// MISSING LINE 1800
+// MISSING LINE 1801
+// MISSING LINE 1802
+// MISSING LINE 1803
+// MISSING LINE 1804
+// MISSING LINE 1805
+// MISSING LINE 1806
+// MISSING LINE 1807
+// MISSING LINE 1808
+// MISSING LINE 1809
+// MISSING LINE 1810
+// MISSING LINE 1811
+// MISSING LINE 1812
+// MISSING LINE 1813
+// MISSING LINE 1814
+// MISSING LINE 1815
+// MISSING LINE 1816
+// MISSING LINE 1817
+// MISSING LINE 1818
+// MISSING LINE 1819
+// MISSING LINE 1820
+// MISSING LINE 1821
+// MISSING LINE 1822
+// MISSING LINE 1823
+// MISSING LINE 1824
+// MISSING LINE 1825
+// MISSING LINE 1826
+// MISSING LINE 1827
+// MISSING LINE 1828
+// MISSING LINE 1829
+// MISSING LINE 1830
+// MISSING LINE 1831
+// MISSING LINE 1832
+// MISSING LINE 1833
+// MISSING LINE 1834
+>
+{t('copy')}
+</button>
+</div>
+)}
+
+<p className="text-neutral-700 dark:text-neutral-300 text-xs font-light leading-relaxed pt-2">
+{selectedCar.description || "Aucune description de présentation n'a été spécifiée."}
+</p>
+</div>
+)}
+
+{/* Вкладка 2: Финансирование */}
+{activeDetailsTab === 'finance' && (
+<form onSubmit={handleFinanceSubmit} className="space-y-6">
+<div>
+// MISSING LINE 1851
+// MISSING LINE 1852
+// MISSING LINE 1853
+// MISSING LINE 1854
+<div className="space-y-1">
+<label className="text-[9px] uppercase tracking-widest text-neutral-450 font-bold">Message (facultatif)</label>
+<textarea rows={3} placeholder="Options souhaitées, questions particulières..." value={testDriveForm.message} onChange={(e) => setTestDriveForm({...testDriveForm, message: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none resize-none"></textarea>
+</div>
+</div>
+
+<button 
+type="submit" 
+className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-sm tracking-wide transition-all shadow-lg"
+>
+Confirmer le rendez-vous
+</button>
+</form>
+)}
+
+</button>
+</form>
+)}
+
+</div>
+</div>
+
+</div>
+</div>
+</div>
+);
+};
+
+// Save CMS settings to Firestore
+const handleSaveSettings = async (e: React.FormEvent) => {
+e.preventDefault();
+try {
+const isMockFirebase = !firebaseConfig || 
+!firebaseConfig.apiKey || 
+firebaseConfig.apiKey.includes('mock') || 
+firebaseConfig.projectId === 'mock-project';
+
+if (isMockFirebase) {
+throw new Error("Mock Firebase detected");
+}
+
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+await withTimeout(setDoc(settingsDocRef, siteSettings), 3000);
+showNotification(lang === 'ru' ? "Настройки успешно сохранены!" : "Paramètres enregistrés !", "success");
+} catch (err) {
+console.error("Error saving settings: ", err);
+showNotification(lang === 'ru' ? "Настройки сохранены локально." : "Paramètres enregistrés (mode hors ligne).", "success");
+}
+};
+
+const renderAdminSettings = () => {
+return (
+<form onSubmit={handleSaveSettings} className="space-y-8 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-xl animate-fadeIn mb-12">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide mb-2">Configuration Globale du Site</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">Modifiez tous les textes, titres, statistiques et coordonnées de contact affichés publiquement.</p>
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Section Véhicules Phares</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Sélection exclusive)</label>
+<input type="text" value={siteSettings.featuredCategory || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredCategory: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.featuredTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+}
+
+const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'site');
+await withTimeout(setDoc(settingsDocRef, siteSettings), 3000);
+showNotification(lang === 'ru' ? "Настройки успешно сохранены!" : "Paramètres enregistrés !", "success");
+} catch (err) {
+console.error("Error saving settings: ", err);
+showNotification(lang === 'ru' ? "Настройки сохранены локально." : "Paramètres enregistrés (mode hors ligne).", "success");
+}
+};
+
+const renderAdminSettings = () => {
+return (
+<form onSubmit={handleSaveSettings} className="space-y-8 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-xl animate-fadeIn mb-12">
+<div>
+<h3 className="text-xl text-neutral-900 dark:text-white font-serif tracking-wide mb-2">Configuration Globale du Site</h3>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">Modifiez tous les textes, titres, statistiques et coordonnées de contact affichés publiquement.</p>
+</div>
+
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+{/* Левая колонка: Баннер и Фичед Секция */}
+<div className="space-y-8 lg:border-r lg:border-neutral-900 lg:pr-8">
+{/* Bannière */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Bannière d'accueil</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre principal</label>
+<input type="text" value={siteSettings.bannerTitle} onChange={(e) => setSiteSettings({...siteSettings, bannerTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre (italique)</label>
+<input type="text" value={siteSettings.bannerSubtitle} onChange={(e) => setSiteSettings({...siteSettings, bannerSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Description</label>
+<textarea rows={3} value={siteSettings.bannerDescription} onChange={(e) => setSiteSettings({...siteSettings, bannerDescription: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+</div>
+</div>
+
+{/* Véhicules Phares */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Section Véhicules Phares</h4>
+<div className="space-y-3 text-xs">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Sélection exclusive)</label>
+<input type="text" value={siteSettings.featuredCategory || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredCategory: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.featuredTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre / Description courte</label>
+<input type="text" value={siteSettings.featuredSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, featuredSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+</div>
+</div>
+
+{/* Правая колонка: О нас, Статистика, Контакты */}
+<div className="space-y-8">
+{/* À Propos & Stats */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Présentation (À Propos) & Stats</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Une relation...)</label>
+<input type="text" value={siteSettings.aboutSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, aboutSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre principal</label>
+<input type="text" value={siteSettings[lang]?.aboutTitle || DEFAULT_SETTINGS[lang].aboutTitle} onChange={(e) => setSiteSettings({...siteSettings, aboutTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Texte complet de présentation</label>
+<textarea rows={3} value={siteSettings[lang]?.aboutText || DEFAULT_SETTINGS[lang].aboutText} onChange={(e) => setSiteSettings({...siteSettings, aboutText: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+
+{/* Stats */}
+<div className="grid grid-cols-3 gap-3 pt-2">
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 1 Valeur</label>
+<input type="text" placeholder="30+" value={siteSettings.stat1Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat1Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 2 Valeur</label>
+<input type="text" placeholder="100%" value={siteSettings.stat2Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat2Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 3 Valeur</label>
+<input type="text" placeholder="24/7" value={siteSettings.stat3Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat3Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+</div>
+</div>
+</div>
+
+{/* Coordonnées & Section Contact */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Coordonnées de Contact & Formulaire</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Nom de l'entreprise</label>
+<input type="text" value={siteSettings.companyName || ''} onChange={(e) => setSiteSettings({...siteSettings, companyName: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Téléphone</label>
+<input type="text" value={siteSettings.phone || ''} onChange={(e) => setSiteSettings({...siteSettings, phone: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse E-mail</label>
+<input type="email" value={siteSettings.email || ''} onChange={(e) => setSiteSettings({...siteSettings, email: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse Physique</label>
+<input type="text" value={siteSettings.address || ''} onChange={(e) => setSiteSettings({...siteSettings, address: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="space-y-3 pt-2">
+<h5 className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 font-bold">Textes d'appel à l'action (Contact)</h5>
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.contactTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre de la section</label>
+<input type="text" value={siteSettings.contactSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Description courte</label>
+<textarea rows={2} value={siteSettings.contactDescription || ''} onChange={(e) => setSiteSettings({...siteSettings, contactDescription: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{/* Section 5: Traductions et Libellés */}
+<div className="space-y-6 col-span-1 lg:col-span-2 pt-8 border-t border-neutral-200 dark:border-neutral-900">
+<div>
+<h4 className="text-sm font-serif tracking-wide text-neutral-900 dark:text-white mb-1">Libellés & Traductions du Site (CMS)</h4>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{/* Section 5: Traductions et Libellés */}
+<div className="space-y-6 col-span-1 lg:col-span-2 pt-8 border-t border-neutral-200 dark:border-neutral-900">
+<div>
+<h4 className="text-sm font-serif tracking-wide text-neutral-900 dark:text-white mb-1">Libellés & Traductions du Site (CMS)</h4>
+<p className="text-neutral-500 dark:text-neutral-400 text-xs">Personnalisez n'importe quel texte ou étiquette sur l'ensemble du site dans les deux langues.</p>
+</div>
+
+<div className="flex flex-wrap gap-4 items-center justify-between border-b border-neutral-200 dark:border-neutral-900 pb-3">
+<div className="flex gap-2">
+<button
+type="button"
+onClick={() => setTranslationEditLang('fr')}
+className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${translationEditLang === 'fr' ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+>
+Version Française (FR)
+</button>
+<button
+type="button"
+onClick={() => setTranslationEditLang('ru')}
+className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${translationEditLang === 'ru' ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' : 'bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'}`}
+>
+Русская версия (RU)
+</button>
+</div>
+
+<div className="flex flex-wrap gap-1 bg-neutral-100 dark:bg-neutral-950 p-1 rounded-xl border border-neutral-200 dark:border-neutral-800">
+{[
+{ id: 'general', label: lang === 'ru' ? 'Общие / Кнопки' : 'Général & Boutons' },
+{ id: 'catalog', label: lang === 'ru' ? 'Каталог / Фильтры' : 'Catalogue & Filtres' },
+{ id: 'vehicle', label: lang === 'ru' ? 'Характеристики' : 'Fiche Technique' },
+{ id: 'forms', label: lang === 'ru' ? 'Формы / Лизинг' : 'Formulaires & LOA' }
+].map(tab => (
+<button
+key={tab.id}
+{(() => {
+const categories = {
+general: [
+{ key: 'catalog', label: 'Lien: Catalogue / Каталог' },
+{ key: 'about', label: 'Lien: À Propos / О нас' },
+{ key: 'contact', label: 'Lien: Contact / Контакты' },
+{ key: 'adminPanel', label: 'Lien: Admin / Панель админа' },
+{ key: 'nousContacter', label: 'Bouton: Nous contacter / Связаться с нами' },
+{ key: 'whatsapp', label: 'Bouton: WhatsApp' },
+{ key: 'callUs', label: 'Bouton: Nous appeler / Позвонить нам' },
+{ key: 'backToCatalog', label: 'Bouton: Retour au catalogue / Назад в каталог' },
+{ key: 'backToHome', label: 'Bouton: Retour à l\'accueil / Назад на главную' },
+{ key: 'details', label: 'Bouton: Détails du véhicule / Подробнее' }
+],
+catalog: [
+{ key: 'filterBrandModel', label: 'Filtre: Marque, modèle... / Марка, модель...' },
+{ key: 'filterPriceMax', label: 'Filtre: Prix max / Макс. цена' },
+{ key: 'allTransmissions', label: 'Filtre: Toutes transmissions / Все коробки' },
+{ key: 'allStatuses', label: 'Filtre: Tous statuts / Все статусы' },
+{ key: 'clearFilters', label: 'Bouton: Effacer filtres / Сбросить фильтры' },
+{ key: 'available', label: 'Statut: Disponible / В наличии' },
+{ key: 'incoming', label: 'Statut: En arrivage / В пути' },
+{ key: 'sold', label: 'Statut: Vendu / Продано' },
+{ key: 'vinVerified', label: 'Badge: VIN vérifié / VIN проверен' }
+],
+vehicle: [
+{ key: 'techSpecs', label: 'Titre: Caractéristiques / Характеристики' },
+{ key: 'specifications', label: 'Onglet: Spécifications / Спецификации' },
+{ key: 'modelYear', label: 'Label: Année modèle / Год выпуска' },
+{ key: 'mileage', label: 'Label: Kilométrage / Пробег' },
+{ key: 'fuel', label: 'Label: Carburant / Тип топлива' },
+{ key: 'transmission', label: 'Label: Transmission / Коробка передач' },
+{ key: 'enginePower', label: 'Label: Puissance / Мощность двигателя' },
+{ key: 'co2Emissions', label: 'Label: Émissions CO2 / Выбросы CO₂' },
+{ key: 'vinCertified', label: 'Label: VIN certifié / Сертифицированный VIN' },
+{ key: 'Essence', label: 'Carburant: Essence / Бензин' },
+{ key: 'Diesel', label: 'Carburant: Diesel / Дизель' },
+{ key: 'Hybride', label: 'Carburant: Hybride / Гибрид' },
+{ key: 'Automatique', label: 'Transmission: Automatique / Автомат' },
+{ key: 'Manuelle', label: 'Transmission: Manuelle / Механика' }
+],
+forms: [
+{ key: 'financing', label: 'Onglet: Financement / Кредит и Лизинг' },
+{ key: 'procedures', label: 'Onglet: Démarches / Оформление документов' },
+{ key: 'simulatedLoa', label: 'Titre: Mensualité LOA / Оценочный лизинг' },
+{ key: 'apport', label: 'Label: Apport / Первоначальный взнос' },
+{ key: 'duration', label: 'Label: Durée / Срок лизинга' },
+{ key: 'months', label: 'Suffixe: Mois / мес' },
+{ key: 'monthlyPayment', label: 'Label: Mensualité / Ежемесячный платеж' },
+{ key: 'applyCG', label: 'Bouton: Demande CG / Подать заявку' },
+{ key: 'testDrive', label: 'Onglet: Essai / Тест-драйв' },
+{ key: 'bookTestDrive', label: 'Titre: Planifier essai / Записаться' },
+{ key: 'clientInfo', label: 'Titre: Infos titulaire / Данные владельца' },
+{ key: 'fullName', label: 'Label: Nom complet / ФИО' },
+{ key: 'email', label: 'Label: E-mail / Эл. почта' },
+{ key: 'phone', label: 'Label: Téléphone / Телефон' },
+{ key: 'address', label: 'Label: Adresse / Почтовый адрес' },
+{ key: 'tradeInQuestion', label: 'Question: Reprise ? / Хотите в трейд-ин?' },
+{ key: 'tradeInInfo', label: 'Titre: Détails reprise / Детали авто' },
+{ key: 'tradeInBrandModel', label: 'Label: Marque & Modèle / Марка и Модель' },
+{ key: 'tradeInYear', label: 'Label: Année / Год выпуска' },
+{ key: 'tradeInKm', label: 'Label: Kilométrage / Пробег' },
+{ key: 'tradeInCondition', label: 'Label: État / Состояние' },
+{ key: 'selectDateTime', label: 'Label: Date & Heure / Дата и время' },
+{ key: 'preferredDate', label: 'Label: Date / Желаемая дата' },
+{ key: 'preferredTime', label: 'Label: Heure / Желаемое время' },
+{ key: 'specialRequest', label: 'Label: Demande / Пожелания' },
+{ key: 'sendRequest', label: 'Bouton: Envoyer / Отправить запрос' },
+{ key: 'formSuccess', label: 'Message: Succès / Успешно отправлено' },
+{/* À Propos & Stats */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Présentation (À Propos) & Stats</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Surtitre (ex: Une relation...)</label>
+<input type="text" value={siteSettings.aboutSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, aboutSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre principal</label>
+<input type="text" value={siteSettings[lang]?.aboutTitle || DEFAULT_SETTINGS[lang].aboutTitle} onChange={(e) => setSiteSettings({...siteSettings, aboutTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Texte complet de présentation</label>
+<textarea rows={3} value={siteSettings[lang]?.aboutText || DEFAULT_SETTINGS[lang].aboutText} onChange={(e) => setSiteSettings({...siteSettings, aboutText: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+
+{/* Stats */}
+<div className="grid grid-cols-3 gap-3 pt-2">
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 1 Valeur</label>
+<input type="text" placeholder="30+" value={siteSettings.stat1Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat1Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat1Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 2 Valeur</label>
+<input type="text" placeholder="100%" value={siteSettings.stat2Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat2Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat2Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-400 text-[10px] font-semibold block">Stat 3 Valeur</label>
+<input type="text" placeholder="24/7" value={siteSettings.stat3Number || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Number: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1.5 px-2 text-neutral-900 dark:text-white focus:outline-none" />
+<input type="text" placeholder="Label" value={siteSettings.stat3Label || ''} onChange={(e) => setSiteSettings({...siteSettings, stat3Label: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-1 px-2 text-[10px] text-neutral-700 dark:text-neutral-300 focus:outline-none mt-1" />
+</div>
+</div>
+</div>
+</div>
+
+{/* Coordonnées & Section Contact */}
+<div className="space-y-4">
+<h4 className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold pb-2 border-b border-neutral-200 dark:border-neutral-900">Coordonnées de Contact & Formulaire</h4>
+<div className="space-y-3 text-xs">
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Nom de l'entreprise</label>
+<input type="text" value={siteSettings.companyName || ''} onChange={(e) => setSiteSettings({...siteSettings, companyName: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Téléphone</label>
+<input type="text" value={siteSettings.phone || ''} onChange={(e) => setSiteSettings({...siteSettings, phone: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse E-mail</label>
+<input type="email" value={siteSettings.email || ''} onChange={(e) => setSiteSettings({...siteSettings, email: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Adresse Physique</label>
+<input type="text" value={siteSettings.address || ''} onChange={(e) => setSiteSettings({...siteSettings, address: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+
+<div className="space-y-3 pt-2">
+<h5 className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 font-bold">Textes d'appel à l'action (Contact)</h5>
+<div className="grid grid-cols-2 gap-4">
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Titre de la section</label>
+<input type="text" value={siteSettings.contactTitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactTitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Sous-titre de la section</label>
+<input type="text" value={siteSettings.contactSubtitle || ''} onChange={(e) => setSiteSettings({...siteSettings, contactSubtitle: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none" />
+</div>
+</div>
+<div className="space-y-1">
+<label className="text-neutral-600 dark:text-neutral-400 font-semibold block">Description courte</label>
+<textarea rows={2} value={siteSettings.contactDescription || ''} onChange={(e) => setSiteSettings({...siteSettings, contactDescription: e.target.value})} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-neutral-900 dark:text-white focus:outline-none resize-none"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{/* Section 5: Traductions et Libellés */}
+<div className="space-y-6 col-span-1 lg:col-span-2 pt-8 border-t border-neutral-200 dark:border-neutral-900">
+<div>
+<h4 className="text-sm font-serif tracking-wide text-neutral-900 dark:text-white mb-1">Libellés & Traductions du Site (CMS)</h4>
+<p className="text-neutral-500 dark:text-neutral-400 text-xs">Personnalisez n'importe quel texte ou étiquette sur l'ensemble du site dans les deux langues.</p>
+</div>
+
+<div className="flex flex-wrap gap-4 items-center justify-between border-b border-neutral-200 dark:border-neutral-900 pb-3">
+className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]/50 text-neutral-500 dark:text-neutral-450 dark:text-neutral-450 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all"
+title={t('adminTitle')}
+>
+<Icons.Unlock />
+</button>
+)}
+<header className="sticky top-0 z-40 bg-[#F8F9FA]/90 dark:bg-[#080809]/90 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-900 shadow-lg transition-all duration-300">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<div 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="flex items-center gap-3 cursor-pointer"
+>
+<span className={`text-xl sm:text-2xl tracking-widest font-serif font-bold bg-clip-text text-transparent bg-gradient-to-r ${theme === 'dark' ? 'from-white via-neutral-300' : 'from-neutral-900 via-neutral-600'} to-[#D4AF37]`}>
+{siteSettings.companyName || "Ligo Automobiles"}
+</span>
+</div>
+
+<nav className="hidden md:flex items-center gap-8 text-sm tracking-widest uppercase font-semibold">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`pb-1 transition-colors ${currentView === 'catalog' ? 'text-[#D4AF37] border-b border-[#D4AF37]' : 'text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] champagne-hover'}`}
+>
+{t('catalog')}
+</button>
+<button 
+onClick={() => {
+setCurrentView('home');
+setTimeout(() => {
+document.getElementById('propos')?.scrollIntoView({ behavior: 'smooth' });
+}, 50);
+}} 
+className="pb-1 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+>
+{t('about')}
+</button>
+<button 
+onClick={() => {
+setCurrentView('home');
+setTimeout(() => {
+document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+}, 50);
+}} 
+className="pb-1 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+>
+{t('contact')}
+</button>
+{isAdmin && (
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`transition-colors ${currentView === 'admin' ? 'text-[#D4AF37]' : 'text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37]'}`}
+>
+{t('adminPanel')}
+</button>
+)}
+</nav>
+
+<div className="flex items-center gap-4">
+{isAdmin ? (
+<div className="flex items-center gap-2">
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className={`hidden sm:inline-block px-3 py-1.5 rounded bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 text-xs font-mono tracking-wider uppercase transition-all`}
+>
+{t('adminPanel')}
+</button>
+<button 
+onClick={() => {
+setIsAdmin(false);
+setCurrentView('home');
+}}
+className="p-2 rounded-lg bg-neutral-900 hover:bg-red-950 border border-neutral-800 hover:border-red-900 text-red-400 hover:text-red-300 transition-all"
+title={t('logout')}
+>
+<Icons.Lock />
+</button>
+</div>
+) : (
+<button 
+onClick={() => setShowAdminLoginModal(true)}
+className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]/50 text-neutral-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all"
+title={t('adminTitle')}
+>
+<Icons.Unlock />
+</button>
+)}
+
+{/* Переключатель темы */}
+<button
+onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] transition-all flex items-center justify-center"
+title={theme === 'dark' ? (lang === 'fr' ? 'Mode Clair' : 'Светлая тема') : (lang === 'fr' ? 'Mode Sombre' : 'Тёмная тема')}
+>
+{theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
+</button>
+
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}`} 
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-semibold text-sm transition-all shadow-lg shadow-[#D4AF37]/20"
+>
+<Icons.WhatsApp />
+<span className="hidden sm:inline">{t('nousContacter')}</span>
+</a>
+
+{/* Переключатель языка */}
+<button
+onClick={() => setLang(lang === 'fr' ? 'ru' : 'fr')}
+className="px-3 py-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-xs font-bold text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] tracking-wider uppercase transition-all flex items-center justify-center gap-1.5"
+title={lang === 'fr' ? 'Русская версия' : 'Version Française'}
+>
+<span>{lang === 'fr' ? '🇷🇺 RU' : '🇫🇷 FR'}</span>
+</button>
+</div>
+</div>
+document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+}, 50);
+}} 
+className="pb-1 text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors champagne-hover"
+>
+{t('contact')}
+</button>
+{isAdmin && (
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}} 
+className={`transition-colors ${currentView === 'admin' ? 'text-[#D4AF37]' : 'text-neutral-700 dark:text-neutral-400 hover:text-[#D4AF37]'}`}
+>
+{t('adminPanel')}
+</button>
+)}
+</nav>
+
+<div className="flex items-center gap-4">
+{isAdmin ? (
+<div className="flex items-center gap-2">
+<button 
+onClick={() => {
+setPreviousView(currentView);
+setCurrentView('admin');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className={`hidden sm:inline-block px-3 py-1.5 rounded bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 text-xs font-mono tracking-wider uppercase transition-all`}
+>
+{t('adminPanel')}
+</button>
+<button 
+onClick={() => {
+setIsAdmin(false);
+setCurrentView('home');
+}}
+className="p-2 rounded-lg bg-neutral-900 hover:bg-red-950 border border-neutral-800 hover:border-red-900 text-red-400 hover:text-red-300 transition-all"
+title={t('logout')}
+>
+<Icons.Lock />
+</button>
+</div>
+) : (
+<button 
+onClick={() => setShowAdminLoginModal(true)}
+className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]/50 text-neutral-500 dark:text-neutral-400 dark:text-neutral-400 hover:text-[#D4AF37] dark:hover:text-[#D4AF37] transition-all"
+title={t('adminTitle')}
+>
+<Icons.Unlock />
+</button>
+)}
+
+{/* Переключатель темы */}
+<button
+onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+className="p-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] transition-all flex items-center justify-center"
+title={theme === 'dark' ? (lang === 'fr' ? 'Mode Clair' : 'Светлая тема') : (lang === 'fr' ? 'Mode Sombre' : 'Тёмная тема')}
+>
+{theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
+</button>
+
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}`} 
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-semibold text-sm transition-all shadow-lg shadow-[#D4AF37]/20"
+>
+<Icons.WhatsApp />
+<span className="hidden sm:inline">{t('nousContacter')}</span>
+</a>
+
+{/* Переключатель языка */}
+<button
+<p className="text-neutral-600 dark:text-neutral-400 text-sm font-light">{siteSettings.featuredSubtitle || (lang === 'ru' ? 'Автомобили прошли полную предпродажную подготовку и технический контроль.' : 'Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.')}</p>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+{cars.slice(0, 6).map((car) => (
+<div 
+key={car.id}
+className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col gold-glow-hover"
+>
+<div 
+onClick={() => handleSelectCar(car)}
+className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
+>
+<img 
+{/* Величественный премиум баннер */}
+<section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden pt-24 px-4 bg-black">
+{/* Background image */}
+<div className="absolute inset-0 z-0">
+<img 
+src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWWY8eJuzYiD9GK0tUeHHip6ZeuNT-8wBqp4yXhWopeA8_OLcGVQ8LozxOrbNMIiIVUmQA4wV4q3CauqsJI52tUnUqxxPqPXrT919JL9uw7Zq5Fr3HI_AJUOQ69ZQq8XNkrXaPsQSDo5IaX8rnsIyllDgz-yQ5tt6UxNW5TIIIK-Cch06UzMYWUTudMocVe70WCCxJDFqrWOBbgyARkZR7hZeJahDQcPtXRAQU4W8rICjExbX3FPgH" 
+alt="Ligo Automobiles Hero" 
+className="w-full h-full object-cover opacity-80 scale-100 select-none pointer-events-none"
+/>
+</div>
+<a 
+href={`https://wa.me/${siteSettings.phone.replace(/\s+/g, '').replace('+', '')}`} 
+target="_blank" 
+rel="noopener noreferrer" 
+className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-semibold text-sm transition-all shadow-lg shadow-[#D4AF37]/20"
+>
+<Icons.WhatsApp />
+<span className="hidden sm:inline">{t('nousContacter')}</span>
+</a>
+
+{/* Переключатель языка */}
+<button
+onClick={() => setLang(lang === 'fr' ? 'ru' : 'fr')}
+className="px-3 py-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-xs font-bold text-neutral-600 dark:text-neutral-400 dark:text-neutral-300 hover:text-[#D4AF37] tracking-wider uppercase transition-all flex items-center justify-center gap-1.5"
+title={lang === 'fr' ? 'Русская версия' : 'Version Française'}
+>
+<span>{lang === 'fr' ? '🇷🇺 RU' : '🇫🇷 FR'}</span>
+</button>
+</div>
+</div>
+</header>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings.stat2Label || (lang === 'ru' ? 'Проверенный VIN-номер' : 'Numéro VIN vérifié')}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings.stat3Label || (lang === 'ru' ? 'Помощь в оформлении документов' : 'Aide aux démarches')}</span>
+</div>
+</div>
+
+<div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-xl transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Открыть каталог' : 'Découvrir le catalogue'}
+</button>
+<button 
+onClick={() => {
+const target = document.getElementById('contact');
+if (target) target.scrollIntoView({ behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-transparent border border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-950 hover:text-neutral-950 dark:hover:text-white hover:border-[#D4AF37] px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-md transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Записаться на встречу' : 'Prendre rendez-vous'}
+</button>
+</div>
+</div>
+
+<div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+<button 
+onClick={() => handleSelectCar(car)}
+className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+>
+{t('details')}
+</button>
+</div>
+</div>
+</div>
+))}
+</div>
+
+<div className="text-center mt-12">
+<button 
+onClick={() => {
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-xl transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Открыть каталог' : 'Découvrir le catalogue'}
+</button>
+<button 
+onClick={() => {
+const target = document.getElementById('contact');
+if (target) target.scrollIntoView({ behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-transparent border border-neutral-700 text-neutral-200 hover:bg-[#121214] hover:text-white hover:border-[#D4AF37] px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-md transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Записаться на встречу' : 'Prendre rendez-vous'}
+</button>
+</div>
+</div>
+</section>
+
+{/* Секция избранных автомобилей на главной (6 авто) */}
+<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-[#F8F9FA] dark:bg-[#080809]">
+<div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{siteSettings.featuredCategory || (lang === 'ru' ? 'Наш выбор' : 'Notre sélection')}</span>
+<h2 className="text-4xl font-serif text-neutral-900 dark:text-white tracking-wide">{siteSettings.featuredTitle || (lang === 'ru' ? 'Рекомендуемые модели' : 'Véhicules à la Une')}</h2>
+<p className="text-neutral-600 dark:text-neutral-400 text-sm font-light">{siteSettings.featuredSubtitle || (lang === 'ru' ? 'Автомобили прошли полную предпродажную подготовку и технический контроль.' : 'Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.')}</p>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+{cars.slice(0, 6).map((car) => (
+<div 
+key={car.id}
+className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col gold-glow-hover"
+>
+<div 
+// MISSING LINE 2616
+// MISSING LINE 2617
+// MISSING LINE 2618
+// MISSING LINE 2619
+// MISSING LINE 2620
+// MISSING LINE 2621
+// MISSING LINE 2622
+// MISSING LINE 2623
+// MISSING LINE 2624
+// MISSING LINE 2625
+// MISSING LINE 2626
+// MISSING LINE 2627
+// MISSING LINE 2628
+// MISSING LINE 2629
+// MISSING LINE 2630
+// MISSING LINE 2631
+// MISSING LINE 2632
+// MISSING LINE 2633
+// MISSING LINE 2634
+// MISSING LINE 2635
+// MISSING LINE 2636
+// MISSING LINE 2637
+// MISSING LINE 2638
+// MISSING LINE 2639
+// MISSING LINE 2640
+// MISSING LINE 2641
+// MISSING LINE 2642
+// MISSING LINE 2643
+// MISSING LINE 2644
+// MISSING LINE 2645
+// MISSING LINE 2646
+// MISSING LINE 2647
+// MISSING LINE 2648
+// MISSING LINE 2649
+// MISSING LINE 2650
+// MISSING LINE 2651
+// MISSING LINE 2652
+// MISSING LINE 2653
+// MISSING LINE 2654
+// MISSING LINE 2655
+// MISSING LINE 2656
+// MISSING LINE 2657
+// MISSING LINE 2658
+// MISSING LINE 2659
+// MISSING LINE 2660
+// MISSING LINE 2661
+// MISSING LINE 2662
+// MISSING LINE 2663
+// MISSING LINE 2664
+// MISSING LINE 2665
+// MISSING LINE 2666
+// MISSING LINE 2667
+// MISSING LINE 2668
+// MISSING LINE 2669
+<Icons.Gauge />
+<span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Fuel />
+<span>{t(car.fuel)}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Activity />
+<span>{car.hp} {lang === 'ru' ? 'л.с.' : 'ch'}</span>
+</div>
+</div>
+</div>
+
+<div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+<button 
+onClick={() => handleSelectCar(car)}
+className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+>
+{t('details')}
+</button>
+</div>
+</div>
+</div>
+))}
+</div>
+
+<div className="text-center mt-12">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="inline-block px-10 py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#e5c158] hover:shadow-[0_0_25px_rgba(212,175,55,0.2)] text-neutral-950 font-bold tracking-wide transition-all duration-300"
+>
+{lang === 'ru' ? `Открыть весь каталог (${cars.length} авто)` : `Découvrir tout le catalogue (${cars.length} véhicules)`}
+</button>
+</div>
+</section>
+</>
+)}
+
+{currentView === 'catalog' && (
+<>
+{/* Блок фильтров каталога */}
+<section id="catalogue" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+{/* Хлебные крошки */}
+<div className="mb-6">
+<button 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="group flex items-center gap-2 text-xs text-neutral-600 hover:text-[#D4AF37] font-bold tracking-widest uppercase transition-all"
+>
+<Icons.ArrowLeft />
+<span className="group-hover:translate-x-1 transition-transform">{t('backToHome')}</span>
+</button>
+</div>
+<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-8 border-b border-neutral-200 dark:border-neutral-900">
+<div>
+<h2 className="text-3xl font-serif text-neutral-900 dark:text-white mb-2 tracking-wide">
+{lang === 'ru' ? 'Каталог автомобилей' : 'Catalogue des Véhicules'}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">
+{lang === 'ru' ? 'Ознакомьтесь с нашим каталогом б/у и новых автомобилей.' : "Explorez notre catalogue de véhicules d'occasion et neufs."}
+</p>
+</div>
+</div>
+
+{/* Интерактивная плашка фильтров */}
+{(activeAdminTab === 'vehicles' || !isAdmin) && (
+<>
+<div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 mb-12 shadow-lg">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+
+{/* Марка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Марка' : 'Marque'}
+</label>
+<select
+value={selectedBrand}
+onChange={(e) => {
+setSelectedBrand(e.target.value);
+setSelectedModel('');
+}}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все марки' : 'Toutes'}</option>
+</span>
+</div>
+<h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif tracking-tight text-white leading-[1.15] font-black">
+{siteSettings[lang]?.bannerTitle || DEFAULT_SETTINGS[lang].bannerTitle}
+</h1>
+<p className="max-w-2xl mx-auto text-neutral-300 text-sm sm:text-base font-light leading-relaxed">
+{siteSettings[lang]?.bannerDescription || DEFAULT_SETTINGS[lang].bannerDescription}
+</p>
+
+{/* Простые, четкие факты преимуществ */}
+<div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat1Label || DEFAULT_SETTINGS[lang].stat1Label}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat2Label || DEFAULT_SETTINGS[lang].stat2Label}</span>
+</div>
+<div className="flex items-center gap-2 bg-[#121214]/85 px-4 py-2 rounded-full border border-neutral-800/80">
+<span className="text-[#D4AF37] text-xs">✓</span>
+<span className="text-xs text-neutral-200 font-semibold">{siteSettings[lang]?.stat3Label || DEFAULT_SETTINGS[lang].stat3Label}</span>
+</div>
+</div>
+
+<div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-xl transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Открыть каталог' : 'Découvrir le catalogue'}
+</button>
+<button 
+onClick={() => {
+const target = document.getElementById('contact');
+if (target) target.scrollIntoView({ behavior: 'smooth' });
+}}
+className="w-full sm:w-auto bg-transparent border border-neutral-700 text-neutral-200 hover:bg-[#121214] hover:text-white hover:border-[#D4AF37] px-8 py-4 font-button text-xs uppercase tracking-widest hover:shadow-md transition-all duration-300 rounded-2xl font-bold"
+>
+{lang === 'ru' ? 'Записаться на встречу' : 'Prendre rendez-vous'}
+</button>
+</div>
+</div>
+</section>
+
+{/* Секция избранных автомобилей на главной (6 авто) */}
+<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 bg-[#F8F9FA] dark:bg-[#080809]">
+<div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{siteSettings.featuredCategory || (lang === 'ru' ? 'Наш выбор' : 'Notre sélection')}</span>
+<h2 className="text-4xl font-serif text-neutral-900 dark:text-white tracking-wide">{siteSettings.featuredTitle || (lang === 'ru' ? 'Рекомендуемые модели' : 'Véhicules à la Une')}</h2>
+<p className="text-neutral-600 dark:text-neutral-400 text-sm font-light">{siteSettings.featuredSubtitle || (lang === 'ru' ? 'Автомобили прошли полную предпродажную подготовку и технический контроль.' : 'Tous les véhicules sont rigoureusement inspectés et prêts pour la livraison.')}</p>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+{cars.slice(0, 6).map((car) => (
+<div 
+key={car.id}
+className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/40 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col gold-glow-hover"
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год до */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска до' : 'Année max'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2026"
+value={yearMax}
+onChange={(e) => setYearMax(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Топливо */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Топливо' : 'Carburant'}
+</label>
+<select
+value={fuel}
+onChange={(e) => setFuel(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все типы' : 'Tous'}</option>
+{availableFuels.map(f => (
+<option key={f} value={f}>{t(f)}</option>
+))}
+</select>
+</div>
+
+{/* Коробка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{t('transmission')}
+</label>
+<select
+value={transmission}
+onChange={(e) => setTransmission(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allTransmissions')}</option>
+<option value="Automatique">{lang === 'ru' ? 'Автомат' : 'Automatique'}</option>
+<option value="Mécanique">{lang === 'ru' ? 'Механика' : 'Mécanique'}</option>
+</select>
+</div>
+
+{/* Статус */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Статус' : 'Disponibilité'}
+</label>
+<select
+value={status}
+onChange={(e) => setStatus(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allStatuses')}</option>
+<option value="En stock">{t('En stock')}</option>
+<option value="En arrivage">{t('En arrivage')}</option>
+<option value="Vendu">{t('Vendu')}</option>
+</select>
+</div>
+
+{/* Текстовый поиск */}
+<div className="space-y-1.5 sm:col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-3">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Поиск по ключевым словам' : 'Recherche textuelle'}
+</label>
+<div className="relative">
+<input
+type="text"
+placeholder={lang === 'ru' ? 'Например: GT3, Weissach...' : 'Ex: GT3, Weissach...'}
+value={searchQuery}
+onChange={(e) => setSearchQuery(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none transition-all"
+/>
+<div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400">
+<Icons.Search />
+</div>
+<button 
+onClick={() => {
+setCurrentView('catalog');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="inline-block px-10 py-4 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#e5c158] hover:shadow-[0_0_25px_rgba(212,175,55,0.2)] text-neutral-950 font-bold tracking-wide transition-all duration-300"
+>
+{lang === 'ru' ? `Открыть весь каталог (${cars.length} авто)` : lang === 'en' ? `Browse entire catalogue (${cars.length} cars)` : `Découvrir tout le catalogue (${cars.length} véhicules)`}
+</button>
+</div>
+</section>
+</>
+)}
+
+{currentView === 'catalog' && (
+<>
+{/* Блок фильтров каталога */}
+<section id="catalogue" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+{/* Хлебные крошки */}
+<div className="mb-6">
+<button 
+onClick={() => {
+setCurrentView('home');
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}}
+className="group flex items-center gap-2 text-xs text-neutral-600 hover:text-[#D4AF37] font-bold tracking-widest uppercase transition-all"
+>
+<Icons.ArrowLeft />
+<span className="group-hover:translate-x-1 transition-transform">{t('backToHome')}</span>
+</button>
+</div>
+<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-8 border-b border-neutral-200 dark:border-neutral-900">
+<div>
+<h2 className="text-3xl font-serif text-neutral-900 dark:text-white mb-2 tracking-wide">
+{lang === 'ru' ? 'Каталог автомобилей' : 'Catalogue des Véhicules'}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 text-sm">
+{lang === 'ru' ? 'Ознакомьтесь с нашим каталогом б/у и новых автомобилей.' : "Explorez notre catalogue de véhicules d'occasion et neufs."}
+</p>
+</div>
+</div>
+
+{/* Интерактивная плашка фильтров */}
+{(activeAdminTab === 'vehicles' || !isAdmin) && (
+<>
+<div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 mb-12 shadow-lg">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+
+{/* Марка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Марка' : 'Marque'}
+</label>
+<select
+value={selectedBrand}
+onChange={(e) => {
+setSelectedBrand(e.target.value);
+setSelectedModel('');
+}}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все марки' : 'Toutes'}</option>
+{availableBrands.map(b => (
+<option key={b} value={b}>{b}</option>
+))}
+</select>
+</div>
+
+{/* Модель */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Модель' : 'Modèle'}
+</label>
+<select
+value={selectedModel}
+onChange={(e) => setSelectedModel(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все модели' : 'Toutes'}</option>
+{availableModels.map(m => (
+<option key={m} value={m}>{m}</option>
+))}
+</select>
+</div>
+
+{/* Цена от */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Цена от (€)' : 'Prix min (€)'}
+</label>
+<input
+type="number"
+placeholder={lang === 'ru' ? 'от 0' : 'Min'}
+value={priceMin}
+onChange={(e) => setPriceMin(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Цена до */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Цена до (€)' : 'Prix max (€)'}
+</label>
+<input
+type="number"
+placeholder={lang === 'ru' ? 'до любой' : 'Max'}
+value={priceMax}
+onChange={(e) => setPriceMax(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год от */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска от' : 'Année min'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2020"
+value={yearMin}
+onChange={(e) => setYearMin(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Год до */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Год выпуска до' : 'Année max'}
+</label>
+<input
+type="number"
+placeholder="Ex: 2026"
+value={yearMax}
+onChange={(e) => setYearMax(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all"
+/>
+</div>
+
+{/* Топливо */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Топливо' : 'Carburant'}
+</label>
+<select
+value={fuel}
+onChange={(e) => setFuel(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{lang === 'ru' ? 'Все типы' : 'Tous'}</option>
+{availableFuels.map(f => (
+<option key={f} value={f}>{t(f)}</option>
+))}
+</select>
+</div>
+
+{/* Коробка */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{t('transmission')}
+</label>
+<select
+value={transmission}
+onChange={(e) => setTransmission(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allTransmissions')}</option>
+<option value="Automatique">{lang === 'ru' ? 'Автомат' : 'Automatique'}</option>
+<option value="Mécanique">{lang === 'ru' ? 'Механика' : 'Mécanique'}</option>
+</select>
+</div>
+
+{/* Статус */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Статус' : 'Disponibilité'}
+</label>
+<select
+value={status}
+onChange={(e) => setStatus(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white rounded-xl py-2.5 px-3 text-xs focus:outline-none transition-all appearance-none cursor-pointer"
+>
+<option value="">{t('allStatuses')}</option>
+<option value="En stock">{t('En stock')}</option>
+<option value="En arrivage">{t('En arrivage')}</option>
+<option value="Vendu">{t('Vendu')}</option>
+</select>
+</div>
+
+{/* Текстовый поиск */}
+<div className="space-y-1.5 sm:col-span-2 md:col-span-3 lg:col-span-3 xl:col-span-3">
+<label className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold block">
+{lang === 'ru' ? 'Поиск по ключевым словам' : 'Recherche textuelle'}
+</label>
+<div className="relative">
+<input
+type="text"
+placeholder={lang === 'ru' ? 'Например: GT3, Weissach...' : 'Ex: GT3, Weissach...'}
+value={searchQuery}
+onChange={(e) => setSearchQuery(e.target.value)}
+className="w-full bg-white dark:bg-[#161618] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 rounded-xl py-2.5 pl-10 pr-4 text-xs focus:outline-none transition-all"
+/>
+<div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400">
+<Icons.Search />
+<div className="flex items-center gap-3">
+<span className="text-[#D4AF37]"><Icons.Phone /></span>
+<span>{siteSettings.phone || "+33 6 00 00 00 00"}</span>
+</div>
+<div className="flex items-center gap-3">
+<span className="text-[#D4AF37]"><Icons.Mail /></span>
+<span>{siteSettings.email || "contact@ligoautomobiles.fr"}</span>
+</div>
+</div>
+</div>
+
+{/* Форма обратной связи */}
+<div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
+<form onSubmit={(e) => { e.preventDefault(); showNotification(lang === 'ru' ? 'Сообщение успешно отправлено! Мы свяжемся с вами.' : "Message envoyé avec succès !", "success"); }} className="space-y-6">
+<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div className="space-y-2">
+<label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{lang === 'ru' ? 'ФИО' : 'Nom complet'}</label>
+<input required type="text" placeholder="Jean Dupont" className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+</div>
+{/* Форма контактов */}
+<section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+<div className="lg:col-span-1 space-y-6">
+<div>
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">{siteSettings.contactSubtitle || (lang === 'ru' ? 'Связаться с нами' : 'Contact')}</span>
+<h2 className="text-3xl font-serif text-neutral-900 dark:text-white tracking-wide mt-2">{siteSettings.contactTitle || (lang === 'ru' ? 'Обсудим ваш проект' : 'Parlons de votre projet')}</h2>
+</div>
+<p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed">
+
+{}
+{/* Индикатор загрузки базы */}
+{loading ? (
+<div className="py-24 text-center space-y-4">
+<div className="inline-block w-8 h-8 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+<p className="text-neutral-600 text-sm font-mono tracking-wider">Mise à jour du catalogue...</p>
+</div>
+) : filteredCars.length === 0 ? (
+<div className="py-24 text-center border border-dashed border-neutral-300 dark:border-neutral-900 rounded-2xl bg-white dark:bg-[#121214]">
+<p className="text-neutral-400 mb-2">{lang === 'ru' ? 'Ни один автомобиль не соответствует вашим критериям поиска.' : 'Aucun véhicule ne correspond à vos critères de recherche.'}</p>
+<button 
+onClick={() => {
+setSearchQuery('');
+setSelectedBrand('');
+setSelectedModel('');
+setPriceMin('');
+setPriceMax('');
+setYearMin('');
+setYearMax('');
+setTransmission('');
+setFuel('');
+setStatus('');
+}}
+className="text-[#D4AF37] hover:underline text-sm font-semibold"
+>
+<div className="space-y-2">
+<label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{lang === 'ru' ? 'Электронная почта' : 'Adresse e-mail'}</label>
+<input required type="email" placeholder="jean@email.com" className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+</div>
+</div>
+<div className="space-y-2">
+<label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{lang === 'ru' ? 'Телефон' : 'Téléphone'}</label>
+<input type="tel" placeholder="+33 6..." className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+</div>
+<div className="space-y-2">
+<label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">Message</label>
+<textarea required rows="4" placeholder={lang === 'ru' ? 'Я хотел бы получить дополнительную информацию о Porsche 911 GT3 RS...' : 'Je souhaite obtenir des informations complémentaires...'} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all resize-none"></textarea>
+</div>
+<button type="submit" className="w-full py-4 rounded-2xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold tracking-wide transition-all shadow-lg hover:shadow-[#D4AF37]/20">
+{lang === 'ru' ? 'Отправить запрос' : 'Envoyer ma demande'}
+</button>
+</form>
+</div>
+</div>
+</section>
+</>
+)}
+
+{/* Подвал сайта */}
+<footer className="border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-400">
+<div className="max-w-7xl mx-auto px-4 space-y-4">
+<p className="tracking-widest font-serif font-bold text-neutral-300">{siteSettings.companyName || "Ligo Automobiles"}</p>
+<p>© {new Date().getFullYear()} {siteSettings.companyName || "Ligo Automobiles"}. Tous droits réservés. {siteSettings.address || "Paris, France"}.</p>
+</div>
+</footer>
+
+{/* Модальное окно авторизации админа */}
+{showAdminLoginModal && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div className="w-full max-w-md bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-2xl relative">
+// MISSING LINE 3201
+// MISSING LINE 3202
+// MISSING LINE 3203
+// MISSING LINE 3204
+// MISSING LINE 3205
+// MISSING LINE 3206
+// MISSING LINE 3207
+// MISSING LINE 3208
+// MISSING LINE 3209
+// MISSING LINE 3210
+// MISSING LINE 3211
+// MISSING LINE 3212
+// MISSING LINE 3213
+// MISSING LINE 3214
+// MISSING LINE 3215
+// MISSING LINE 3216
+// MISSING LINE 3217
+// MISSING LINE 3218
+// MISSING LINE 3219
+// MISSING LINE 3220
+// MISSING LINE 3221
+// MISSING LINE 3222
+// MISSING LINE 3223
+// MISSING LINE 3224
+// MISSING LINE 3225
+// MISSING LINE 3226
+// MISSING LINE 3227
+// MISSING LINE 3228
+// MISSING LINE 3229
+{/* Краткие технические характеристики */}
+<div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
+<div className="flex items-center gap-2">
+<Icons.Calendar />
+<span>{car.year}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Gauge />
+<span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Fuel />
+<span>{t(car.fuel)}</span>
+</div>
+<div className="flex items-center gap-2">
+<Icons.Activity />
+<span>{car.hp} {lang === 'ru' ? 'л.с.' : 'ch'}</span>
+</div>
+</div>
+</div>
+
+{/* Кнопки управления и просмотра */}
+<div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+<button 
+onClick={() => handleSelectCar(car)}
+className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+>
+{t('details')}
+</button>
+
+{isAdmin && (
+// MISSING LINE 3261
+// MISSING LINE 3262
+// MISSING LINE 3263
+// MISSING LINE 3264
+// MISSING LINE 3265
+// MISSING LINE 3266
+// MISSING LINE 3267
+// MISSING LINE 3268
+// MISSING LINE 3269
+// MISSING LINE 3270
+// MISSING LINE 3271
+// MISSING LINE 3272
+// MISSING LINE 3273
+// MISSING LINE 3274
+// MISSING LINE 3275
+// MISSING LINE 3276
+// MISSING LINE 3277
+// MISSING LINE 3278
+// MISSING LINE 3279
+// MISSING LINE 3280
+// MISSING LINE 3281
+// MISSING LINE 3282
+// MISSING LINE 3283
+// MISSING LINE 3284
+// MISSING LINE 3285
+// MISSING LINE 3286
+// MISSING LINE 3287
+// MISSING LINE 3288
+// MISSING LINE 3289
+)}
+
+{currentView === 'admin' && isAdmin && renderAdminDashboard()}
+
+{}
+{currentView === 'home' && (
+<>
+{/* Секция о нас */}
+<section id="propos" className="bg-[#F1F3F5] dark:bg-[#0D0D0D] border-y border-neutral-200 dark:border-neutral-900 py-20 text-neutral-900 dark:text-white">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div className="space-y-6">
+<span className="text-xs uppercase tracking-widest text-[#D4AF37] font-semibold">{siteSettings.aboutSubtitle || "Ligo Automobiles"}</span>
+<h2 className="text-3xl sm:text-4xl font-serif text-neutral-900 dark:text-white tracking-wide leading-snug">
+{siteSettings.aboutTitle || "Votre partenaire automobile de confiance en France"}
+</h2>
+<p className="text-neutral-600 dark:text-neutral-400 dark:text-neutral-400 font-light leading-relaxed">
+{siteSettings.aboutText || "Nous mettons notre expertise à votre service pour vous proposer des véhicules inspectés et garantis. Chaque modèle passe par une vérification administrative et technique rigoureuse."}
+</p>
+<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat1Number || "✓"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat1Label || "Garantie complète"}</div>
+</div>
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat2Number || "VIN"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat2Label || "Numéro vérifié"}</div>
+</div>
+<div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
+<div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat3Number || "DOC"}</div>
+<div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings.stat3Label || "Aide démarches"}</div>
+</div>
+</div>
+</div>
+<div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-200 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
+<img 
+// MISSING LINE 3326
+// MISSING LINE 3327
+// MISSING LINE 3328
+// MISSING LINE 3329
+// MISSING LINE 3330
+// MISSING LINE 3331
+// MISSING LINE 3332
+// MISSING LINE 3333
+// MISSING LINE 3334
+// MISSING LINE 3335
+// MISSING LINE 3336
+// MISSING LINE 3337
+// MISSING LINE 3338
+// MISSING LINE 3339
+// MISSING LINE 3340
+// MISSING LINE 3341
+// MISSING LINE 3342
+// MISSING LINE 3343
+// MISSING LINE 3344
+// MISSING LINE 3345
+// MISSING LINE 3346
+// MISSING LINE 3347
+// MISSING LINE 3348
+// MISSING LINE 3349
+// MISSING LINE 3350
+// MISSING LINE 3351
+// MISSING LINE 3352
+// MISSING LINE 3353
+// MISSING LINE 3354
+// MISSING LINE 3355
+// MISSING LINE 3356
+// MISSING LINE 3357
+// MISSING LINE 3358
+// MISSING LINE 3359
+// MISSING LINE 3360
+// MISSING LINE 3361
+// MISSING LINE 3362
+// MISSING LINE 3363
+// MISSING LINE 3364
+// MISSING LINE 3365
+// MISSING LINE 3366
+// MISSING LINE 3367
+// MISSING LINE 3368
+// MISSING LINE 3369
+// MISSING LINE 3370
+// MISSING LINE 3371
+// MISSING LINE 3372
+// MISSING LINE 3373
+// MISSING LINE 3374
+// MISSING LINE 3375
+// MISSING LINE 3376
+// MISSING LINE 3377
+// MISSING LINE 3378
+// MISSING LINE 3379
+// MISSING LINE 3380
+// MISSING LINE 3381
+// MISSING LINE 3382
+// MISSING LINE 3383
+// MISSING LINE 3384
+// MISSING LINE 3385
+// MISSING LINE 3386
+// MISSING LINE 3387
+// MISSING LINE 3388
+// MISSING LINE 3389
+</div>
+</div>
+</section>
+</>
+)}
+
+{/* Подвал сайта */}
+<footer className="border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-400">
+<div className="max-w-7xl mx-auto px-4 space-y-4">
+<p className="tracking-widest font-serif font-bold text-neutral-300">{siteSettings.companyName || "Ligo Automobiles"}</p>
+<p>© {new Date().getFullYear()} {siteSettings.companyName || "Ligo Automobiles"}. Tous droits réservés. {siteSettings.address || "Paris, France"}.</p>
+</div>
+</footer>
+
+{/* Модальное окно авторизации админа */}
+{showAdminLoginModal && (
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div className="w-full max-w-md bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-2xl relative">
+<button 
+onClick={() => setShowAdminLoginModal(false)}
+className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-neutral-800 dark:hover:text-white transition-colors"
+// MISSING LINE 3411
+// MISSING LINE 3412
+// MISSING LINE 3413
+// MISSING LINE 3414
+// MISSING LINE 3415
+// MISSING LINE 3416
+// MISSING LINE 3417
+// MISSING LINE 3418
+// MISSING LINE 3419
+// MISSING LINE 3420
+// MISSING LINE 3421
+// MISSING LINE 3422
+// MISSING LINE 3423
+// MISSING LINE 3424
+// MISSING LINE 3425
+// MISSING LINE 3426
+// MISSING LINE 3427
+// MISSING LINE 3428
+// MISSING LINE 3429
+// MISSING LINE 3430
+// MISSING LINE 3431
+// MISSING LINE 3432
+// MISSING LINE 3433
+// MISSING LINE 3434
+// MISSING LINE 3435
+// MISSING LINE 3436
+// MISSING LINE 3437
+// MISSING LINE 3438
+// MISSING LINE 3439
+// MISSING LINE 3440
+// MISSING LINE 3441
+// MISSING LINE 3442
+// MISSING LINE 3443
+// MISSING LINE 3444
+// MISSING LINE 3445
+// MISSING LINE 3446
+// MISSING LINE 3447
+// MISSING LINE 3448
+// MISSING LINE 3449
+// MISSING LINE 3450
+// MISSING LINE 3451
+// MISSING LINE 3452
+// MISSING LINE 3453
+// MISSING LINE 3454
+// MISSING LINE 3455
+// MISSING LINE 3456
+// MISSING LINE 3457
+// MISSING LINE 3458
+// MISSING LINE 3459
+// MISSING LINE 3460
+// MISSING LINE 3461
+// MISSING LINE 3462
+// MISSING LINE 3463
+// MISSING LINE 3464
+// MISSING LINE 3465
+// MISSING LINE 3466
+// MISSING LINE 3467
+// MISSING LINE 3468
+// MISSING LINE 3469
+// MISSING LINE 3470
+// MISSING LINE 3471
+// MISSING LINE 3472
+// MISSING LINE 3473
+// MISSING LINE 3474
+// MISSING LINE 3475
+// MISSING LINE 3476
+// MISSING LINE 3477
+// MISSING LINE 3478
+// MISSING LINE 3479
+// MISSING LINE 3480
+// MISSING LINE 3481
+// MISSING LINE 3482
+// MISSING LINE 3483
+// MISSING LINE 3484
+// MISSING LINE 3485
+// MISSING LINE 3486
+// MISSING LINE 3487
+// MISSING LINE 3488
+// MISSING LINE 3489
+// MISSING LINE 3490
+// MISSING LINE 3491
+// MISSING LINE 3492
+// MISSING LINE 3493
+// MISSING LINE 3494
+// MISSING LINE 3495
+// MISSING LINE 3496
+// MISSING LINE 3497
+// MISSING LINE 3498
+// MISSING LINE 3499
+// MISSING LINE 3500
+// MISSING LINE 3501
+// MISSING LINE 3502
+// MISSING LINE 3503
+// MISSING LINE 3504
+// MISSING LINE 3505
+// MISSING LINE 3506
+// MISSING LINE 3507
+// MISSING LINE 3508
+// MISSING LINE 3509
+// MISSING LINE 3510
+// MISSING LINE 3511
+// MISSING LINE 3512
+// MISSING LINE 3513
+// MISSING LINE 3514
+// MISSING LINE 3515
+// MISSING LINE 3516
+// MISSING LINE 3517
+// MISSING LINE 3518
+// MISSING LINE 3519
+// MISSING LINE 3520
+// MISSING LINE 3521
+// MISSING LINE 3522
+// MISSING LINE 3523
+// MISSING LINE 3524
+// MISSING LINE 3525
+// MISSING LINE 3526
+// MISSING LINE 3527
+// MISSING LINE 3528
+// MISSING LINE 3529
+// MISSING LINE 3530
+// MISSING LINE 3531
+// MISSING LINE 3532
+// MISSING LINE 3533
+// MISSING LINE 3534
+// MISSING LINE 3535
+// MISSING LINE 3536
+// MISSING LINE 3537
+// MISSING LINE 3538
+// MISSING LINE 3539
+// MISSING LINE 3540
+// MISSING LINE 3541
+// MISSING LINE 3542
+// MISSING LINE 3543
+// MISSING LINE 3544
+// MISSING LINE 3545
+// MISSING LINE 3546
+// MISSING LINE 3547
+// MISSING LINE 3548
+// MISSING LINE 3549
+// MISSING LINE 3550
+// MISSING LINE 3551
+// MISSING LINE 3552
+// MISSING LINE 3553
+// MISSING LINE 3554
+// MISSING LINE 3555
+// MISSING LINE 3556
+// MISSING LINE 3557
+// MISSING LINE 3558
+// MISSING LINE 3559
+// MISSING LINE 3560
+// MISSING LINE 3561
+// MISSING LINE 3562
+// MISSING LINE 3563
+// MISSING LINE 3564
+// MISSING LINE 3565
+// MISSING LINE 3566
+// MISSING LINE 3567
+// MISSING LINE 3568
+// MISSING LINE 3569
+// MISSING LINE 3570
+// MISSING LINE 3571
+// MISSING LINE 3572
+// MISSING LINE 3573
+// MISSING LINE 3574
+{/* Section 4: Description */}
+<div className="space-y-1.5">
+<label className="text-[10px] uppercase tracking-wider text-neutral-600 font-bold">Description complète</label>
+<textarea 
+rows="3" 
+placeholder="Présentation, options spécifiques, historique..." 
+value={formData.description} 
+onChange={(e) => setFormData({...formData, description: e.target.value})} 
+className="w-full bg-neutral-50 border border-neutral-200 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-neutral-900 placeholder-neutral-450 focus:outline-none transition-all resize-none"
+></textarea>
+</div>
+
+<div className="flex gap-4 pt-4 border-t border-neutral-200">
+<button 
+type="button" 
+onClick={() => setShowAddEditModal(false)} 
+className="flex-1 py-3 rounded-xl bg-neutral-150 hover:bg-neutral-200 text-neutral-700 font-bold transition-all border border-neutral-200"
+>
+Annuler
+</button>
+<button 

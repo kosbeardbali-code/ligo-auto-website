@@ -1,0 +1,8 @@
+src/App.tsx(528,7): error TS1005: ',' expected.
+src/App.tsx(685,7): error TS1005: ',' expected.
+src/App.tsx(842,7): error TS1005: ',' expected.
+src/App.tsx(2021,9): error TS1005: ')' expected.
+src/App.tsx(2021,11): error TS1003: Identifier expected.
+src/App.tsx(2568,5): error TS1128: Declaration or statement expected.
+src/App.tsx(2569,3): error TS1109: Expression expected.
+src/App.tsx(2570,1): error TS1128: Declaration or statement expected.
