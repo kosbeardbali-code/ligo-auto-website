@@ -5,20 +5,19 @@ import { getFirestore, doc, addDoc, updateDoc, deleteDoc, onSnapshot, collection
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 
-declare const __firebase_config: string;
-declare const __app_id: string | undefined;
-
-// Safe lookup for global window configuration variables
-const firebaseConfigStr = typeof window !== 'undefined' && (window as any).__firebase_config 
-  ? (window as any).__firebase_config 
-  : typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-const firebaseConfig = JSON.parse(firebaseConfigStr);
+// Hardcoded Firebase configuration for Vercel deployment
+const firebaseConfig = {
+  apiKey: "AIzaSyCDtqzovTjat0DLJ161aiEfpmKeeYn6I8",
+  authDomain: "ligo-auto.firebaseapp.com",
+  projectId: "ligo-auto",
+  storageBucket: "ligo-auto.firebasestorage.app",
+  messagingSenderId: "1038813841068",
+  appId: "1:1038813841068:web:56e339aca331d66d100109"
+};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof window !== 'undefined' && (window as any).__app_id 
-  ? (window as any).__app_id 
-  : typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const appId = firebaseConfig.appId;
 
 // Helper to wrap Firestore promises with a timeout
 function withTimeout<T>(promise: Promise<T>, timeoutMs = 3000): Promise<T> {
