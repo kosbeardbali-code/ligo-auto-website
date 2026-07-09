@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = firebaseConfig.appId;
+const appId = "ligo-auto";
 
 // Helper to wrap Firestore promises with a timeout
 function withTimeout<T>(promise: Promise<T>, timeoutMs = 3000): Promise<T> {
