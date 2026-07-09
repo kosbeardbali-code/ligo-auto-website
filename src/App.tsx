@@ -436,7 +436,7 @@ export default function App() {
       fuel: "Carburant",
       transmission: "Transmission",
       enginePower: "Puissance moteur",
-      co2Emissions: "Émissions CO₂",
+      co2Emissions: "Puissance fiscale (P6)",
       vinCertified: "Numéro VIN certifié",
       backToCatalog: "Retour au catalogue",
       backToHome: "Retour à l'accueil",
@@ -497,7 +497,7 @@ export default function App() {
       Manuelle: "Manuelle",
       Mécanique: "Manuelle",
       "En stock": "Disponible",
-      "En arrivage": "En arrivage",
+      "En arrivage": "Réservé",
       Vendu: "Vendu",
       hp: "ch",
       copy: "Copier",
@@ -537,17 +537,33 @@ export default function App() {
       tabFormsLeasing: "Formulaires & LOA",
       fillAllFields: "Veuillez remplir tous les champs obligatoires.",
       allRightsReserved: "Tous droits réservés",
-      stat1Label: "Garantie sur tous les véhicules",
-      stat2Label: "Numéro VIN vérifié",
-      stat3Label: "Aide aux démarches",
+      stat1Title: "INSPECTION / SÉLECTION RIGOUREUSE",
+      stat1Sub: "Confiance / État du véhicule",
+      stat2Title: "VIN / NUMÉRO VÉRIFIÉ",
+      stat2Sub: "Transparence / Historique",
+      stat3Title: "LOG / LOGISTIQUE SÉCURISÉE ou CMD / SUR MESURE",
+      stat3Sub: "Service / Logistique",
       prevImage: "Précédent (Gauche)",
       nextImage: "Suivant (Droite)",
       confirmDeletion: "Confirmer la suppression",
       navHelp: "Utilisez les touches ◄ et ► pour naviguer, Echap pour fermer",
-      prevImage: "Précédent (Gauche)",
-      nextImage: "Suivant (Droite)",
-      confirmDeletion: "Confirmer la suppression",
-      navHelp: "Utilisez les touches ◄ et ► pour naviguer, Echap pour fermer",
+      namePlaceholder: "Jean Dupont",
+      emailPlaceholder: "jean@email.com",
+      phonePlaceholder: "+33 6...",
+      passwordPlaceholder: "Mot de passe",
+      generalInfoStep: "Informations générales",
+      mileageKm: "Kilométrage (km)",
+      priceEuro: "Prix (€)",
+      powerHp: "Puissance (ch)",
+      techSpecsStep: "Caractéristiques Techniques",
+      status: "Statut",
+      co2gkm: "Puissance fiscale (P6)",
+      certifyVin: "Certifier le VIN",
+      mediaGalleryStep: "Galerie Média",
+      mainImage: "Image Principale",
+      photoGalleryLimit: "Galerie Photo (Max 30)",
+      dragOr: "Glissez ou",
+      browse: "parcourez",
     },
     en: {
       catalog: "Catalogue",
@@ -570,7 +586,7 @@ export default function App() {
       fuel: "Fuel",
       transmission: "Transmission",
       enginePower: "Engine Power",
-      co2Emissions: "CO₂ Emissions",
+      co2Emissions: "Fiscal power (P6)",
       vinCertified: "Certified VIN",
       backToCatalog: "Back to catalogue",
       backToHome: "Back to home",
@@ -631,7 +647,7 @@ export default function App() {
       Manuelle: "Manual",
       Mécanique: "Manual",
       "En stock": "In stock",
-      "En arrivage": "In transit",
+      "En arrivage": "Reserved",
       Vendu: "Sold",
       hp: "hp",
       copy: "Copy",
@@ -671,17 +687,33 @@ export default function App() {
       tabFormsLeasing: "Forms & Leasing",
       fillAllFields: "Please fill in all required fields.",
       allRightsReserved: "All rights reserved",
-      stat1Label: "Warranty on all cars",
-      stat2Label: "Verified VIN number",
-      stat3Label: "Help with paperwork",
+      stat1Title: "RIGOROUS INSPECTION / SELECTION",
+      stat1Sub: "Trust / Vehicle Condition",
+      stat2Title: "VIN / VERIFIED NUMBER",
+      stat2Sub: "Transparency / History",
+      stat3Title: "SECURE LOGISTICS / CUSTOM ORDER",
+      stat3Sub: "Service / Logistics",
       prevImage: "Previous (Left)",
       nextImage: "Next (Right)",
       confirmDeletion: "Confirm Deletion",
       navHelp: "Use ◄ and ► to navigate, Esc to close",
-      prevImage: "Previous (Left)",
-      nextImage: "Next (Right)",
-      confirmDeletion: "Confirm Deletion",
-      navHelp: "Use ◄ and ► to navigate, Esc to close",
+      namePlaceholder: "John Doe",
+      emailPlaceholder: "john@email.com",
+      phonePlaceholder: "+1 234...",
+      passwordPlaceholder: "Password",
+      generalInfoStep: "General Info",
+      mileageKm: "Mileage (km)",
+      priceEuro: "Price (€)",
+      powerHp: "Power (hp)",
+      techSpecsStep: "Tech Specs",
+      status: "Status",
+      co2gkm: "Fiscal power (P6)",
+      certifyVin: "Certify VIN",
+      mediaGalleryStep: "Media Gallery",
+      mainImage: "Main Image",
+      photoGalleryLimit: "Photo Gallery (Max 30)",
+      dragOr: "Drag or",
+      browse: "browse",
     },
     ru: {
       catalog: "Каталог",
@@ -704,7 +736,7 @@ export default function App() {
       fuel: "Тип топлива",
       transmission: "Коробка передач",
       enginePower: "Мощность двигателя",
-      co2Emissions: "Выбросы CO₂",
+      co2Emissions: "Налоговая мощность (P6)",
       vinCertified: "Сертифицированный VIN",
       backToCatalog: "Назад в каталог",
       backToHome: "Назад на главную",
@@ -765,7 +797,7 @@ export default function App() {
       Manuelle: "Механика",
       Mécanique: "Механика",
       "En stock": "В наличии",
-      "En arrivage": "В пути",
+      "En arrivage": "Зарезервировано",
       Vendu: "Продано",
       hp: "л.с.",
       copy: "Копировать",
@@ -805,17 +837,33 @@ export default function App() {
       tabFormsLeasing: "Формы / Лизинг",
       fillAllFields: "Пожалуйста, заполните все обязательные поля.",
       allRightsReserved: "Все права защищены",
-      stat1Label: "Гарантия на все авто",
-      stat2Label: "Проверенный номер",
-      stat3Label: "Помощь с документами",
+      stat1Title: "СТРОГИЙ ОСМОТР / ОТБОР",
+      stat1Sub: "Надежность / Состояние авто",
+      stat2Title: "VIN / ПРОВЕРЕННЫЙ НОМЕР",
+      stat2Sub: "Прозрачность / История",
+      stat3Title: "БЕЗОПАСНАЯ ЛОГИСТИКА / ПОД ЗАКАЗ",
+      stat3Sub: "Сервис / Логистика",
       prevImage: "Назад (Влево)",
       nextImage: "Вперед (Вправо)",
       confirmDeletion: "Подтвердить удаление",
       navHelp: "Используйте ◄ и ► для навигации, Esc для закрытия",
-      prevImage: "Назад (Влево)",
-      nextImage: "Вперед (Вправо)",
-      confirmDeletion: "Подтвердить удаление",
-      navHelp: "Используйте ◄ и ► для навигации, Esc для закрытия",
+      namePlaceholder: "Иван Иванов",
+      emailPlaceholder: "ivan@email.com",
+      phonePlaceholder: "+7 900...",
+      passwordPlaceholder: "Пароль",
+      generalInfoStep: "Основная информация",
+      mileageKm: "Пробег (км)",
+      priceEuro: "Цена (€)",
+      powerHp: "Мощность (л.с.)",
+      techSpecsStep: "Технические характеристики",
+      status: "Статус",
+      co2gkm: "Налоговая мощность (P6)",
+      certifyVin: "Подтвердить VIN",
+      mediaGalleryStep: "Медиагалерея",
+      mainImage: "Главное фото",
+      photoGalleryLimit: "Галерея фото (Макс 30)",
+      dragOr: "Перетащите или",
+      browse: "выберите файл",
     }
   };
 
@@ -830,8 +878,8 @@ export default function App() {
   const DEFAULT_SETTINGS = {
     companyName: "Ligo Automobiles",
     address: "Paris, France",
-    phone: "+33 6 00 00 00 00",
-    email: "contact@ligoautomobiles.fr",
+    phone: "+33 7 66 75 32 23",
+    email: "ligo.automobiles@gmail.com",
     bannerImage: "",
     aboutImage: "",
     stat1Number: "✓",
@@ -847,9 +895,12 @@ export default function App() {
       featuredCategory: "Каталог",
       featuredTitle: "Наши автомобили",
       featuredSubtitle: "Проверенные технически и готовые к эксплуатации модели.",
-      stat1Label: "Гарантия на все авто",
-      stat2Label: "Проверенный номер",
-      stat3Label: "Помощь с документами",
+      stat1Title: "СТРОГИЙ ОСМОТР / ОТБОР",
+      stat1Sub: "Надежность / Состояние авто",
+      stat2Title: "VIN / ПРОВЕРЕННЫЙ НОМЕР",
+      stat2Sub: "Прозрачность / История",
+      stat3Title: "БЕЗОПАСНАЯ ЛОГИСТИКА / ПОД ЗАКАЗ",
+      stat3Sub: "Сервис / Логистика",
       contactTitle: "Связаться с нами",
       contactSubtitle: "Обсудим ваш проект",
       contactDescription: "Хотите получить дополнительную информацию о конкретной модели? Свяжитесь с нами напрямую."
@@ -864,9 +915,12 @@ export default function App() {
       featuredCategory: "Catalogue",
       featuredTitle: "Nos Véhicules",
       featuredSubtitle: "Des modèles techniquement éprouvés et prêts à l'emploi.",
-      stat1Label: "Garantie sur tous les véhicules",
-      stat2Label: "Numéro VIN vérifié",
-      stat3Label: "Aide aux démarches",
+      stat1Title: "INSPECTION / SÉLECTION RIGOUREUSE",
+      stat1Sub: "Confiance / État du véhicule",
+      stat2Title: "VIN / NUMÉRO VÉRIFIÉ",
+      stat2Sub: "Transparence / Historique",
+      stat3Title: "LOG / LOGISTIQUE SÉCURISÉE ou CMD / SUR MESURE",
+      stat3Sub: "Service / Logistique",
       contactTitle: "Contactez-nous",
       contactSubtitle: "Discutons de votre projet",
       contactDescription: "Vous souhaitez plus d'informations sur un modèle précis ? Contactez-nous directement."
@@ -881,9 +935,12 @@ export default function App() {
       featuredCategory: "Catalogue",
       featuredTitle: "Our Vehicles",
       featuredSubtitle: "Technically proven and ready-to-run models.",
-      stat1Label: "Warranty on all cars",
-      stat2Label: "Verified VIN number",
-      stat3Label: "Help with paperwork",
+      stat1Title: "RIGOROUS INSPECTION / SELECTION",
+      stat1Sub: "Trust / Vehicle Condition",
+      stat2Title: "VIN / VERIFIED NUMBER",
+      stat2Sub: "Transparency / History",
+      stat3Title: "SECURE LOGISTICS / CUSTOM ORDER",
+      stat3Sub: "Service / Logistics",
       contactTitle: "Contact Us",
       contactSubtitle: "Discuss your project",
       contactDescription: "Want to get more information about a specific model? Contact us directly."
@@ -1287,7 +1344,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen overflow-x-hidden w-full font-sans antialiased ${theme === 'dark' ? 'bg-[#0A0A0B] text-white' : 'bg-[#F8F9FA] text-neutral-900'}`}>
+    <div lang={lang} className={`min-h-screen overflow-x-hidden w-full font-sans antialiased ${theme === 'dark' ? 'bg-[#0A0A0B] text-white' : 'bg-[#F8F9FA] text-neutral-900'}`}>
 
       {/* Кастомная нотификация */}
       {notification && (
@@ -1302,12 +1359,11 @@ export default function App() {
 
       {/* Хэдер */}
       <header className="bg-white dark:bg-[#0A0A0B] border-b border-neutral-200 dark:border-neutral-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1 flex items-center justify-between">
           <div onClick={() => { setCurrentView('home'); setSelectedCar(null); window.scrollTo({ top: 0 }); }} className="cursor-pointer flex items-center gap-1">
-            <span className="text-xl sm:text-2xl md:text-3xl font-serif font-black tracking-wide text-neutral-900 dark:text-white">Ligo</span>
-            <span className="text-xl sm:text-2xl md:text-3xl font-serif font-black tracking-wide text-[#D4AF37]">Automobiles</span>
+            <img src="/logo.png" alt="Ligo Automobiles Logo" className="h-24 sm:h-32 md:h-40 w-auto -my-6 md:-my-10 dark:invert dark:hue-rotate-180 mix-blend-multiply dark:mix-blend-screen" />
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest font-semibold">
+          <nav className="hidden md:flex items-center gap-12 lg:gap-20 text-sm uppercase tracking-widest font-semibold">
             <button onClick={() => { setCurrentView('catalog'); window.scrollTo({ top: 0 }); }} className="text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
             <a href="#propos" onClick={(e) => { e.preventDefault(); setCurrentView('home'); setTimeout(() => document.getElementById('propos')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors">{t('about')}</a>
             <a href="#contact" onClick={(e) => { e.preventDefault(); setCurrentView('home'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] transition-colors">{t('contact')}</a>
@@ -1356,16 +1412,16 @@ export default function App() {
               {/* 3 Cards */}
               <div className="flex flex-col sm:flex-row gap-6 pt-12 w-full justify-center max-w-6xl">
                 <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-lg border border-white/20 hover:bg-black/60 transition-colors">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <p className="text-xs uppercase tracking-widest text-white font-bold drop-shadow">Garantie Complète</p>
+                  <div className="text-[11px] md:text-[13px] font-serif font-black text-[#D4AF37] mb-2 leading-tight drop-shadow uppercase">{siteSettings[lang]?.stat1Title || DEFAULT_SETTINGS[lang]?.stat1Title || t('stat1Title')}</div>
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white font-bold drop-shadow">{siteSettings[lang]?.stat1Sub || DEFAULT_SETTINGS[lang]?.stat1Sub || t('stat1Sub')}</p>
                 </div>
                 <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-lg border border-white/20 hover:bg-black/60 transition-colors">
-                  <div className="text-2xl font-serif font-black text-[#D4AF37] mb-1 leading-none drop-shadow">VIN</div>
-                  <p className="text-xs uppercase tracking-widest text-white font-bold drop-shadow">Numéro Vérifié</p>
+                  <div className="text-[11px] md:text-[13px] font-serif font-black text-[#D4AF37] mb-2 leading-tight drop-shadow uppercase">{siteSettings[lang]?.stat2Title || DEFAULT_SETTINGS[lang]?.stat2Title || t('stat2Title')}</div>
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white font-bold drop-shadow">{siteSettings[lang]?.stat2Sub || DEFAULT_SETTINGS[lang]?.stat2Sub || t('stat2Sub')}</p>
                 </div>
                 <div className="flex-1 bg-black/40 backdrop-blur-md rounded-2xl p-5 flex flex-col items-center justify-center text-center shadow-lg border border-white/20 hover:bg-black/60 transition-colors">
-                  <div className="text-2xl font-serif font-black text-[#D4AF37] mb-1 leading-none drop-shadow">DOC</div>
-                  <p className="text-xs uppercase tracking-widest text-white font-bold drop-shadow">Aide Démarches</p>
+                  <div className="text-[11px] md:text-[13px] font-serif font-black text-[#D4AF37] mb-2 leading-tight drop-shadow uppercase">{siteSettings[lang]?.stat3Title || DEFAULT_SETTINGS[lang]?.stat3Title || t('stat3Title')}</div>
+                  <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white font-bold drop-shadow">{siteSettings[lang]?.stat3Sub || DEFAULT_SETTINGS[lang]?.stat3Sub || t('stat3Sub')}</p>
                 </div>
               </div>
             </div>
@@ -1389,20 +1445,113 @@ export default function App() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cars.slice(0, 6).map((car) => (
-              <div key={car.id} className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37] rounded-3xl overflow-hidden transition-all duration-500 flex flex-col hover:shadow-2xl hover:-translate-y-1" onClick={() => handleSelectCar(car)}>
-                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-200 dark:bg-neutral-950 cursor-pointer">
-                  <img src={car.image || getFallbackSvg()} alt={`${car.brand} ${car.model}`} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" onError={(e) => { const fb = getFallbackSvg(); if (e.currentTarget.src !== fb) e.currentTarget.src = fb; }} />
+              <div 
+                key={car.id}
+                className="group relative bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37] rounded-3xl overflow-hidden transition-all duration-500 flex flex-col hover:shadow-2xl hover:-translate-y-1"
+              >
+                {/* Картинка и плашки */}
+                <div 
+                  onClick={() => handleSelectCar(car)}
+                  className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
+                >
+                  <img 
+                    src={car.image || getFallbackSvg(800, 500, 24, 3)} 
+                    alt={`${car.brand} ${car.model}`}
+                    className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
+                    onError={(e) => {
+                      const fallback = getFallbackSvg(800, 500, 24, 3);
+                      if (e.currentTarget.src !== fallback) {
+                        e.currentTarget.src = fallback;
+                      }
+                    }}
+                  />
                   <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-[#121214] to-transparent"></div>
+                  
+                  {/* Статус-бейдж */}
+                  <div className="absolute top-4 left-4 flex flex-col gap-2">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                      car.status === 'Vendu' 
+                        ? 'bg-neutral-900 text-neutral-400 border border-neutral-800' 
+                        : car.status === 'En arrivage'
+                          ? 'bg-amber-950/40 text-amber-400 border border-amber-900/50'
+                          : 'bg-green-950/40 text-green-400 border border-green-900/50'
+                    }`}>
+                      {t(car.status)}
+                    </span>
+                    {car.verifiedVin && (
+                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
+                        <Icons.CheckBadge />
+                        {t('vinVerified')}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
-                    <h3 className="text-lg font-bold text-neutral-900 dark:text-white mt-0.5">{car.model}</h3>
+
+                {/* Основное описание */}
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div onClick={() => handleSelectCar(car)} className="cursor-pointer">
+                        <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                        <h3 className="text-xl font-bold text-neutral-900 dark:text-white group-hover:text-[#D4AF37] transition-colors">{car.model}</h3>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-serif font-black text-[#D4AF37]">
+                          {car.price ? car.price.toLocaleString('fr-FR') : '0'} €
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Краткие технические характеристики */}
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
+                      <div className="flex items-center gap-2">
+                        <Icons.Calendar />
+                        <span>{car.year}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Icons.Gauge />
+                        <span>{car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Icons.Fuel />
+                        <span>{t(car.fuel)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Icons.Activity />
+                        <span>{car.hp} {t('hp')}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-800">
-                    <span className="text-lg font-serif font-black text-[#D4AF37]">{car.price ? car.price.toLocaleString('fr-FR') : '0'} €</span>
-                    <span className="text-xs text-neutral-500 dark:text-neutral-400">{car.year} • {car.km ? car.km.toLocaleString('fr-FR') : '0'} km</span>
+
+                  {/* Кнопки управления и просмотра */}
+                  <div className="mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between gap-3">
+                    <button 
+                      onClick={() => handleSelectCar(car)}
+                      className="flex-1 py-3.5 px-4 bg-transparent hover:bg-[#D4AF37] hover:text-neutral-950 text-[#D4AF37] border border-[#D4AF37]/30 hover:border-[#D4AF37] uppercase tracking-widest transition-all duration-300 rounded-xl font-bold text-xs"
+                    >
+                      {t('details')}
+                    </button>
+                    
+                    {isAdmin && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => handleOpenEditModal(car)}
+                          className="p-3 rounded-xl bg-neutral-900 hover:bg-[#D4AF37]/10 border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37] text-neutral-400 hover:text-[#D4AF37] transition-all"
+                          title={t('edit')}
+                        >
+                          <Icons.Edit />
+                        </button>
+                        <button 
+                          onClick={() => setDeleteConfirmCar(car)}
+                          className="p-3 rounded-xl bg-neutral-900 hover:bg-red-950/45 border border-neutral-200 dark:border-neutral-800 hover:border-red-650 text-neutral-400 hover:text-red-400 transition-all"
+                          title={t('delete')}
+                        >
+                          <Icons.Trash />
+                        </button>
+                      </div>
+                    )}
                   </div>
+
                 </div>
               </div>
             ))}
@@ -1440,18 +1589,6 @@ export default function App() {
                 <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{selectedCar.brand}</span>
                 <h1 className="text-4xl font-serif font-black text-neutral-900 dark:text-white mt-1">{selectedCar.model}</h1>
                 <div className="text-4xl font-serif font-black text-[#D4AF37] mt-3 mb-6">{selectedCar.price ? selectedCar.price.toLocaleString('fr-FR') : '0'} €</div>
-                
-                {/* Contact Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  <a href={`https://wa.me/${siteSettings.whatsapp?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3.5 rounded-xl font-bold transition-colors">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-                    WhatsApp
-                  </a>
-                  <a href={`tel:${siteSettings.phone?.replace(/[^0-9+]/g, '')}`} className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37] text-neutral-900 dark:text-white px-6 py-3.5 rounded-xl font-bold transition-colors">
-                    <Icons.Phone />
-                    {t('callUs')}
-                  </a>
-                </div>
               </div>
               
               {(() => {
@@ -1464,7 +1601,7 @@ export default function App() {
               })()}
               
               <div className="flex gap-4 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto">
-                {['specs', 'finance', 'paperwork', 'testdrive'].map(tab => (
+                {['specs', 'testdrive'].map(tab => (
                   <button key={tab} onClick={() => setActiveDetailsTab(tab)} className={`py-3 text-xs font-bold uppercase tracking-widest whitespace-nowrap border-b-2 transition-all ${activeDetailsTab === tab ? 'border-[#D4AF37] text-[#D4AF37]' : 'border-transparent text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300'}`}>
                     {tab === 'specs' ? t('specifications') : tab === 'finance' ? t('financing') : tab === 'paperwork' ? t('procedures') : t('testDrive')}
                   </button>
@@ -1480,7 +1617,7 @@ export default function App() {
                     <div className="flex flex-col"><span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 mb-1">{t('fuel')}</span><span className="font-semibold text-neutral-900 dark:text-white">{t(selectedCar.fuel)}</span></div>
                     <div className="flex flex-col"><span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 mb-1">{t('transmission')}</span><span className="font-semibold text-neutral-900 dark:text-white">{t(selectedCar.transmission)}</span></div>
                     <div className="flex flex-col"><span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 mb-1">{t('enginePower')}</span><span className="font-semibold text-neutral-900 dark:text-white">{selectedCar.hp} {t('hp')}</span></div>
-                    <div className="flex flex-col"><span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 mb-1">{t('co2Emissions')}</span><span className="font-semibold text-neutral-900 dark:text-white">{selectedCar.co2} g/km</span></div>
+                    <div className="flex flex-col"><span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 mb-1">{t('co2Emissions')}</span><span className="font-semibold text-neutral-900 dark:text-white">{selectedCar.co2} CV</span></div>
                   </div>
 
                   {selectedCar.vin && (
@@ -1489,46 +1626,22 @@ export default function App() {
                       <button onClick={() => handleCopyVIN(selectedCar.vin)} className="px-3 py-1.5 rounded-lg bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all">{t('copy')}</button>
                     </div>
                   )}
-                </div>
-              )}
 
-              {activeDetailsTab === 'finance' && (
-                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 space-y-4">
-                  <h3 className="text-sm font-serif font-bold text-neutral-900 dark:text-white">{t('simulatedLoa')}</h3>
-                  <div className="space-y-3">
-                    <div><label className="text-xs text-neutral-500 dark:text-neutral-400">{t('apport')}: {loanApport.toLocaleString('fr-FR')} €</label><input type="range" min="0" max={selectedCar.price * 0.5} step="1000" value={loanApport} onChange={(e) => setLoanApport(Number(e.target.value))} className="w-full accent-[#D4AF37]" /></div>
-                    <div><label className="text-xs text-neutral-500 dark:text-neutral-400">{t('duration')}: {loanDuration} {t('months')}</label><input type="range" min="24" max="72" step="12" value={loanDuration} onChange={(e) => setLoanDuration(Number(e.target.value))} className="w-full accent-[#D4AF37]" /></div>
-                  </div>
-                  <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-xl p-4 text-center">
-                    <div className="text-xs text-neutral-600 dark:text-neutral-400 mb-1">{t('monthlyPayment')}</div>
-                    <div className="text-3xl font-serif font-black text-[#D4AF37]">{Math.round((selectedCar.price - loanApport) / loanDuration).toLocaleString('fr-FR')} € / {t('months')}</div>
+                  {/* Contact Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+                    <a href={`https://wa.me/${siteSettings.whatsapp?.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3.5 rounded-xl font-bold transition-colors shadow-sm">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                      WhatsApp
+                    </a>
+                    <a href={`tel:${siteSettings.phone?.replace(/[^0-9+]/g, '')}`} className="flex-1 flex items-center justify-center gap-2 bg-white dark:bg-[#1A1A1C] border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37] text-neutral-900 dark:text-white px-6 py-3.5 rounded-xl font-bold transition-colors shadow-sm">
+                      <Icons.Phone />
+                      {t('callUs')}
+                    </a>
                   </div>
                 </div>
               )}
 
-              {activeDetailsTab === 'paperwork' && (
-                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6">
-                  <h3 className="text-sm font-serif font-bold text-neutral-900 dark:text-white mb-4">{t('applyCG')}</h3>
-                  <form onSubmit={handleCarteGriseSubmit} className="space-y-3">
-                    <input type="text" placeholder={t('fullName')} value={cgForm.name} onChange={(e) => setCgForm({...cgForm, name: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-sm text-neutral-900 dark:text-white focus:outline-none" required />
-                    <input type="email" placeholder={t('email')} value={cgForm.email} onChange={(e) => setCgForm({...cgForm, email: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-sm text-neutral-900 dark:text-white focus:outline-none" required />
-                    <input type="tel" placeholder={t('phone')} value={cgForm.phone} onChange={(e) => setCgForm({...cgForm, phone: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-sm text-neutral-900 dark:text-white focus:outline-none" required />
-                    <input type="text" placeholder={t('address')} value={cgForm.address} onChange={(e) => setCgForm({...cgForm, address: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2.5 px-4 text-sm text-neutral-900 dark:text-white focus:outline-none" required />
-                    <div className="flex items-center gap-2"><input type="checkbox" checked={cgForm.hasTradeIn} onChange={(e) => setCgForm({...cgForm, hasTradeIn: e.target.checked})} className="rounded border-neutral-300 text-[#D4AF37]" /><label className="text-xs text-neutral-600 dark:text-neutral-400">{t('tradeInQuestion')}</label></div>
-                    {cgForm.hasTradeIn && (
-                      <div className="space-y-2 pl-4 border-l-2 border-[#D4AF37]/30">
-                        <input type="text" placeholder={t('tradeInBrandModel')} value={cgForm.tradeInBrandModel} onChange={(e) => setCgForm({...cgForm, tradeInBrandModel: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-sm text-neutral-900 dark:text-white focus:outline-none" />
-                        <div className="grid grid-cols-3 gap-2">
-                          <input type="text" placeholder={t('tradeInYear')} value={cgForm.tradeInYear} onChange={(e) => setCgForm({...cgForm, tradeInYear: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-sm text-neutral-900 dark:text-white focus:outline-none" />
-                          <input type="text" placeholder={t('tradeInKm')} value={cgForm.tradeInKm} onChange={(e) => setCgForm({...cgForm, tradeInKm: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-sm text-neutral-900 dark:text-white focus:outline-none" />
-                          <input type="text" placeholder={t('tradeInCondition')} value={cgForm.tradeInCondition} onChange={(e) => setCgForm({...cgForm, tradeInCondition: e.target.value})} className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-sm text-neutral-900 dark:text-white focus:outline-none" />
-                        </div>
-                      </div>
-                    )}
-                    <button type="submit" className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold transition-all">{t('sendRequest')}</button>
-                  </form>
-                </div>
-              )}
+
 
               {activeDetailsTab === 'testdrive' && (
                 <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6">
@@ -1547,15 +1660,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* WhatsApp & Call buttons */}
-              <div className="flex gap-3">
-                <a href={`https://wa.me/${(siteSettings.phone || '+33600000000').replace(/[^0-9+]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold text-xs uppercase tracking-wider transition-all">
-                  <Icons.WhatsApp /> {t('whatsapp')}
-                </a>
-                <a href={`tel:${(siteSettings.phone || '+33600000000').replace(/[^0-9+]/g, '')}`} className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-[#D4AF37] hover:text-[#D4AF37] font-bold text-xs uppercase tracking-wider transition-all">
-                  <Icons.Phone /> {t('callUs')}
-                </a>
-              </div>
+
             </div>
           </div>
         </section>
@@ -1948,20 +2053,6 @@ export default function App() {
               <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed">
                 {siteSettings[lang]?.aboutText || siteSettings.aboutText || DEFAULT_SETTINGS[lang]?.aboutText || t('aboutText')}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
-                  <div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat1Number || "✓"}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings[lang]?.stat1Label || DEFAULT_SETTINGS[lang]?.stat1Label || t('stat1Label')}</div>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
-                  <div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat2Number || "VIN"}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings[lang]?.stat2Label || DEFAULT_SETTINGS[lang]?.stat2Label || t('stat2Label')}</div>
-                </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 hover:border-[#D4AF37]/35 text-center shadow-lg transition-all duration-300 gold-glow-hover">
-                  <div className="text-2xl font-serif font-bold text-[#D4AF37] mb-1">{siteSettings.stat3Number || "DOC"}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-neutral-600 dark:text-neutral-300 font-semibold">{siteSettings[lang]?.stat3Label || DEFAULT_SETTINGS[lang]?.stat3Label || t('stat3Label')}</div>
-                </div>
-              </div>
             </div>
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-200 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <img 
@@ -1996,12 +2087,15 @@ export default function App() {
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[#D4AF37]"><Icons.Phone /></span>
-                <span>{siteSettings.phone || "+33 6 00 00 00 00"}</span>
+                <span>{siteSettings.phone || "+33 7 66 75 32 23"}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[#D4AF37]"><Icons.Mail /></span>
-                <span>{siteSettings.email || "contact@ligoautomobiles.fr"}</span>
+                <span>{siteSettings.email || "ligo.automobiles@gmail.com"}</span>
               </div>
+            </div>
+            <div className="pt-8 flex justify-start">
+              <img src="/logo.png" alt="Ligo Automobiles Logo" className="w-48 sm:w-56 md:w-64 opacity-90 dark:invert dark:hue-rotate-180 mix-blend-multiply dark:mix-blend-screen" />
             </div>
           </div>
 

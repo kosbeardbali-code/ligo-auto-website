@@ -10,3 +10,5 @@ yarn-debug.log*
 yarn-error.log*
 .idea/
 .vscode/
+localtunnel.log
+pinggy.log
