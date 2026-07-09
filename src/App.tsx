@@ -973,12 +973,26 @@ export default function App() {
   const [isDraggingMain, setIsDraggingMain] = useState(false);
   const [isDraggingGallery, setIsDraggingGallery] = useState(false);
 
+  const uploadToImgBB = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await fetch('https://api.imgbb.com/1/upload?key=25812d2bb5a355308a29abb882264648', {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('ImgBB Upload Failed');
+    }
+    const data = await response.json();
+    return data.data.url;
+  };
+
   const handleMainImageUpload = async (file) => {
     try {
       setMainImageUploading(true);
-      setMainImageProgress(0);
-      const compressed = await compressImage(file);
-      setFormData(prev => ({ ...prev, image: compressed }));
+      setMainImageProgress(50);
+      const imageUrl = await uploadToImgBB(file);
+      setFormData(prev => ({ ...prev, image: imageUrl }));
       setMainImageProgress(100);
       setTimeout(() => setMainImageUploading(false), 500);
     } catch (err) {
@@ -989,19 +1003,22 @@ export default function App() {
 
   const handleGalleryImagesUpload = async (files) => {
     setGalleryUploading(true);
-    const queue = files.map((f, i) => ({ id: `upload-${Date.now()}-${i}`, name: f.name, progress: 0, status: 'uploading', file: f }));
+    const queue = files.map((f, i) => ({ id: `upload-${Date.now()}-${i}`, name: f.name, progress: 50, status: 'uploading', file: f }));
     setGalleryUploadQueue(queue);
-    const uploadPromises = queue.map(async (item) => {
+    
+    for (const item of queue) {
       try {
-        const compressed = await compressImage(item.file);
+        const imageUrl = await uploadToImgBB(item.file);
         setGalleryUploadQueue(prev => prev.map(q => q.id === item.id ? { ...q, progress: 100, status: 'done' } : q));
-        setFormData(prev => ({ ...prev, galleryImages: [...(prev.galleryImages || []), compressed] }));
+        setFormData(prev => ({ ...prev, galleryImages: [...(prev.galleryImages || []), imageUrl] }));
       } catch (err) {
         setGalleryUploadQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'error' } : q));
       }
-    });
-    await Promise.all(uploadPromises);
-    setGalleryUploading(false);
+    }
+    setTimeout(() => {
+      setGalleryUploadQueue([]);
+      setGalleryUploading(false);
+    }, 1500);
   };
 
   useEffect(() => {
@@ -2576,9 +2593,14 @@ export default function App() {
                 >{t('cancel')}</button>
                 <button 
                   type="submit" 
-                  className="flex-1 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold transition-all shadow-lg active:scale-[0.99]"
+                  disabled={mainImageUploading || galleryUploading}
+                  className={`flex-1 py-3 rounded-xl font-bold transition-all shadow-lg active:scale-[0.99] ${
+                    mainImageUploading || galleryUploading 
+                      ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' 
+                      : 'bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950'
+                  }`}
                 >
-                  Sauvegarder
+                  {mainImageUploading || galleryUploading ? 'Загрузка изображения на сервера...' : 'Sauvegarder'}
                 </button>
               </div>
             </form>
