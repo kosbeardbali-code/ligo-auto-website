@@ -2155,39 +2155,31 @@ export default function App() {
 
           {/* Форма обратной связи */}
           <div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
-            <form onSubmit={async (e) => { 
-              e.preventDefault(); 
-              const form = e.currentTarget;
-              const formData = new FormData(form);
-              const data = Object.fromEntries(formData.entries());
-              showNotification("Отправка...", "info");
-              
-              try {
-                const ref = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
-                addDoc(ref, {
-                  type: "Message Général",
-                  clientName: data.name,
-                  clientEmail: data.email,
-                  clientPhone: data.phone || "",
-                  specialRequest: data.message,
-                  status: "Nouveau",
-                  createdAt: new Date().toISOString()
-                });
-              } catch(err) { console.warn("Firebase save error", err); }
-
-              try {
-                const targetEmail = siteSettings.email || "ligo.automobiles@gmail.com";
-                await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-                  method: "POST",
-                  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                  body: JSON.stringify(data)
-                });
-                showNotification(t('messageSent'), "success");
-                form.reset();
-              } catch (err) {
-                showNotification("Erreur", "error");
-              }
+            <form 
+              action={`https://formsubmit.co/${siteSettings?.email || "ligo.automobiles@gmail.com"}`} 
+              method="POST"
+              onSubmit={(e) => { 
+                e.preventDefault(); 
+                const form = e.currentTarget;
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                try {
+                  const ref = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+                  addDoc(ref, {
+                    type: "Message Général",
+                    clientName: data.name,
+                    clientEmail: data.email,
+                    clientPhone: data.phone || "",
+                    specialRequest: data.message,
+                    status: "Nouveau",
+                    createdAt: new Date().toISOString()
+                  });
+                } catch(err) { console.warn("Firebase save error", err); }
+  
+                form.submit();
             }} className="space-y-6">
+              <input type="hidden" name="_next" value={typeof window !== 'undefined' ? window.location.href : ''} />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_subject" value="Nouveau message - Ligo Automobiles" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
