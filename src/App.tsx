@@ -2152,8 +2152,6 @@ export default function App() {
           {/* Форма обратной связи */}
           <div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
             <form 
-              action={`https://formsubmit.co/${siteSettings?.email || "ligo.automobiles@gmail.com"}`} 
-              method="POST"
               onSubmit={(e) => { 
                 e.preventDefault(); 
                 const form = e.currentTarget;
@@ -2173,11 +2171,9 @@ export default function App() {
                   });
                 } catch(err) { console.warn("Firebase save error", err); }
   
-                form.submit();
+                showNotification(t('messageSent'), "success");
+                form.reset();
             }} className="space-y-6">
-              <input type="hidden" name="_next" value={typeof window !== 'undefined' ? window.location.href : ''} />
-              <input type="hidden" name="_captcha" value="false" />
-              <input type="hidden" name="_subject" value="Nouveau message - Ligo Automobiles" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('fullName')}</label>
