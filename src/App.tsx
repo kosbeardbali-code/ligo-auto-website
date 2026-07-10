@@ -1738,8 +1738,6 @@ export default function App() {
         </div>
 
         {/* Интерактивная плашка фильтров */}
-        {(activeAdminTab === 'vehicles' || !isAdmin) && (
-          <>
         {/* Filters Toggle Button */}
         <div className="flex items-center justify-between bg-[#f8f9fa] dark:bg-[#1a1a1c] border border-neutral-900 dark:border-neutral-800 rounded-xl p-4 mb-6 shadow-sm cursor-pointer active:scale-[0.98] transition-transform w-full lg:w-1/3 xl:w-1/4" onClick={() => setShowMobileFilters(!showMobileFilters)}>
           <div className="flex items-center gap-3">
@@ -2081,8 +2079,6 @@ export default function App() {
               </div>
             ))}
           </div>
-        )}
-          </>
         )}
 
       </section>
