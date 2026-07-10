@@ -1183,7 +1183,7 @@ export default function App() {
     try {
       if (carToEdit) {
         const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', carToEdit.id);
-        await updateDoc(carDocRef, carData);
+        await setDoc(carDocRef, carData, { merge: true });
       } else {
         const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
         await addDoc(carsCollection, carData);
