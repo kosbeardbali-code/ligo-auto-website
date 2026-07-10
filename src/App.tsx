@@ -1103,7 +1103,7 @@ export default function App() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       isResolved = true;
       clearTimeout(loadTimeout);
-      if (snapshot.empty) { setCars(loadLocalCars()); } else {
+      if (snapshot.empty) { setCars([]); } else {
         const list = [];
         snapshot.forEach((docSnap) => { list.push({ id: docSnap.id, ...docSnap.data() }); });
         setCars(list);
@@ -1215,16 +1215,20 @@ export default function App() {
 
   const handleDeleteCar = async () => {
     if (!deleteConfirmCar) return;
+    const carId = deleteConfirmCar.id;
+    setDeleteConfirmCar(null);
+    if (selectedCar && selectedCar.id === carId) setSelectedCar(null);
+    
+    setCars(prev => prev.filter(car => car.id !== carId));
+    
     try {
-      const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', deleteConfirmCar.id);
+      const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', carId);
       await withTimeout(deleteDoc(carDocRef), 2000);
       showNotification(t('carDeleted'), "success");
     } catch (err) {
-      setCars(prev => prev.filter(car => car.id !== deleteConfirmCar.id));
+      console.warn("Delete error:", err);
       showNotification(t('carDeleted') + " (mode hors ligne)", "success");
     }
-    setDeleteConfirmCar(null);
-    if (selectedCar && selectedCar.id === deleteConfirmCar.id) setSelectedCar(null);
   };
 
   const handleAdminLoginSubmit = (e) => {
