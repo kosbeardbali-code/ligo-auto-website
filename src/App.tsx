@@ -2155,24 +2155,58 @@ export default function App() {
 
           {/* Форма обратной связи */}
           <div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
-            <form onSubmit={(e) => { e.preventDefault(); showNotification(t('messageSent'), "success"); }} className="space-y-6">
+            <form onSubmit={async (e) => { 
+              e.preventDefault(); 
+              const form = e.currentTarget;
+              const formData = new FormData(form);
+              const data = Object.fromEntries(formData.entries());
+              showNotification("Отправка...", "info");
+              
+              try {
+                const ref = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries');
+                addDoc(ref, {
+                  type: "Message Général",
+                  clientName: data.name,
+                  clientEmail: data.email,
+                  clientPhone: data.phone || "",
+                  specialRequest: data.message,
+                  status: "Nouveau",
+                  createdAt: new Date().toISOString()
+                });
+              } catch(err) { console.warn("Firebase save error", err); }
+
+              try {
+                const targetEmail = siteSettings.email || "ligo.automobiles@gmail.com";
+                await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+                  method: "POST",
+                  headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                  body: JSON.stringify(data)
+                });
+                showNotification(t('messageSent'), "success");
+                form.reset();
+              } catch (err) {
+                showNotification("Erreur", "error");
+              }
+            }} className="space-y-6">
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_subject" value="Nouveau message - Ligo Automobiles" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('fullName')}</label>
-                  <input required type="text" placeholder={t('namePlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+                  <input name="name" required type="text" placeholder={t('namePlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('email')}</label>
-                  <input required type="email" placeholder={t('emailPlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+                  <input name="email" required type="email" placeholder={t('emailPlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('phone')}</label>
-                <input type="tel" placeholder={t('phonePlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
+                <input name="phone" type="tel" placeholder={t('phonePlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all" />
               </div>
               <div className="space-y-2">
                 <label className="text-xs uppercase tracking-widest text-neutral-600 dark:text-neutral-400 font-medium">{t('messageLabel')}</label>
-                <textarea required rows="4" placeholder={t('specialRequestPlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all resize-none"></textarea>
+                <textarea name="message" required rows="4" placeholder={t('specialRequestPlaceholder')} className="w-full bg-white dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-3 px-4 text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 focus:outline-none transition-all resize-none"></textarea>
               </div>
               <button type="submit" className="w-full py-4 rounded-2xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold tracking-wide transition-all shadow-lg hover:shadow-[#D4AF37]/20">
                 {t('sendRequest')}
