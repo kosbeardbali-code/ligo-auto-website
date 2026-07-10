@@ -6,18 +6,19 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 
 
 // Hardcoded Firebase configuration for Vercel deployment
-const firebaseConfig = {
-  apiKey: "AIzaSyCDtqzovTjat0DLJ161aiEfpmKeeYn6I8",
+const actualConfig = {
+  apiKey: "AIzaSyCDtqzoVTjat0DLJ161aiEjfpmKeeYn6I8",
   authDomain: "ligo-auto.firebaseapp.com",
   projectId: "ligo-auto",
   storageBucket: "ligo-auto.firebasestorage.app",
   messagingSenderId: "1038813841068",
   appId: "1:1038813841068:web:56e339aca331d66d100109"
 };
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(actualConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = "ligo-auto";
+const actualAppId = "ligo-auto";
+const appId = actualAppId;
 
 // Helper to wrap Firestore promises with a timeout
 function withTimeout<T>(promise: Promise<T>, timeoutMs = 3000): Promise<T> {
@@ -299,6 +300,21 @@ const DEMO_CARS = [
   }
 ];
 
+const loadLocalCars = () => {
+  try {
+    const saved = localStorage.getItem('ligo_cars');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error("Failed to parse local cars:", e);
+  }
+  return DEMO_CARS;
+};
+
 export default function App() {
   // Theme state synced with localStorage, defaulting to 'light'
   const [theme, setTheme] = useState(() => {
@@ -336,9 +352,15 @@ export default function App() {
   const [user, setUser] = useState(null);
   
   // Данные каталога автомобилей
-  const [cars, setCars] = useState(DEMO_CARS);
+  const [cars, setCars] = useState(loadLocalCars);
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState(null);
+
+  useEffect(() => {
+    if (cars && cars !== DEMO_CARS) {
+      localStorage.setItem('ligo_cars', JSON.stringify(cars));
+    }
+  }, [cars]);
 
   // Кастомная система нотификаций (без алертов)
   const [notification, setNotification] = useState(null);
@@ -1055,7 +1077,7 @@ export default function App() {
     let isResolved = false;
     const loadTimeout = setTimeout(() => {
       if (!isResolved) {
-        setCars(DEMO_CARS);
+        setCars(loadLocalCars());
         setLoading(false);
       }
     }, 4000);
@@ -1064,7 +1086,7 @@ export default function App() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       isResolved = true;
       clearTimeout(loadTimeout);
-      if (snapshot.empty) { setCars(DEMO_CARS); } else {
+      if (snapshot.empty) { setCars(loadLocalCars()); } else {
         const list = [];
         snapshot.forEach((docSnap) => { list.push({ id: docSnap.id, ...docSnap.data() }); });
         setCars(list);
@@ -1073,7 +1095,7 @@ export default function App() {
     }, (err) => {
       isResolved = true;
       clearTimeout(loadTimeout);
-      setCars(DEMO_CARS);
+      setCars(loadLocalCars());
       setLoading(false);
     });
     return () => { clearTimeout(loadTimeout); unsubscribe(); };
