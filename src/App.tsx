@@ -399,7 +399,7 @@ export default function App() {
   // Модальные окна и интерактивность
   const [selectedCar, setSelectedCar] = useState(() => {
     try {
-      const saved = localStorage.getItem('ligo_selectedCar');
+      const saved = sessionStorage.getItem('ligo_selectedCar');
       return saved ? JSON.parse(saved) : null;
     } catch { return null; }
   });
@@ -414,18 +414,18 @@ export default function App() {
   const [activeAdminTab, setActiveAdminTab] = useState('vehicles'); // 'vehicles' | 'inquiries'
 
   // Маршрутизация и детальный вид машины (SPA)
-  const [currentView, setCurrentView] = useState(() => localStorage.getItem('ligo_currentView') || 'home'); // 'home' | 'catalog' | 'car-details'
+  const [currentView, setCurrentView] = useState(() => sessionStorage.getItem('ligo_currentView') || 'home'); // 'home' | 'catalog' | 'car-details'
   const [previousView, setPreviousView] = useState('home');
 
   useEffect(() => {
-    if (selectedCar) { localStorage.setItem('ligo_selectedCar', JSON.stringify(selectedCar)); } 
-    else { localStorage.removeItem('ligo_selectedCar'); }
+    if (selectedCar) { sessionStorage.setItem('ligo_selectedCar', JSON.stringify(selectedCar)); } 
+    else { sessionStorage.removeItem('ligo_selectedCar'); }
   }, [selectedCar]);
 
   useEffect(() => { localStorage.setItem('ligo_isAdmin', String(isAdmin)); }, [isAdmin]);
 
   useEffect(() => { 
-    localStorage.setItem('ligo_currentView', currentView); 
+    sessionStorage.setItem('ligo_currentView', currentView); 
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [currentView]);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
