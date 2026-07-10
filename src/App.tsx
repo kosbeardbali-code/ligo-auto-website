@@ -1210,7 +1210,7 @@ export default function App() {
 
   const handleAdminLoginSubmit = (e) => {
     e.preventDefault();
-    if (adminPassword === 'admin2024') {
+    if (adminPassword === 'France2026') {
       setIsAdmin(true);
       setShowAdminLoginModal(false);
       setAdminPassword('');
