@@ -1264,20 +1264,44 @@ export default function App() {
     return () => unsubscribe();
   }, [appId]);
 
-  const handleCarteGriseSubmit = (e) => {
+  const handleCarteGriseSubmit = async (e) => {
     e.preventDefault();
     if (!cgForm.name || !cgForm.email || !cgForm.phone || !cgForm.address) { showNotification(t('fillAllFields'), "error"); return; }
     const inquiryData = { type: "Carte Grise & Immatriculation", carBrand: selectedCar.brand, carModel: selectedCar.model, carPrice: selectedCar.price, clientName: cgForm.name, clientEmail: cgForm.email, clientPhone: cgForm.phone, clientAddress: cgForm.address, hasTradeIn: cgForm.hasTradeIn, tradeInDetails: cgForm.hasTradeIn ? `${cgForm.tradeInBrandModel} (${cgForm.tradeInYear}) - ${cgForm.tradeInKm} km - ${cgForm.tradeInCondition}` : "", status: "Nouveau", createdAt: new Date().toISOString() };
     try { const ref = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'); addDoc(ref, inquiryData); } catch (err) { console.warn("Offline:", err); }
+    
+    // Web3Forms
+    const formData = new FormData();
+    formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+    formData.append("subject", "Demande de Carte Grise - " + selectedCar.brand + " " + selectedCar.model);
+    formData.append("from_name", "Ligo Auto Website");
+    formData.append("name", cgForm.name);
+    formData.append("email", cgForm.email);
+    formData.append("phone", cgForm.phone);
+    formData.append("message", "Demande de carte grise pour " + selectedCar.brand + " " + selectedCar.model + ".\nAdresse: " + cgForm.address + "\nReprise: " + (cgForm.hasTradeIn ? `${cgForm.tradeInBrandModel} (${cgForm.tradeInYear}) - ${cgForm.tradeInKm} km - ${cgForm.tradeInCondition}` : "Non"));
+    try { await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }); } catch (err) { console.warn("Web3Forms error", err); }
+
     showNotification(t('formSuccess'), "success");
     setCgForm({ name: '', email: '', phone: '', address: '', hasTradeIn: false, tradeInBrandModel: '', tradeInYear: '', tradeInKm: '', tradeInCondition: '' });
   };
 
-  const handleTestDriveSubmit = (e) => {
+  const handleTestDriveSubmit = async (e) => {
     e.preventDefault();
     if (!testDriveForm.name || !testDriveForm.email || !testDriveForm.phone || !testDriveForm.date) { showNotification(t('fillAllFields'), "error"); return; }
     const inquiryData = { type: "Demande d'essai / RDV", carBrand: selectedCar.brand, carModel: selectedCar.model, carPrice: selectedCar.price, clientName: testDriveForm.name, clientEmail: testDriveForm.email, clientPhone: testDriveForm.phone, clientAddress: "Showroom", preferredDate: testDriveForm.date, preferredTime: testDriveForm.time, specialRequest: testDriveForm.comment, hasTradeIn: false, tradeInDetails: "", status: "Nouveau", createdAt: new Date().toISOString() };
     try { const ref = collection(db, 'artifacts', appId, 'public', 'data', 'inquiries'); addDoc(ref, inquiryData); } catch (err) { console.warn("Offline:", err); }
+    
+    // Web3Forms
+    const formData = new FormData();
+    formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+    formData.append("subject", "Demande d'essai - " + selectedCar.brand + " " + selectedCar.model);
+    formData.append("from_name", "Ligo Auto Website");
+    formData.append("name", testDriveForm.name);
+    formData.append("email", testDriveForm.email);
+    formData.append("phone", testDriveForm.phone);
+    formData.append("message", "Demande d'essai / RDV pour " + selectedCar.brand + " " + selectedCar.model + ".\nDate: " + testDriveForm.date + " " + testDriveForm.time + "\nCommentaire: " + testDriveForm.comment);
+    try { await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }); } catch (err) { console.warn("Web3Forms error", err); }
+
     showNotification(t('formSuccess'), "success");
     setTestDriveForm({ name: '', email: '', phone: '', date: '', time: '', comment: '' });
   };
@@ -2152,7 +2176,7 @@ export default function App() {
           {/* Форма обратной связи */}
           <div className="lg:col-span-2 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-3xl p-8 sm:p-10 shadow-lg">
             <form 
-              onSubmit={(e) => { 
+              onSubmit={async (e) => { 
                 e.preventDefault(); 
                 const form = e.currentTarget;
                 const formData = new FormData(form);
@@ -2170,6 +2194,20 @@ export default function App() {
                     createdAt: new Date().toISOString()
                   });
                 } catch(err) { console.warn("Firebase save error", err); }
+
+                // Web3Forms Integration
+                formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+                formData.append("subject", "Nouveau message depuis Ligo Automobiles");
+                formData.append("from_name", "Ligo Auto Website");
+                
+                try {
+                  await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData
+                  });
+                } catch (err) {
+                  console.warn("Web3Forms error", err);
+                }
   
                 showNotification(t('messageSent'), "success");
                 form.reset();
