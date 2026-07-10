@@ -1711,7 +1711,7 @@ export default function App() {
                   {/* Contact Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-neutral-200 dark:border-neutral-800">
                     <a 
-                      href={`https://wa.me/${siteSettings.phone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(t('waTemplate') || `Bonjour, je suis intéressé(e) par votre véhicule ${selectedCar.brand} ${selectedCar.model} au prix de ${selectedCar.price?.toLocaleString('fr-FR')} €.`)}`} 
+                      href={`https://wa.me/${siteSettings.phone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, je suis intéressé(e) par votre véhicule ${selectedCar.brand} ${selectedCar.model} au prix de ${selectedCar.price?.toLocaleString('fr-FR')} €.`)}`} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3.5 rounded-xl font-bold transition-colors shadow-sm"
