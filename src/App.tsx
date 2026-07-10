@@ -1177,21 +1177,23 @@ export default function App() {
     setFormErrors(errors);
     if (Object.values(errors).some(Boolean)) { showNotification(t('fillAllFields'), "error"); return; }
     const carData = { brand: formData.brand.trim(), model: formData.model.trim(), year: Number(formData.year) || new Date().getFullYear(), km: Number(formData.km) || 0, price: Number(formData.price), fuel: formData.fuel, transmission: formData.transmission, hp: Number(formData.hp) || 0, co2: Number(formData.co2) || 0, vin: formData.vin.trim(), status: formData.status, image: formData.image, description: formData.description.trim(), verifiedVin: formData.verifiedVin, galleryImages: formData.galleryImages || [] };
+    
+    showNotification("Сохранение в базу данных...", "info");
+    
     try {
       if (carToEdit) {
         const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', carToEdit.id);
-        await withTimeout(updateDoc(carDocRef, carData), 3000);
+        await updateDoc(carDocRef, carData);
       } else {
         const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
-        await withTimeout(addDoc(carsCollection, carData), 3000);
+        await addDoc(carsCollection, carData);
       }
-      showNotification(t('carSaved'), "success");
-    } catch (err) {
-      if (carToEdit) { setCars(prev => prev.map(c => c.id === carToEdit.id ? { ...c, ...carData } : c)); }
-      else { setCars(prev => [...prev, { id: `local-${Date.now()}`, ...carData }]); }
-      showNotification(t('carSaved') + " (mode hors ligne)", "success");
+      showNotification("Успешно сохранено в облако Firestore!", "success");
+      setShowAddEditModal(false);
+    } catch (err: any) {
+      console.error("Firebase save error:", err);
+      showNotification(`Ошибка сохранения: ${err.message || 'Unknown Error'}`, "error");
     }
-    setShowAddEditModal(false);
   };
 
   const handleDeleteCar = async () => {
