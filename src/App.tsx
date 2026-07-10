@@ -1272,7 +1272,7 @@ export default function App() {
     
     // Web3Forms
     const formData = new FormData();
-    formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+    formData.append("access_key", "55750683-79d3-4352-b108-26fe5c10453e");
     formData.append("subject", "Demande de Carte Grise - " + selectedCar.brand + " " + selectedCar.model);
     formData.append("from_name", "Ligo Auto Website");
     formData.append("name", cgForm.name);
@@ -1293,7 +1293,7 @@ export default function App() {
     
     // Web3Forms
     const formData = new FormData();
-    formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+    formData.append("access_key", "55750683-79d3-4352-b108-26fe5c10453e");
     formData.append("subject", "Demande d'essai - " + selectedCar.brand + " " + selectedCar.model);
     formData.append("from_name", "Ligo Auto Website");
     formData.append("name", testDriveForm.name);
@@ -2196,7 +2196,7 @@ export default function App() {
                 } catch(err) { console.warn("Firebase save error", err); }
 
                 // Web3Forms Integration
-                formData.append("access_key", "6cccb369-d5b4-43ca-9bfa-5a2bf43acaa8");
+                formData.append("access_key", "55750683-79d3-4352-b108-26fe5c10453e");
                 formData.append("subject", "Nouveau message depuis Ligo Automobiles");
                 formData.append("from_name", "Ligo Auto Website");
                 
