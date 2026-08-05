@@ -162,9 +162,9 @@ const DEMO_CARS = [
     vin: "WP0ZZZ99ZPS240811",
     status: "En stock",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuClvuoUxKQIu-RmKS7kxWdKDQU7g4pTofke_W29SOKrl2Q1zpfNa-82f2MdubRYVCgtf7fY3uZxofApF7_grlRusi7X1YiqOzf6sSjCkug0EyimW0dOSyFP8pzxz1Q6IN9BxQ9l893DsnYEry4D-SJB4j_K-_Y2-mnHNUltlBVqbZp1dckyEbOVDIR5oRm0eFGwKGSLWw2oSiTzS51KjpApor6UZCRhkFxe7M0U9YlAl2VUJgDiqiJN",
-    description: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация с пакетом Weissach, карбоно-керамическими тормозами (PCCB), системой подъема передней оси (Lift) и отделкой салона расширенной кожей/Alcantara с контрастной прострочкой цвета Racing Yellow. Активная гарантия Porsche Approved.",
-    description_en: "Absolutely perfect condition. Exclusive collector configuration. Porsche Approved active warranty.",
-    description_ru: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация. Активная гарантия Porsche Approved.",
+    description: "État absolument parfait. Configuration de collection exclusive avec pack Weissach, freins carbone-céramique (PCCB), système d'élévation de l'essieu avant (Lift) et finition intérieure en cuir étendu/Alcantara avec surpiqûres jaune Racing. Garantie active Porsche Approved.",
+    description_en: "Absolutely perfect condition. Exclusive collector configuration with Weissach package, carbon-ceramic brakes (PCCB), front axle lift system, and extended leather/Alcantara interior with Racing Yellow stitching. Active Porsche Approved warranty.",
+    description_ru: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация с пакетом Weissach, карбоно-керамическими тормозами (PCCB), системой подъема передней оси (Lift) и отделкой салона расширенной кожей/Alcantara с контрастной прострочкой цвета Racing Yellow. Активная гарантия Porsche Approved.",
     verifiedVin: true
   },
   {
@@ -181,9 +181,9 @@ const DEMO_CARS = [
     vin: "ZFF81AHA000284561",
     status: "En stock",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDTbmRwZBxvLeWY9FCQrzSC13P-Qss_BKa7Qc8_ObbsE0jBoWhgUgSsrc-CVB3s0Cetf6ClQUG8gfv91j9OyK2NRGJagwp7_kRessWeAIGxAHY1iD52m8tM5_UTomP8KGb6RuhB59kky40dfd5GRULpGKRB707GiWnRtuFPhd-3YKAREzTR6dHeFGVwVTkcTzzG7ZMqPEtdpvjTUkudUZmDwZEtaOXIO8yhWzQRYg3MLEMcwWscKt1D",
-    description: "Оригинальная краска Rosso Corsa с контрастной крышей Nero DS. Оснащена 20-дюймовыми коваными дисками, окрашенными в желтый цвет тормозными суппортами, гоночными сиденьями из углеродного волокна Daytona и отделкой салона карбоном. Полностью покрыта прозрачной защитной пленкой (PPF).",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Peinture originale Rosso Corsa avec toit contrasté Nero DS. Équipée de jantes forgées 20 pouces, étriers de frein jaunes, sièges racing Daytona en fibre de carbone et finition carbone. Protection complète par film transparent (PPF).",
+    description_en: "Original Rosso Corsa paint with contrasting Nero DS roof. Equipped with 20-inch forged wheels, yellow brake calipers, Daytona carbon fiber racing seats, and carbon interior trim. Fully covered with transparent protective film (PPF).",
+    description_ru: "Оригинальная краска Rosso Corsa с контрастной крышей Nero DS. Оснащена 20-дюймовыми коваными дисками, окрашенными в желтый цвет тормозными суппортами, гоночными сиденьями из углеродного волокна Daytona и отделкой салона карбоном. Полностью покрыта прозрачной защитной пленкой (PPF).",
     verifiedVin: true
   },
   {
@@ -200,9 +200,9 @@ const DEMO_CARS = [
     vin: "WAUZZZ4GZPS182455",
     status: "En arrivage",
     image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCUegYAhIi4Tgdh7bIIdSIHMP8BdTXPie_4Ot2mQza2NVN-2mMNXgAlZSZJEyJqf9NCRDruU3lbuCUKKPoTo44eSwyIN6Jme_aG9f7IR03ezODgtdMbvbfM57ue1gECOBoTVy50vjv3ipd0dNjg1NNosiWdIgC-Dxong1pKNojzUw8ic5Vx9Rtyf3Vh9D-cgvgzVhvGnHlH9eUo5jHBWvRZTINSiE8LiYBPcp8A_XHM5Jvl3BDRySKT",
-    description: "Первый владелец. Красивейший цвет металлик Mythic Black от Audi Exclusive. Максимальная комплектация, включающая полноуправляемое шасси (подруливающие задние колеса), спортивный выхлоп RS, фары HD Matrix LED с лазерной оптикой последнего поколения и премиальную аудиосистему Bang & Olufsen Advanced 3D.",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Premier propriétaire. Magnifique teinte métallisée Noir Mythic d'Audi Exclusive. Configuration maximale avec roues arrière directrices, échappement sport RS, phares HD Matrix LED avec technologie laser et système audio Bang & Olufsen Advanced 3D.",
+    description_en: "First owner. Beautiful Mythic Black metallic color from Audi Exclusive. Maximum options including rear-wheel steering, RS sport exhaust, HD Matrix LED headlights with laser light, and Bang & Olufsen Advanced 3D sound system.",
+    description_ru: "Первый владелец. Красивейший цвет металлик Mythic Black от Audi Exclusive. Максимальная комплектация, включающая полноуправляемое шасси (подруливающие задние колеса), спортивный выхлоп RS, фары HD Matrix LED с лазерной оптикой последнего поколения и премиальную аудиосистему Bang & Olufsen Advanced 3D.",
     verifiedVin: true
   },
   {
@@ -219,9 +219,9 @@ const DEMO_CARS = [
     vin: "SCFKS53E8PGC02415",
     status: "En stock",
     image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&q=80&w=1200",
-    description: "Специальная серия F1 Edition. Уникальный цвет Satin Aston Martin Racing Green. Оптимизированное шасси, специальный аэродинамический комплект, создающий дополнительную прижимную силу, и эксклюзивные 21-дюймовые диски. Активный спортивный выхлоп.",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Série spéciale F1 Edition. Teinte exclusive Satin Aston Martin Racing Green. Châssis optimisé, kit aérodynamique spécifique apportant un appui supplémentaire, et jantes exclusives de 21 pouces. Échappement sport actif.",
+    description_en: "Special F1 Edition series. Unique Satin Aston Martin Racing Green color. Optimized chassis, special aerodynamic kit creating additional downforce, and exclusive 21-inch wheels. Active sport exhaust.",
+    description_ru: "Специальная серия F1 Edition. Уникальный цвет Satin Aston Martin Racing Green. Оптимизированное шасси, специальный аэродинамический комплект, создающий дополнительную прижимную силу, и эксклюзивные 21-дюймовые диски. Активный спортивный выхлоп.",
     verifiedVin: true
   },
   {
@@ -238,9 +238,9 @@ const DEMO_CARS = [
     vin: "ZH1UA5ZS4NLA09812",
     status: "En stock",
     image: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
-    description: "Атмосферный двигатель V10 мощностью 640 лошадиных сил. Задний привод с подруливающей задней осью. Окраска кузова металлик Verde Selvans. Полный карбоновый пакет салона и экстерьера, карбоно-керамические тормоза.",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Moteur V10 atmosphérique de 640 chevaux. Propulsion arrière avec roues arrière directrices. Peinture métallisée Verde Selvans. Pack carbone complet intérieur et extérieur, freins carbone-céramique.",
+    description_en: "Naturally aspirated 640 hp V10 engine. Rear-wheel drive with rear-wheel steering. Verde Selvans metallic paint. Full carbon pack interior and exterior, carbon-ceramic brakes.",
+    description_ru: "Атмосферный двигатель V10 мощностью 640 лошадиных сил. Задний привод с подруливающей задней осью. Окраска кузова металлик Verde Selvans. Полный карбоновый пакет салона и экстерьера, карбоно-керамические тормоза.",
     verifiedVin: true
   },
   {
@@ -257,9 +257,9 @@ const DEMO_CARS = [
     vin: "WDD1903781A024105",
     status: "En stock",
     image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-    description: "Гибридная технология E Performance, заимствованная из Формулы-1. Суммарная мощность 843 л.с. Матовый цвет Gris Sélénite Magno designo (матовый). Панорамный люк, высокоэффективная тормозная система AMG из керамики.",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Technologie hybride E Performance issue de la Formule 1. Puissance cumulée de 843 ch. Teinte mate designo Gris Sélénite Magno. Toit panoramique, système de freinage haute performance AMG en céramique.",
+    description_en: "Formula 1 derived E Performance hybrid technology. Combined power of 843 hp. designo Selenite Grey Magno matte paint. Panoramic sunroof, AMG high-performance ceramic braking system.",
+    description_ru: "Гибридная технология E Performance, заимствованная из Формулы-1. Суммарная мощность 843 л.с. Матовый цвет Gris Sélénite Magno designo (матовый). Панорамный люк, высокоэффективная тормозная система AMG из керамики.",
     verifiedVin: true
   },
   {
@@ -276,9 +276,9 @@ const DEMO_CARS = [
     vin: "SCBGD4ZG8MC084155",
     status: "En stock",
     image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200",
-    description: "Эксклюзивная отделка Mulliner. Салон из стеганой кожи ручной работы с двойным ромбовидным узором. Окраска кузова Onyx Black. Аудиосистема Naim для Bentley исключительной точности звучания, активная адаптивная пневмоподвеска Bentley Dynamic Ride.",
-    description_en: "Full options. Perfect condition.",
-    description_ru: "Полная комплектация. Идеальное состояние.",
+    description: "Finition exclusive Mulliner. Intérieur en cuir matelassé fait main avec motif double losange. Peinture Onyx Black. Système audio Naim for Bentley d'une précision exceptionnelle, suspension pneumatique adaptative Bentley Dynamic Ride.",
+    description_en: "Exclusive Mulliner spec. Handcrafted quilted leather interior with double diamond pattern. Onyx Black exterior. Naim for Bentley ultra-premium audio system, Bentley Dynamic Ride active adaptive air suspension.",
+    description_ru: "Эксклюзивная отделка Mulliner. Салон из стеганой кожи ручной работы с двойным ромбовидным узором. Окраска кузова Onyx Black. Аудиосистема Naim для Bentley исключительной точности звучания, активная адаптивная пневмоподвеска Bentley Dynamic Ride.",
     verifiedVin: true
   },
   {
@@ -295,7 +295,9 @@ const DEMO_CARS = [
     vin: "ZAM82CMA0P1028456",
     status: "En stock",
     image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=1200",
-    description: "Версия Spyder Cielo с умной электрохромной стеклянной крышей. Двигатель V6 Nettuno с двойным сгоранием, созданный на основе технологий F1. Цвет кузова Acquamarina. Сверхлегкий монокок из углеродного волокна.",
+    description: "Version Spyder Cielo avec toit en verre électrochrome intelligent. Moteur V6 Nettuno à double combustion issu de la F1. Couleur de carrosserie Acquamarina. Monocoque ultraléger en fibre de carbone.",
+    description_en: "Spyder Cielo version with smart electrochromic glass roof. F1-derived Nettuno twin-combustion V6 engine. Acquamarina body color. Ultra-lightweight carbon fiber monocoque.",
+    description_ru: "Версия Spyder Cielo с умной электрохромной стеклянной крышей. Двигатель V6 Nettuno с двойным сгоранием, созданный на основе технологий F1. Цвет кузова Acquamarina. Сверхлегкий монокок из углеродного волокна.",
     verifiedVin: true
   }
 ];
@@ -1157,7 +1159,7 @@ export default function App() {
       if (status && car.status !== status) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
-        const searchStr = `${car.brand} ${car.model} ${car.description || ''} ${car.vin || ''} ${car.year}`.toLowerCase();
+        const searchStr = `${car.brand} ${car.model} ${car.description || ''} ${car.description_en || ''} ${car.description_ru || ''} ${car.vin || ''} ${car.year}`.toLowerCase();
         if (!searchStr.includes(q)) return false;
       }
       return true;
@@ -1193,7 +1195,25 @@ export default function App() {
     const errors = { brand: !formData.brand.trim(), model: !formData.model.trim(), price: !formData.price || Number(formData.price) <= 0, image: !formData.image };
     setFormErrors(errors);
     if (Object.values(errors).some(Boolean)) { showNotification(t('fillAllFields'), "error"); return; }
-    const carData = { brand: formData.brand.trim(), model: formData.model.trim(), year: Number(formData.year) || new Date().getFullYear(), km: Number(formData.km) || 0, price: Number(formData.price), fuel: formData.fuel, transmission: formData.transmission, hp: Number(formData.hp) || 0, co2: Number(formData.co2) || 0, vin: formData.vin.trim(), status: formData.status, image: formData.image, description: formData.description.trim(), verifiedVin: formData.verifiedVin, galleryImages: formData.galleryImages || [] };
+    const carData = { 
+      brand: (formData.brand || '').trim(), 
+      model: (formData.model || '').trim(), 
+      year: Number(formData.year) || new Date().getFullYear(), 
+      km: Number(formData.km) || 0, 
+      price: Number(formData.price), 
+      fuel: formData.fuel, 
+      transmission: formData.transmission, 
+      hp: Number(formData.hp) || 0, 
+      co2: Number(formData.co2) || 0, 
+      vin: (formData.vin || '').trim(), 
+      status: formData.status, 
+      image: formData.image, 
+      description: (formData.description || '').trim(), 
+      description_en: (formData.description_en || '').trim(), 
+      description_ru: (formData.description_ru || '').trim(), 
+      verifiedVin: formData.verifiedVin, 
+      galleryImages: formData.galleryImages || [] 
+    };
     
     showNotification("Сохранение в базу данных...", "info");
     
@@ -1677,11 +1697,13 @@ export default function App() {
               </div>
               
               {(() => {
-                const desc = lang === 'en' && selectedCar.description_en 
-                  ? selectedCar.description_en 
-                  : lang === 'ru' && selectedCar.description_ru 
-                    ? selectedCar.description_ru 
-                    : selectedCar.description;
+                const getCarDesc = () => {
+                  if (!selectedCar) return '';
+                  if (lang === 'en') return selectedCar.description_en || selectedCar.description || selectedCar.description_ru || '';
+                  if (lang === 'ru') return selectedCar.description_ru || selectedCar.description || selectedCar.description_en || '';
+                  return selectedCar.description || selectedCar.description_en || selectedCar.description_ru || '';
+                };
+                const desc = getCarDesc();
                 return desc ? <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed whitespace-pre-line">{desc}</p> : null;
               })()}
               
