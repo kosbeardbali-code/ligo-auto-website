@@ -2757,226 +2757,24 @@ export function detectTrafficSource(): TrafficSourceInfo {
   }
 }
 
-// Generates a realistic baseline history for the past 30 days if no analytics events exist yet
-export function generateBaselineAnalytics(carsList: Car[], articlesList: Article[]): AnalyticsEvent[] {
-  const events: AnalyticsEvent[] = [];
-  const now = Date.now();
-  const sources = [
-    { source: 'Google Organic', weight: 45, utm: { utmSource: 'google', utmMedium: 'organic' } },
-    { source: 'Google Ads', weight: 20, utm: { utmSource: 'google', utmMedium: 'cpc', utmCampaign: 'suv_occasion_france' } },
-    { source: 'Direct', weight: 15, utm: {} },
-    { source: 'Instagram', weight: 10, utm: { utmSource: 'instagram', utmMedium: 'social', utmCampaign: 'peugeot2008_promo' } },
-    { source: 'Facebook', weight: 6, utm: { utmSource: 'facebook', utmMedium: 'social', utmCampaign: 'auto_prestige_reprise' } },
-    { source: 'WhatsApp', weight: 4, utm: { utmSource: 'whatsapp', utmMedium: 'chat' } }
-  ];
-
-  const pickSource = () => {
-    const rnd = Math.random() * 100;
-    let acc = 0;
-    for (const s of sources) {
-      acc += s.weight;
-      if (rnd <= acc) return s;
-    }
-    return sources[0];
-  };
-
-  const peugeotCar = carsList.find(c => c.brand.toLowerCase().includes('peugeot') && c.model.includes('2008')) || carsList[0];
-  const capturCar = carsList.find(c => c.brand.toLowerCase().includes('renault') || c.model.toLowerCase().includes('captur')) || carsList[1] || carsList[0];
-  const qashqaiCar = carsList.find(c => c.brand.toLowerCase().includes('nissan') || c.model.toLowerCase().includes('qashqai')) || carsList[2] || carsList[0];
-
-  // Distribute over 30 days
-  for (let day = 0; day < 30; day++) {
-    const dayTimestamp = new Date(now - day * 24 * 60 * 60 * 1000);
-    const dayVisitorsCount = Math.floor(35 + Math.sin(day) * 10 + Math.random() * 15);
-
-    for (let v = 0; v < dayVisitorsCount; v++) {
-      const vId = `vid_b_${day}_${v}`;
-      const sId = `sid_b_${day}_${v}`;
-      const srcObj = pickSource();
-      const eventTime = new Date(dayTimestamp.getTime() + Math.random() * 86400000).toISOString();
-
-      // Home / Catalog page view
-      events.push({
-        id: `evt_b_${events.length}`,
-        event: 'page_view',
-        path: '/',
-        visitorId: vId,
-        sessionId: sId,
-        source: srcObj.source,
-        ...srcObj.utm,
-        language: Math.random() > 0.3 ? 'fr' : Math.random() > 0.5 ? 'en' : 'ru',
-        timestamp: eventTime
-      });
-
-      // Car views
-      const carsToView = carsList.slice(0, Math.min(carsList.length, 5));
-      carsToView.forEach(c => {
-        // High interest on Peugeot 2008
-        const viewProb = (peugeotCar && c.id === peugeotCar.id) ? 0.65 : 0.35;
-        if (Math.random() < viewProb) {
-          events.push({
-            id: `evt_b_${events.length}`,
-            event: 'vehicle_view',
-            vehicleId: c.id,
-            brand: c.brand,
-            model: c.model,
-            path: `/vehicules/${c.slug || c.id}/`,
-            visitorId: vId,
-            sessionId: sId,
-            source: srcObj.source,
-            ...srcObj.utm,
-            language: 'fr',
-            timestamp: eventTime
-          });
-
-          // Comparison additions
-          if (Math.random() < 0.12) {
-            events.push({
-              id: `evt_b_${events.length}`,
-              event: 'vehicle_compare_add',
-              vehicleId: c.id,
-              brand: c.brand,
-              model: c.model,
-              path: `/vehicules/${c.slug || c.id}/`,
-              visitorId: vId,
-              sessionId: sId,
-              source: srcObj.source,
-              ...srcObj.utm,
-              language: 'fr',
-              timestamp: eventTime
-            });
-          }
-
-          // WhatsApp / Contact clicks
-          if (Math.random() < 0.05) {
-            events.push({
-              id: `evt_b_${events.length}`,
-              event: 'vehicle_whatsapp_click',
-              vehicleId: c.id,
-              brand: c.brand,
-              model: c.model,
-              path: `/vehicules/${c.slug || c.id}/`,
-              visitorId: vId,
-              sessionId: sId,
-              source: srcObj.source,
-              ...srcObj.utm,
-              language: 'fr',
-              timestamp: eventTime
-            });
-          } else if (Math.random() < 0.02) {
-            events.push({
-              id: `evt_b_${events.length}`,
-              event: 'vehicle_phone_click',
-              vehicleId: c.id,
-              brand: c.brand,
-              model: c.model,
-              path: `/vehicules/${c.slug || c.id}/`,
-              visitorId: vId,
-              sessionId: sId,
-              source: srcObj.source,
-              ...srcObj.utm,
-              language: 'fr',
-              timestamp: eventTime
-            });
-          } else if (Math.random() < 0.015) {
-            events.push({
-              id: `evt_b_${events.length}`,
-              event: 'vehicle_lead_submit',
-              vehicleId: c.id,
-              brand: c.brand,
-              model: c.model,
-              path: `/vehicules/${c.slug || c.id}/`,
-              visitorId: vId,
-              sessionId: sId,
-              source: srcObj.source,
-              ...srcObj.utm,
-              language: 'fr',
-              timestamp: eventTime
-            });
-          }
-        }
-      });
-
-      // Comparison pairs (e.g. Peugeot 2008 compared with Captur and Qashqai)
-      if (peugeotCar && capturCar && Math.random() < 0.2) {
-        const pairIds = [peugeotCar.id, capturCar.id];
-        if (qashqaiCar && Math.random() < 0.6) pairIds.push(qashqaiCar.id);
-        const pairs: string[] = [];
-        for (let i = 0; i < pairIds.length; i++) {
-          for (let j = 0; j < pairIds.length; j++) {
-            if (i !== j) pairs.push(`${pairIds[i]}:${pairIds[j]}`);
-          }
-        }
-        events.push({
-          id: `evt_b_${events.length}`,
-          event: 'comparison_view',
-          comparedVehicleIds: pairIds,
-          comparedPairs: pairs,
-          path: '/comparaison/',
-          visitorId: vId,
-          sessionId: sId,
-          source: srcObj.source,
-          ...srcObj.utm,
-          language: 'fr',
-          timestamp: eventTime
-        });
-      }
-
-      // Article views
-      if (articlesList.length > 0 && Math.random() < 0.25) {
-        const art = articlesList[Math.floor(Math.random() * articlesList.length)];
-        events.push({
-          id: `evt_b_${events.length}`,
-          event: 'article_view',
-          articleId: art.id,
-          articleTitle: art.title,
-          path: `/actualites/${art.slug || art.id}/`,
-          visitorId: vId,
-          sessionId: sId,
-          source: srcObj.source,
-          ...srcObj.utm,
-          language: 'fr',
-          timestamp: eventTime
-        });
-
-        if (art.relatedVehicleId && Math.random() < 0.2) {
-          events.push({
-            id: `evt_b_${events.length}`,
-            event: 'article_vehicle_click',
-            articleId: art.id,
-            vehicleId: art.relatedVehicleId,
-            path: `/actualites/${art.slug || art.id}/`,
-            visitorId: vId,
-            sessionId: sId,
-            source: srcObj.source,
-            ...srcObj.utm,
-            language: 'fr',
-            timestamp: eventTime
-          });
-        }
-      }
-    }
-  }
-
-  return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+// Baseline analytics (empty by default for real tracking)
+export function generateBaselineAnalytics(_carsList?: Car[], _articlesList?: Article[]): AnalyticsEvent[] {
+  return [];
 }
 
-export const loadLocalAnalyticsEvents = (carsList: Car[], articlesList: Article[]): AnalyticsEvent[] => {
+export const loadLocalAnalyticsEvents = (_carsList?: Car[], _articlesList?: Article[]): AnalyticsEvent[] => {
   try {
     const saved = localStorage.getItem('ligo_analytics_events');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 20) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
   } catch (e) { console.error('Failed to parse local analytics events:', e); }
 
-  const baseline = generateBaselineAnalytics(carsList, articlesList);
-  try { localStorage.setItem('ligo_analytics_events', JSON.stringify(baseline.slice(0, 3000))); } catch {}
-  return baseline;
+  return [];
 };
-
 
 export interface CarFaqItem {
   id?: string;
@@ -4234,6 +4032,16 @@ export function App() {
     a.click();
     URL.revokeObjectURL(url);
     showNotification(lang === 'ru' ? 'Файл аналитики скачан!' : 'Analytics CSV downloaded!', 'success');
+  };
+
+  const handleResetAnalytics = () => {
+    if (window.confirm(lang === 'ru' ? 'Вы уверены, что хотите обнулить всю статистику посещений?' : 'Êtes-vous sûr de vouloir réinitialiser toutes les statistiques ?')) {
+      setAnalyticsEvents([]);
+      try {
+        localStorage.setItem('ligo_analytics_events', JSON.stringify([]));
+      } catch {}
+      showNotification(lang === 'ru' ? 'Статистика успешно обнулена!' : 'Statistiques réinitialisées !', 'success');
+    }
   };
 
   // Car Add/Edit Form State
@@ -6814,8 +6622,31 @@ const renderAdminDashboard = () => {
                     <Icons.Download />
                     <span>CSV</span>
                   </button>
+
+                  <button
+                    onClick={handleResetAnalytics}
+                    className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 hover:bg-red-500 hover:text-white text-red-600 dark:text-red-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-red-200 dark:border-red-900/50"
+                    title={lang === 'ru' ? 'Обнулить всю статистику' : 'Réinitialiser les statistiques'}
+                  >
+                    <Icons.Trash />
+                    <span>{lang === 'ru' ? 'Обнулить' : 'Réinitialiser'}</span>
+                  </button>
                 </div>
               </div>
+
+              {filteredEvents.length === 0 && (
+                <div className="bg-white dark:bg-[#121214] border border-dashed border-neutral-300 dark:border-neutral-800 rounded-2xl p-8 text-center space-y-2">
+                  <div className="text-3xl">📊</div>
+                  <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
+                    {lang === 'ru' ? 'Статистика сброшена (0 событий)' : 'Statistiques réinitialisées (0 événement)'}
+                  </h4>
+                  <p className="text-xs text-neutral-500 max-w-md mx-auto">
+                    {lang === 'ru'
+                      ? 'Все счётчики обнулены. Новые данные будут автоматически накапливаться по мере того, как посетители заходят на сайт, смотрят авто и кликают контакты.'
+                      : 'Les compteurs sont à zéro. Les données réelles s’afficheront au fur et à mesure des visites clients.'}
+                  </p>
+                </div>
+              )}
 
               {/* 4 Main KPI Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
