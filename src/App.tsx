@@ -7797,10 +7797,13 @@ return (
 
       {/* Footer */}
       {currentView !== 'admin' && (
-        <footer className="border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-400 mt-16">
+        <footer className="relative border-t border-neutral-200 dark:border-neutral-900 bg-[#F1F3F5] dark:bg-[#0D0D0D] py-12 text-center text-xs text-neutral-600 dark:text-neutral-400 mt-16">
           <div className="max-w-7xl mx-auto px-4 space-y-4">
             <p className="tracking-widest font-serif font-bold text-neutral-800 dark:text-neutral-300">{siteSettings.companyName || "Ligo Automobiles"}</p>
             <p>© {new Date().getFullYear()} {siteSettings.companyName || "Ligo Automobiles"}. {t('allRightsReserved')}. {siteSettings.address || "Paris, France"}.</p>
+          </div>
+          <div className="sm:absolute sm:bottom-4 sm:right-6 mt-4 sm:mt-0 text-[11px] text-neutral-400/60 dark:text-neutral-600 hover:text-[#D4AF37] transition-colors select-none font-medium tracking-wide">
+            by Wind
           </div>
         </footer>
       )}
