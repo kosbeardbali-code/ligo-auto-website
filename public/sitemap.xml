@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Main Pages -->
+  <url>
+    <loc>https://ligo-auto.fr/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://ligo-auto.fr/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ligo-auto.fr/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://ligo-auto.fr/" />
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/catalogue/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/comparaison/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/actualites/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Vehicles -->
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/porsche-911-gt3-rs-occasion-2023/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/ferrari-f8-tributo-occasion-2022/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/audi-rs6-avant-performance-occasion-2024/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/aston-martin-vantage-v8-f1-edition-occasion-2023/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/lamborghini-huracan-tecnica-occasion-2023/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/mercedes-benz-amg-gt-63-s-e-performance-occasion-2022/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/bentley-continental-gt-v8-mulliner-occasion-2021/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/vehicules/maserati-mc20-cielo-occasion-2023/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Articles -->
+  <url>
+    <loc>https://ligo-auto.fr/actualites/peugeot-2008-occasion-guide-achat/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/actualites/essence-diesel-hybride-electrique-que-choisir-2026/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/actualites/10-points-a-verifier-achat-voiture-occasion/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/actualites/porsche-911-pourquoi-reste-t-elle-la-sportive-de-reference/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ligo-auto.fr/actualites/comment-bien-choisir-ses-pneus-ete-hiver-4-saisons/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
