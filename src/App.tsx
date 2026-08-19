@@ -6738,40 +6738,38 @@ return (
                   />
                   <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-[#121214] to-transparent"></div>
                   
-                  {/* Статус-бейдж */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                  {/* Single Sleek Status Badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm ${
                       car.status === 'Vendu' 
-                        ? 'bg-neutral-900 text-neutral-400 border border-neutral-800' 
+                        ? 'bg-neutral-900/90 text-neutral-400 border border-neutral-700/60' 
                         : car.status === 'En arrivage'
-                          ? 'bg-amber-950/40 text-amber-400 border border-amber-900/50'
-                          : 'bg-green-950/40 text-green-400 border border-green-900/50'
+                          ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                          : 'bg-black/50 text-white/95 border border-white/20'
                     }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        car.status === 'Vendu' ? 'bg-neutral-500' : car.status === 'En arrivage' ? 'bg-amber-400' : 'bg-emerald-400'
+                      }`}></span>
                       {t(car.status)}
                     </span>
-                    {car.verifiedVin && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
-                        <Icons.CheckBadge />
-                        {t('vinVerified')}
-                      </span>
-                    )}
                   </div>
-                  {/* Compare Button */}
+
+                  {/* Compact Circular Compare Button */}
                   <button 
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleToggleCompare(car);
                     }}
-                    className={`absolute top-4 right-4 z-10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all backdrop-blur-md shadow-lg ${
+                    className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md active:scale-90 ${
                       isCompared(car.id)
-                        ? 'bg-[#D4AF37] text-neutral-950 border border-[#D4AF37] ring-2 ring-[#D4AF37]/30 scale-105'
-                        : 'bg-black/60 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]'
+                        ? 'bg-[#D4AF37] text-neutral-950 ring-2 ring-[#D4AF37]/50 scale-105'
+                        : 'bg-black/45 hover:bg-black/75 text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]'
                     }`}
                     title={isCompared(car.id) ? t('compareAdded') : t('compareAction')}
+                    aria-label={isCompared(car.id) ? t('compareAdded') : t('compareAction')}
                   >
                     <Icons.Compare />
-                    <span>{isCompared(car.id) ? t('compareAdded') : t('compareAction')}</span>
                   </button>
                 </div>
 
@@ -6779,11 +6777,19 @@ return (
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between gap-4">
-                      <div onClick={() => handleSelectCar(car)} className="cursor-pointer">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                      <div onClick={() => handleSelectCar(car)} className="cursor-pointer flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                          {car.verifiedVin && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#D4AF37] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/15 px-2 py-0.5 rounded-full border border-[#D4AF37]/20">
+                              <Icons.CheckBadge />
+                              <span>{t('vinVerified')}</span>
+                            </span>
+                          )}
+                        </div>
                         <h3 className="text-xl font-bold text-neutral-900 dark:text-white group-hover:text-[#D4AF37] transition-colors">{car.model}</h3>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         <div className="text-xl font-serif font-black text-[#D4AF37]">
                           {car.price ? car.price.toLocaleString('fr-FR') : '0'} €
                         </div>
@@ -7897,41 +7903,38 @@ return (
                   />
                   <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-[#121214] to-transparent"></div>
                   
-                  {/* Статус-бейдж */}
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                  {/* Single Sleek Status Badge */}
+                  <div className="absolute top-3 left-3 z-10">
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm ${
                       car.status === 'Vendu' 
-                        ? 'bg-neutral-900 text-neutral-400 border border-neutral-800' 
+                        ? 'bg-neutral-900/90 text-neutral-400 border border-neutral-700/60' 
                         : car.status === 'En arrivage'
-                          ? 'bg-amber-950/40 text-amber-400 border border-amber-900/50'
-                          : 'bg-green-950/40 text-green-400 border border-green-900/50'
+                          ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                          : 'bg-black/50 text-white/95 border border-white/20'
                     }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        car.status === 'Vendu' ? 'bg-neutral-500' : car.status === 'En arrivage' ? 'bg-amber-400' : 'bg-emerald-400'
+                      }`}></span>
                       {translateStatus(car.status, lang)}
                     </span>
-                    {car.verifiedVin && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 dark:bg-[#121214]/95 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] font-bold uppercase tracking-widest">
-                        <Icons.CheckBadge />
-                        {t('vinVerified')}
-                      </span>
-                    )}
                   </div>
 
-                  {/* Compare Button */}
+                  {/* Compact Circular Compare Button */}
                   <button 
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleToggleCompare(car);
                     }}
-                    className={`absolute top-4 right-4 z-10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all backdrop-blur-md shadow-lg ${
+                    className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-md active:scale-90 ${
                       isCompared(car.id)
-                        ? 'bg-[#D4AF37] text-neutral-950 border border-[#D4AF37] ring-2 ring-[#D4AF37]/30 scale-105'
-                        : 'bg-black/60 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]'
+                        ? 'bg-[#D4AF37] text-neutral-950 ring-2 ring-[#D4AF37]/50 scale-105'
+                        : 'bg-black/45 hover:bg-black/75 text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]'
                     }`}
                     title={isCompared(car.id) ? t('compareAdded') : t('compareAction')}
+                    aria-label={isCompared(car.id) ? t('compareAdded') : t('compareAction')}
                   >
                     <Icons.Compare />
-                    <span>{isCompared(car.id) ? t('compareAdded') : t('compareAction')}</span>
                   </button>
                 </div>
 
@@ -7939,11 +7942,19 @@ return (
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between gap-4">
-                      <div onClick={() => handleSelectCar(car)} className="cursor-pointer">
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                      <div onClick={() => handleSelectCar(car)} className="cursor-pointer flex-1">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                          {car.verifiedVin && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#D4AF37] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/15 px-2 py-0.5 rounded-full border border-[#D4AF37]/20">
+                              <Icons.CheckBadge />
+                              <span>{t('vinVerified')}</span>
+                            </span>
+                          )}
+                        </div>
                         <h3 className="text-xl font-bold text-neutral-900 dark:text-white group-hover:text-[#D4AF37] transition-colors">{car.model}</h3>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         <div className="text-xl font-serif font-black text-[#D4AF37]">
                           {car.price ? Number(car.price).toLocaleString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR') : '0'} €
                         </div>
