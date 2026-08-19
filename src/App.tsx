@@ -6894,7 +6894,7 @@ return (
           </nav>
 
           {/* Article Header */}
-          <header className="space-y-6">
+          <header className="space-y-4">
             {selectedArticle.tags && selectedArticle.tags.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 {selectedArticle.tags.map((tag, idx) => (
@@ -6905,28 +6905,13 @@ return (
               </div>
             )}
 
+            {/* 1. Title */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black text-neutral-900 dark:text-white leading-[1.2] tracking-tight">
               {getArticleTitle(selectedArticle)}
             </h1>
-
-            {getArticleExcerpt(selectedArticle) && (
-              <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 font-light leading-relaxed border-l-4 border-[#D4AF37] pl-5 py-2 italic bg-neutral-50 dark:bg-[#141416] rounded-r-2xl">
-                {getArticleExcerpt(selectedArticle)}
-              </p>
-            )}
-
-            <div className="flex items-center gap-4 pt-4 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500">
-              <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-neutral-950 flex items-center justify-center font-bold text-sm shadow-sm">
-                LA
-              </div>
-              <div>
-                <p className="font-bold text-neutral-900 dark:text-white">{selectedArticle.author || 'Ligo Automobiles'}</p>
-                <p className="text-neutral-500">{selectedArticle.publishedAt ? new Date(selectedArticle.publishedAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Édition Ligo Automobiles'}</p>
-              </div>
-            </div>
           </header>
 
-          {/* Featured Image */}
+          {/* 2. Featured Image */}
           {selectedArticle.featuredImage && (
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[16/9] bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <img 
@@ -6938,9 +6923,29 @@ return (
             </div>
           )}
 
-          {/* Article Main Content */}
-          <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 sm:p-14 shadow-sm">
-            {renderArticleContent(getArticleContent(selectedArticle))}
+          {/* 3. Excerpt Quote */}
+          {getArticleExcerpt(selectedArticle) && (
+            <p className="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 font-light leading-relaxed border-l-4 border-[#D4AF37] pl-5 py-3 italic bg-neutral-50 dark:bg-[#141416] rounded-r-2xl shadow-sm">
+              {getArticleExcerpt(selectedArticle)}
+            </p>
+          )}
+
+          {/* 4. Article Main Content & 5. Author at bottom */}
+          <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 sm:p-14 shadow-sm space-y-12">
+            <div>
+              {renderArticleContent(getArticleContent(selectedArticle))}
+            </div>
+
+            {/* 5. Author at bottom */}
+            <div className="flex items-center gap-4 pt-8 border-t border-neutral-200 dark:border-neutral-800 text-xs text-neutral-500">
+              <div className="w-11 h-11 rounded-full bg-[#D4AF37] text-neutral-950 flex items-center justify-center font-bold text-sm shadow-sm">
+                LA
+              </div>
+              <div>
+                <p className="font-bold text-sm text-neutral-900 dark:text-white">{selectedArticle.author || 'Ligo Automobiles'}</p>
+                <p className="text-neutral-500 mt-0.5">{selectedArticle.publishedAt ? new Date(selectedArticle.publishedAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Édition Ligo Automobiles'}</p>
+              </div>
+            </div>
           </div>
         </article>
       )}
