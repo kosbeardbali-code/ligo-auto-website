@@ -4232,8 +4232,17 @@ export function App() {
 
   // Popstate & Initial Route Resolver
   useEffect(() => {
-    const handleRoute = () => {
+    const handleRoute = (isPopstate = false) => {
+      // Never kick the admin out of the admin panel on background data changes
+      if (!isPopstate && currentView === 'admin') {
+        return;
+      }
+
       const path = window.location.pathname;
+      if (path.startsWith('/admin')) {
+        setCurrentView('admin');
+        return;
+      }
       if (path.startsWith('/actualites')) {
         const parts = path.split('/').filter(Boolean);
         if (parts.length === 1) {
@@ -4283,17 +4292,18 @@ export function App() {
         }
       } else if (path.startsWith('/comparaison')) {
         setCurrentView('comparaison');
-      } else if (path.startsWith('/admin')) {
-        setCurrentView('admin');
       } else if (path === '/' || path === '') {
         setCurrentView('home');
       }
     };
 
-    handleRoute();
-    window.addEventListener('popstate', handleRoute);
-    return () => window.removeEventListener('popstate', handleRoute);
-  }, [articles, cars]);
+    if (currentView !== 'admin') {
+      handleRoute(false);
+    }
+    const onPop = () => handleRoute(true);
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [articles, cars, currentView]);
 
   // Dynamic SEO & Meta Tags
   useEffect(() => {
@@ -5712,7 +5722,7 @@ const renderAdminDashboard = () => {
             <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">Panneau de gestion du catalogue et des demandes clients.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => { setIsAdmin(false); setCurrentView('home'); }} className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-bold transition-all">{t('logout')}</button>
+            <button onClick={() => { setIsAdmin(false); navigateTo('home'); }} className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-bold transition-all">{t('logout')}</button>
           </div>
         </div>
 
@@ -6385,7 +6395,7 @@ return (
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="p-2.5 rounded-xl bg-neutral-100 dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all" title={theme === 'dark' ? t('lightMode') : t('darkMode')}>
               {theme === 'dark' ? <Icons.Sun /> : <Icons.Moon />}
             </button>
-            <button onClick={() => isAdmin ? (setCurrentView('admin'), window.scrollTo({top:0})) : setShowAdminLoginModal(true)} className="p-2.5 rounded-xl bg-neutral-100 dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all" title={t('adminPanel')}>
+            <button onClick={() => isAdmin ? navigateTo('admin') : setShowAdminLoginModal(true)} className="p-2.5 rounded-xl bg-neutral-100 dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] hover:border-[#D4AF37] transition-all" title={t('adminPanel')}>
               {isAdmin ? <Icons.Unlock /> : <Icons.Lock />}
             </button>
           </div>
@@ -9562,7 +9572,7 @@ return (
                 setIsAdmin(true);
                 setShowAdminLoginModal(false);
                 setAdminPassword('');
-                setCurrentView('admin');
+                navigateTo('admin');
                 showNotification("Connexion réussie.", "success");
               } else {
                 showNotification("Mot de passe incorrect.", "error");
