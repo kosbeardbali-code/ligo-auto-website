@@ -95,17 +95,324 @@ body, header, section, footer, div, p, span, h1, h2, h3, h4, input, select, text
 html:not(.dark) {
   color-scheme: light;
 }
-html.dark {
-  color-scheme: dark;
+/* ==========================================================================
+   Ligo Automobiles Editorial Article Typography (.article-content)
+   ========================================================================== */
+.article-content {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #374151; /* neutral-700 */
+  font-size: 18px;
+  line-height: 1.75;
+  font-weight: 400;
+  word-break: break-word;
 }
 
-/* Custom scrollbars for light mode */
-html:not(.dark) ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+.dark .article-content {
+  color: #D1D5DB; /* neutral-300 */
 }
-html:not(.dark) ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+
+/* 17. Premier paragraphe d'introduction */
+.article-content > p:first-of-type {
+  font-size: 20px;
+  line-height: 1.75;
+  color: #1F2937;
 }
-html:not(.dark) ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+.dark .article-content > p:first-of-type {
+  color: #E5E7EB;
 }
+
+/* 4 & 5. Corps de texte et espacement des paragraphes */
+.article-content p {
+  margin-top: 0;
+  margin-bottom: 18px;
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+/* 6 & 7. Titres H2 avec élégant accent vertical doré */
+.article-content h2 {
+  font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #111827;
+  margin-top: 52px;
+  margin-bottom: 18px;
+  padding-left: 18px;
+  border-left: 4px solid #D4AF37;
+  border-radius: 2px;
+  letter-spacing: -0.01em;
+}
+
+.dark .article-content h2 {
+  color: #FFFFFF;
+}
+
+/* 8. Sous-titres H3 */
+.article-content h3 {
+  font-family: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 23px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #1F2937;
+  margin-top: 34px;
+  margin-bottom: 12px;
+  letter-spacing: -0.005em;
+}
+
+.dark .article-content h3 {
+  color: #F3F4F6;
+}
+
+/* Titres H4 */
+.article-content h4 {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #D4AF37;
+  margin-top: 28px;
+  margin-bottom: 10px;
+}
+
+/* 9 & 10. Listes compactes et puces dorées */
+.article-content ul,
+.article-content ol {
+  margin-top: 16px;
+  margin-bottom: 24px;
+  padding-left: 20px;
+}
+
+.article-content li {
+  margin-bottom: 7px;
+  line-height: 1.6;
+  font-size: 18px;
+}
+
+.article-content li:last-child {
+  margin-bottom: 0;
+}
+
+/* Élimination des marges parasites à l'intérieur des listes */
+.article-content li p,
+.article-content li > p {
+  margin: 0 !important;
+  display: inline;
+}
+
+/* Puces dorées raffinées pour les listes non-ordonnées */
+.article-content ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.article-content ul > li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.article-content ul > li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #D4AF37;
+}
+
+/* Listes ordonnées avec numérotation dorée */
+.article-content ol {
+  list-style-type: decimal;
+  padding-left: 24px;
+}
+
+.article-content ol > li::marker {
+  color: #D4AF37;
+  font-weight: 700;
+}
+
+/* 11. Texte en gras (Strong) */
+.article-content strong,
+.article-content b {
+  font-weight: 650;
+  color: #111827;
+}
+
+.dark .article-content strong,
+.dark .article-content b {
+  color: #FFFFFF;
+}
+
+/* 12. Liens intégrés dans l'article */
+.article-content a {
+  color: #D4AF37;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.article-content a:hover {
+  color: #B89628;
+  text-decoration-color: #B89628;
+}
+
+/* Citations en bloc (Blockquote) */
+.article-content blockquote {
+  margin: 32px 0;
+  padding: 18px 24px;
+  border-left: 4px solid #D4AF37;
+  background-color: rgba(212, 175, 55, 0.06);
+  border-radius: 0 16px 16px 0;
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.dark .article-content blockquote {
+  background-color: #18181b;
+  color: #D1D5DB;
+}
+
+/* 13. Images dans le corps de l'article */
+.article-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 32px auto;
+  border-radius: 18px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+.dark .article-content img {
+  border-color: #262626;
+}
+
+/* 14. Tableaux responsifs */
+.article-content .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin: 32px 0;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.dark .article-content .table-responsive {
+  border-color: #262626;
+}
+
+.article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 16px;
+}
+
+.article-content th {
+  background-color: #F9FAFB;
+  color: #111827;
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.dark .article-content th {
+  background-color: #18181b;
+  color: #FFFFFF;
+  border-bottom-color: #262626;
+}
+
+.article-content td {
+  padding: 12px 18px;
+  border-bottom: 1px solid #E5E7EB;
+  color: #374151;
+}
+
+.dark .article-content td {
+  border-bottom-color: #262626;
+  color: #D1D5DB;
+}
+
+.article-content tr:last-child td {
+  border-bottom: none;
+}
+
+/* 15. Séparateur horizontal HR */
+.article-content hr {
+  margin: 48px 0;
+  border: 0;
+  border-top: 1px solid #E5E7EB;
+}
+
+.dark .article-content hr {
+  border-top-color: #262626;
+}
+
+/* 22. Adaptabilité Mobile (< 640px) */
+@media (max-width: 640px) {
+  .article-content {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  .article-content > p:first-of-type {
+    font-size: 18px;
+    line-height: 1.65;
+  }
+
+  .article-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  .article-content h2 {
+    font-size: 26px;
+    line-height: 1.25;
+    margin-top: 38px;
+    margin-bottom: 16px;
+    padding-left: 14px;
+    border-left-width: 3.5px;
+  }
+
+  .article-content h3 {
+    font-size: 20px;
+    line-height: 1.35;
+    margin-top: 28px;
+    margin-bottom: 10px;
+  }
+
+  .article-content li {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 6px;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    margin-top: 12px;
+    margin-bottom: 18px;
+  }
+
+  .article-content ul > li::before {
+    top: 9px;
+  }
+
+  .article-content blockquote {
+    font-size: 17px;
+    padding: 14px 18px;
+    margin: 24px 0;
+  }
+
+  .article-content hr {
+    margin: 36px 0;
+  }
+}
+

@@ -4253,12 +4253,17 @@ export function App() {
           setSelectedArticleCategory(parts[2]);
           setSelectedArticle(null);
         } else if (parts.length >= 2) {
-          const slug = parts[1];
-          const found = articles.find(a => 
-            a.slug === slug ||
-            a.translations?.fr?.slug === slug ||
-            a.translations?.en?.slug === slug ||
-            a.translations?.ru?.slug === slug
+          const rawSlug = parts[1];
+          let slug = rawSlug;
+          try {
+            slug = decodeURIComponent(rawSlug);
+          } catch {}
+          const allPool = [...articles, ...DEMO_ARTICLES];
+          const found = allPool.find(a => 
+            a.slug === slug || a.slug === rawSlug ||
+            a.translations?.fr?.slug === slug || a.translations?.fr?.slug === rawSlug ||
+            a.translations?.en?.slug === slug || a.translations?.en?.slug === rawSlug ||
+            a.translations?.ru?.slug === slug || a.translations?.ru?.slug === rawSlug
           );
           if (found) {
             setSelectedArticle(found);
@@ -4273,10 +4278,15 @@ export function App() {
       } else if (path.startsWith('/vehicules')) {
         const parts = path.split('/').filter(Boolean);
         if (parts.length >= 2) {
-          const slug = parts[1];
+          const rawSlug = parts[1];
+          let slug = rawSlug;
+          try {
+            slug = decodeURIComponent(rawSlug);
+          } catch {}
           const found = cars.find(c => 
-            (c.slug && c.slug === slug) ||
+            (c.slug && (c.slug === slug || c.slug === rawSlug)) ||
             generateCarSlug(c) === slug ||
+            generateCarSlug(c) === rawSlug ||
             String(c.id) === slug
           );
           if (found) {
@@ -4679,17 +4689,29 @@ export function App() {
     if (!text) return '';
     
     // Normalize newlines and unescape literal \n strings
-    const src = text.replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\r\n/g, '\n');
+    let src = text.replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\r\n/g, '\n');
+    
+    // Clean legacy internal CTA markers if any
+    src = src.replace(/\[CTA_CONTACT\]/gi, '').replace(/\[CTA_VEHICULES\]/gi, '').replace(/\[CTA_CAR\]/gi, '');
+    
+    // If the input is already full rich HTML, return it directly
+    const isRichHtml = /<(p|h2|h3|ul|ol|table|blockquote)[^>]*>/i.test(src);
+    if (isRichHtml) {
+      return src;
+    }
+
     const lines = src.split('\n');
     const htmlBlocks: string[] = [];
     let inList: 'ul' | 'ol' | null = null;
     let listItems: string[] = [];
+    let inTable = false;
+    let tableRows: string[] = [];
 
     const flushList = () => {
       if (inList === 'ul') {
-        htmlBlocks.push(`<ul class="my-6 space-y-3 list-none pl-0">${listItems.join('')}</ul>`);
+        htmlBlocks.push(`<ul>${listItems.join('')}</ul>`);
       } else if (inList === 'ol') {
-        htmlBlocks.push(`<ol class="my-6 space-y-3 pl-6 list-decimal marker:text-[#D4AF37] marker:font-bold">${listItems.join('')}</ol>`);
+        htmlBlocks.push(`<ol>${listItems.join('')}</ol>`);
       }
       inList = null;
       listItems = [];
@@ -4698,15 +4720,45 @@ export function App() {
     const formatInline = (str: string): string => {
       return str
         // Images: ![alt](url)
-        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<div class="my-8 rounded-2xl overflow-hidden shadow-xl border border-neutral-200 dark:border-neutral-800"><img src="$2" alt="$1" class="w-full object-cover" loading="lazy" /></div>')
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" loading="lazy" />')
         // Links: [text](url)
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-[#D4AF37] hover:underline font-semibold">$1</a>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
         // Bold: **text** or __text__
-        .replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold text-neutral-900 dark:text-white">$1</strong>')
-        .replace(/__(.+?)__/g, '<strong class="font-bold text-neutral-900 dark:text-white">$1</strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.+?)__/g, '<strong>$1</strong>')
         // Italic: *text* or _text_
-        .replace(/\*([^*]+)\*/g, '<em class="italic text-neutral-800 dark:text-neutral-200">$1</em>')
-        .replace(/_([^_]+)_/g, '<em class="italic text-neutral-800 dark:text-neutral-200">$1</em>');
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/_([^_]+)_/g, '<em>$1</em>');
+    };
+
+    const flushTable = () => {
+      if (inTable && tableRows.length > 0) {
+        let tableHtml = '<div class="table-responsive"><table>';
+        let isFirstRow = true;
+        for (let r = 0; r < tableRows.length; r++) {
+          const rowText = tableRows[r].trim();
+          // Skip separator row |:---|:---|
+          if (/^\|?(\s*:?-+:?\s*\|?)+$/.test(rowText)) {
+            continue;
+          }
+          const cells = rowText.split('|').map(c => c.trim()).filter((c, idx, arr) => {
+            if (idx === 0 && c === '') return false;
+            if (idx === arr.length - 1 && c === '') return false;
+            return true;
+          });
+          if (cells.length === 0) continue;
+          if (isFirstRow) {
+            tableHtml += '<thead><tr>' + cells.map(c => `<th>${formatInline(c)}</th>`).join('') + '</tr></thead><tbody>';
+            isFirstRow = false;
+          } else {
+            tableHtml += '<tr>' + cells.map(c => `<td>${formatInline(c)}</td>`).join('') + '</tr>';
+          }
+        }
+        tableHtml += '</tbody></table></div>';
+        htmlBlocks.push(tableHtml);
+      }
+      inTable = false;
+      tableRows = [];
     };
 
     for (let i = 0; i < lines.length; i++) {
@@ -4715,49 +4767,68 @@ export function App() {
 
       if (!trimmed) {
         flushList();
+        flushTable();
+        continue;
+      }
+
+      // Check for Markdown table row
+      if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+        flushList();
+        inTable = true;
+        tableRows.push(trimmed);
+        continue;
+      } else if (inTable) {
+        flushTable();
+      }
+
+      // Check if line is already an HTML block element
+      if (/^<(h[1-6]|p|blockquote|ul|ol|table|hr|img|div)/i.test(trimmed)) {
+        flushList();
+        htmlBlocks.push(trimmed);
         continue;
       }
 
       // Headers
       if (trimmed.startsWith('#### ')) {
         flushList();
-        htmlBlocks.push(`<h4 class="text-base font-bold text-[#D4AF37] uppercase tracking-wider mt-8 mb-2">${formatInline(trimmed.slice(5))}</h4>`);
+        htmlBlocks.push(`<h4>${formatInline(trimmed.slice(5))}</h4>`);
       } else if (trimmed.startsWith('### ')) {
         flushList();
-        htmlBlocks.push(`<h3 class="text-xl sm:text-2xl font-serif font-bold text-neutral-900 dark:text-white mt-10 mb-3 tracking-tight">${formatInline(trimmed.slice(4))}</h3>`);
+        htmlBlocks.push(`<h3>${formatInline(trimmed.slice(4))}</h3>`);
       } else if (trimmed.startsWith('## ')) {
         flushList();
-        htmlBlocks.push(`<h2 class="text-2xl sm:text-3xl font-serif font-bold text-neutral-900 dark:text-white mt-12 mb-4 pb-2 border-b border-neutral-200 dark:border-neutral-800/80 tracking-tight flex items-center gap-3"><span class="w-1.5 h-6 bg-[#D4AF37] rounded-full inline-block"></span><span>${formatInline(trimmed.slice(3))}</span></h2>`);
+        htmlBlocks.push(`<h2>${formatInline(trimmed.slice(3))}</h2>`);
       } else if (trimmed.startsWith('# ')) {
         flushList();
-        htmlBlocks.push(`<h1 class="text-3xl sm:text-4xl font-serif font-bold text-neutral-900 dark:text-white mt-12 mb-5 pb-3 border-b border-neutral-200 dark:border-neutral-800 tracking-tight">${formatInline(trimmed.slice(2))}</h1>`);
+        htmlBlocks.push(`<h2>${formatInline(trimmed.slice(2))}</h2>`);
       } else if (trimmed.startsWith('> ')) {
         flushList();
-        htmlBlocks.push(`<blockquote class="my-6 pl-5 py-3 border-l-4 border-[#D4AF37] bg-neutral-50 dark:bg-[#18181b] rounded-r-2xl italic text-neutral-700 dark:text-neutral-300 font-serif text-lg leading-relaxed">${formatInline(trimmed.slice(2))}</blockquote>`);
+        htmlBlocks.push(`<blockquote>${formatInline(trimmed.slice(2))}</blockquote>`);
       } else if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
         flushList();
-        htmlBlocks.push(`<hr class="my-10 border-neutral-200 dark:border-neutral-800" />`);
+        htmlBlocks.push(`<hr />`);
       } else if (/^[-*]\s+/.test(trimmed)) {
         if (inList !== 'ul') {
           flushList();
           inList = 'ul';
         }
         const itemText = trimmed.replace(/^[-*]\s+/, '');
-        listItems.push(`<li class="flex items-start gap-3 text-base sm:text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed"><span class="w-1.5 h-1.5 rounded-full bg-[#D4AF37] mt-3 flex-shrink-0"></span><span class="flex-1">${formatInline(itemText)}</span></li>`);
+        listItems.push(`<li>${formatInline(itemText)}</li>`);
       } else if (/^\d+\.\s+/.test(trimmed)) {
         if (inList !== 'ol') {
           flushList();
           inList = 'ol';
         }
         const itemText = trimmed.replace(/^\d+\.\s+/, '');
-        listItems.push(`<li class="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed">${formatInline(itemText)}</li>`);
+        listItems.push(`<li>${formatInline(itemText)}</li>`);
       } else {
         flushList();
-        htmlBlocks.push(`<p class="mb-6 text-base sm:text-lg text-neutral-700 dark:text-neutral-300 leading-relaxed font-light">${formatInline(trimmed)}</p>`);
+        htmlBlocks.push(`<p>${formatInline(trimmed)}</p>`);
       }
     }
 
     flushList();
+    flushTable();
     return htmlBlocks.join('\n');
   };
 
@@ -4765,7 +4836,7 @@ export function App() {
     if (!content) return null;
     return (
       <div 
-        className="article-content space-y-2 max-w-none text-neutral-700 dark:text-neutral-300"
+        className="article-content"
         dangerouslySetInnerHTML={{ __html: formatMarkdownArticle(content) }}
       />
     );
