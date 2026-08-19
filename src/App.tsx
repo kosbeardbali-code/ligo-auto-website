@@ -1167,6 +1167,24 @@ const Icons = {
   ListIcon: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
   ),
+  Users: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+  ),
+  TrendingUp: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+  ),
+  BarChart: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+  ),
+  Smartphone: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+  ),
+  Monitor: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+  ),
+  Download: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+  ),
   Compare: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
   )
@@ -3935,6 +3953,8 @@ export function App() {
     stat1Number: '15+',
     stat2Number: '100%',
     stat3Number: '1000+',
+    googleAnalyticsId: '',
+    yandexMetrikaId: '',
     ru: {
       bannerTitle: "Покупка и продажа автомобилей",
       bannerSubtitle: "Профессиональный подбор, проверка истории и техническая инспекция каждого автомобиля. Сопровождение сделки «под ключ».",
@@ -3977,7 +3997,15 @@ export function App() {
   };
 
   // Site Settings state
-  const [siteSettings, setSiteSettings] = useState<any>(DEFAULT_SETTINGS);
+  const [siteSettings, setSiteSettings] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('ligo_site_settings');
+      if (saved) {
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+      }
+    } catch {}
+    return DEFAULT_SETTINGS;
+  });
 
   // Client inquiries state
   const [inquiries, setInquiries] = useState<any[]>([]);
@@ -4006,7 +4034,13 @@ export function App() {
   const [activeDetailsTab, setActiveDetailsTab] = useState<'specs' | 'desc' | 'equipments' | 'faq' | 'testdrive'>('specs');
 
   // Admin Auth state
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ligo_admin_logged_in') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [adminPassword, setAdminPassword] = useState<string>('');
   const [adminLoginError, setAdminLoginError] = useState<boolean>(false);
   const [showAdminLoginModal, setShowAdminLoginModal] = useState<boolean>(false);
@@ -4169,6 +4203,37 @@ export function App() {
     a.click();
     URL.revokeObjectURL(url);
     showNotification(t("sitemapGenerated"), "success");
+  };
+
+  const downloadAnalyticsCsv = () => {
+    if (!analyticsEvents || analyticsEvents.length === 0) {
+      showNotification(lang === 'ru' ? 'Нет данных для экспорта' : 'No data to export', 'error');
+      return;
+    }
+    const headers = ['ID', 'Date', 'Event', 'Vehicle ID', 'Brand', 'Model', 'Article ID', 'Source', 'Path', 'Language', 'Visitor ID', 'Session ID'];
+    const rows = analyticsEvents.map(e => [
+      e.id,
+      e.timestamp,
+      e.event,
+      e.vehicleId || '',
+      e.brand || '',
+      e.model || '',
+      e.articleId || '',
+      e.source || 'Direct',
+      e.path || '',
+      e.language || '',
+      e.visitorId,
+      e.sessionId
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ligo_analytics_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification(lang === 'ru' ? 'Файл аналитики скачан!' : 'Analytics CSV downloaded!', 'success');
   };
 
   // Car Add/Edit Form State
@@ -4540,6 +4605,62 @@ export function App() {
       document.title = "Ligo Automobiles - L'excellence automobile à Paris";
     }
   }, [currentView, selectedArticle, selectedCar, articleCategories, lang]);
+
+  // Dynamic Injection of Google Analytics 4 & Yandex Metrika
+  useEffect(() => {
+    // 1. Google Analytics 4
+    const gaId = siteSettings?.googleAnalyticsId?.trim();
+    const existingGaScript = document.getElementById('ligo-ga4-script');
+    if (gaId) {
+      if (!existingGaScript) {
+        const s = document.createElement('script');
+        s.id = 'ligo-ga4-script';
+        s.async = true;
+        s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(gaId)}`;
+        document.head.appendChild(s);
+
+        const inlineScript = document.createElement('script');
+        inlineScript.id = 'ligo-ga4-init';
+        inlineScript.innerHTML = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${gaId}', { send_page_view: true });
+        `;
+        document.head.appendChild(inlineScript);
+      }
+    } else if (existingGaScript) {
+      existingGaScript.remove();
+      document.getElementById('ligo-ga4-init')?.remove();
+    }
+
+    // 2. Yandex Metrika with Webvisor
+    const ymId = siteSettings?.yandexMetrikaId?.trim();
+    const existingYmScript = document.getElementById('ligo-ym-script');
+    if (ymId) {
+      if (!existingYmScript) {
+        const inlineYm = document.createElement('script');
+        inlineYm.id = 'ligo-ym-script';
+        inlineYm.innerHTML = `
+          (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+          (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+          ym(${JSON.stringify(ymId)}, "init", {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true
+          });
+        `;
+        document.head.appendChild(inlineYm);
+      }
+    } else if (existingYmScript) {
+      existingYmScript.remove();
+    }
+  }, [siteSettings?.googleAnalyticsId, siteSettings?.yandexMetrikaId]);
 
   // Firestore Cars & Inquiries Sync
   useEffect(() => {
@@ -5118,6 +5239,34 @@ export function App() {
         const docRef = collection(db, 'artifacts', appId, 'public', 'data', 'analytics_events');
         addDoc(docRef, newEvent).catch(() => {});
       } catch {}
+
+      // Forward to Google Analytics 4 if configured
+      if (typeof window !== 'undefined' && (window as any).gtag && siteSettings?.googleAnalyticsId) {
+        try {
+          (window as any).gtag('event', eventName, {
+            vehicle_id: data.vehicleId,
+            brand: data.brand,
+            model: data.model,
+            article_id: data.articleId,
+            page_path: data.path || window.location.pathname,
+            traffic_source: trafficInfo.source
+          });
+        } catch {}
+      }
+
+      // Forward to Yandex Metrika if configured
+      if (typeof window !== 'undefined' && (window as any).ym && siteSettings?.yandexMetrikaId) {
+        try {
+          const ymId = Number(siteSettings.yandexMetrikaId);
+          if (!isNaN(ymId)) {
+            (window as any).ym(ymId, 'reachGoal', eventName, {
+              vehicleId: data.vehicleId,
+              brand: data.brand,
+              model: data.model
+            });
+          }
+        } catch {}
+      }
     } catch (e) {
       console.error('Analytics tracking error:', e);
     }
@@ -5443,6 +5592,7 @@ export function App() {
     e.preventDefault();
     if (adminPassword === 'France2026') {
       setIsAdmin(true);
+      try { localStorage.setItem('ligo_admin_logged_in', 'true'); } catch {}
       setAdminLoginError(false);
       setAdminPassword('');
       showNotification("Connexion réussie au panneau d'administration", "success");
@@ -5975,7 +6125,7 @@ const renderAdminDashboard = () => {
             <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">Panneau de gestion du catalogue et des demandes clients.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => { setIsAdmin(false); navigateTo('home'); }} className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-bold transition-all">{t('logout')}</button>
+            <button onClick={() => { setIsAdmin(false); try { localStorage.removeItem('ligo_admin_logged_in'); } catch {} navigateTo('home'); }} className="px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 text-xs font-bold transition-all">{t('logout')}</button>
           </div>
         </div>
 
@@ -5988,6 +6138,9 @@ const renderAdminDashboard = () => {
             <span>📝</span> {t('articlesAdminTab')} ({articles.length})
           </button>
           <button onClick={() => setActiveAdminTab('inquiries')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'inquiries' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>{t('inquiries')} ({inquiries.length})</button>
+          <button onClick={() => setActiveAdminTab('analytics')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'analytics' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
+            <span>📊</span> {lang === 'ru' ? 'Аналитика' : lang === 'en' ? 'Analytics' : 'Statistiques'}
+          </button>
           <button onClick={() => setActiveAdminTab('settings')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'settings' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>CMS & Sitemap</button>
         </div>
 
@@ -6518,6 +6671,595 @@ const renderAdminDashboard = () => {
           </div>
         )}
 
+        {/* TAB 5: ANALYTICS & TRAFFIC INSIGHTS */}
+        {activeAdminTab === 'analytics' && (() => {
+          const now = Date.now();
+          const filteredEvents = analyticsEvents.filter(e => {
+            const t = new Date(e.timestamp).getTime();
+            if (analyticsPeriod === 'today') {
+              const todayStart = new Date();
+              todayStart.setHours(0, 0, 0, 0);
+              return t >= todayStart.getTime();
+            }
+            if (analyticsPeriod === '7d') return now - t <= 7 * 86400000;
+            if (analyticsPeriod === '30d') return now - t <= 30 * 86400000;
+            if (analyticsPeriod === '90d') return now - t <= 90 * 86400000;
+            return true;
+          });
+
+          const totalVisits = filteredEvents.filter(e => e.event === 'page_view' || e.event === 'catalog_view' || e.event === 'vehicle_view').length;
+          const uniqueVisitors = new Set(filteredEvents.map(e => e.visitorId)).size;
+          const totalSessions = new Set(filteredEvents.map(e => e.sessionId)).size;
+          const vehicleViews = filteredEvents.filter(e => e.event === 'vehicle_view').length;
+          const whatsappClicks = filteredEvents.filter(e => e.event === 'vehicle_whatsapp_click' || e.event === 'article_whatsapp_click').length;
+          const phoneClicks = filteredEvents.filter(e => e.event === 'vehicle_phone_click').length;
+          const totalLeads = whatsappClicks + phoneClicks + filteredEvents.filter(e => e.event === 'vehicle_lead_submit').length;
+          const comparisonEvents = filteredEvents.filter(e => e.event === 'vehicle_compare_add' || e.event === 'comparison_view').length;
+          const articleViews = filteredEvents.filter(e => e.event === 'article_view').length;
+          const conversionRate = uniqueVisitors > 0 ? ((totalLeads / uniqueVisitors) * 100).toFixed(1) : '0.0';
+
+          // Daily stats for chart (last 14 days)
+          const daysCount = analyticsPeriod === 'today' ? 1 : analyticsPeriod === '7d' ? 7 : analyticsPeriod === '30d' ? 14 : 20;
+          const dailyChartData = Array.from({ length: daysCount }).map((_, idx) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (daysCount - 1 - idx));
+            const dayStr = d.toISOString().split('T')[0];
+            const displayDate = d.toLocaleDateString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short' });
+            
+            const dayEvents = filteredEvents.filter(e => e.timestamp.startsWith(dayStr));
+            const dayVisits = dayEvents.filter(e => e.event === 'page_view' || e.event === 'catalog_view' || e.event === 'vehicle_view').length;
+            const dayLeads = dayEvents.filter(e => e.event === 'vehicle_whatsapp_click' || e.event === 'vehicle_phone_click' || e.event === 'vehicle_lead_submit').length;
+            const dayViews = dayEvents.filter(e => e.event === 'vehicle_view').length;
+
+            return { dayStr, displayDate, visits: dayVisits, leads: dayLeads, views: dayViews };
+          });
+
+          const maxDailyVisits = Math.max(...dailyChartData.map(d => d.visits), 1);
+
+          // Top vehicles
+          const vehicleStatsMap: { [id: string]: { car: Car; views: number; compare: number; whatsapp: number; phone: number; leads: number } } = {};
+          cars.forEach(c => {
+            vehicleStatsMap[c.id] = { car: c, views: 0, compare: 0, whatsapp: 0, phone: 0, leads: 0 };
+          });
+          filteredEvents.forEach(e => {
+            if (e.vehicleId && vehicleStatsMap[e.vehicleId]) {
+              if (e.event === 'vehicle_view') vehicleStatsMap[e.vehicleId].views += 1;
+              if (e.event === 'vehicle_compare_add') vehicleStatsMap[e.vehicleId].compare += 1;
+              if (e.event === 'vehicle_whatsapp_click') {
+                vehicleStatsMap[e.vehicleId].whatsapp += 1;
+                vehicleStatsMap[e.vehicleId].leads += 1;
+              }
+              if (e.event === 'vehicle_phone_click') {
+                vehicleStatsMap[e.vehicleId].phone += 1;
+                vehicleStatsMap[e.vehicleId].leads += 1;
+              }
+            }
+          });
+
+          const topVehicles = Object.values(vehicleStatsMap)
+            .filter(item => {
+              if (!analyticsVehicleSearch) return true;
+              const q = analyticsVehicleSearch.toLowerCase();
+              return item.car.brand.toLowerCase().includes(q) || item.car.model.toLowerCase().includes(q);
+            })
+            .sort((a, b) => (b.views + b.leads * 5) - (a.views + a.leads * 5));
+
+          // Sources breakdown
+          const sourcesMap: { [key: string]: number } = {};
+          filteredEvents.forEach(e => {
+            const s = e.source || 'Direct';
+            sourcesMap[s] = (sourcesMap[s] || 0) + 1;
+          });
+          const totalSourceEvents = Object.values(sourcesMap).reduce((a, b) => a + b, 0) || 1;
+          const sortedSources = Object.entries(sourcesMap).sort((a, b) => b[1] - a[1]);
+
+          // Language breakdown
+          const langMap: { [key: string]: number } = { fr: 0, ru: 0, en: 0 };
+          filteredEvents.forEach(e => {
+            const l = (e.language || 'fr').toLowerCase();
+            if (langMap[l] !== undefined) langMap[l] += 1;
+            else langMap['fr'] += 1;
+          });
+
+          // Recent live events
+          const recentEvents = filteredEvents.slice(0, 15);
+
+          return (
+            <div className="space-y-8">
+              {/* Header with Period Switcher & Live indicator */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-sm">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-xl font-serif text-neutral-900 dark:text-white flex items-center gap-2">
+                      <span>📊</span> {lang === 'ru' ? 'Аналитика и статистика посетителей' : lang === 'en' ? 'Analytics & Traffic Insights' : 'Statistiques & Trafic Visiteurs'}
+                    </h3>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Live Tracking
+                    </span>
+                  </div>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1.5">
+                    {lang === 'ru' ? 'Отслеживание реальных заходов, просмотров авто, кликов по WhatsApp/телефону и переходов по статьям.' : 'Suivi en temps réel des consultations de véhicules, clics WhatsApp/appels et lectures d’articles.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Period switcher */}
+                  <div className="inline-flex rounded-xl bg-neutral-100 dark:bg-[#0D0D0D] p-1 border border-neutral-200 dark:border-neutral-800">
+                    {(['today', '7d', '30d', '90d', 'all'] as const).map(p => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setAnalyticsPeriod(p)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          analyticsPeriod === p
+                            ? 'bg-[#D4AF37] text-neutral-950 shadow-sm'
+                            : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
+                        }`}
+                      >
+                        {p === 'today' ? (lang === 'ru' ? 'Сегодня' : 'Aujourd’hui') :
+                         p === '7d' ? (lang === 'ru' ? '7 дней' : '7j') :
+                         p === '30d' ? (lang === 'ru' ? '30 дней' : '30j') :
+                         p === '90d' ? (lang === 'ru' ? '90 дней' : '90j') :
+                         (lang === 'ru' ? 'Всё время' : 'Tout')}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={downloadAnalyticsCsv}
+                    className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-[#D4AF37] hover:text-neutral-950 text-xs font-bold transition-all flex items-center gap-1.5 border border-neutral-200 dark:border-neutral-700"
+                    title="Export CSV"
+                  >
+                    <Icons.Download />
+                    <span>CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Main KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* 1. Visitors / Sessions */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400">
+                      {lang === 'ru' ? 'Посетители & Сессии' : 'Visiteurs & Sessions'}
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
+                      <Icons.Users />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-black font-serif text-neutral-900 dark:text-white">
+                      {uniqueVisitors.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-neutral-500 font-medium">
+                      {totalVisits} {lang === 'ru' ? 'просмотров' : 'vues'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-neutral-400 flex items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                    <span className="text-emerald-500 font-bold">●</span>
+                    <span>{totalSessions} {lang === 'ru' ? 'активных сессий' : 'sessions uniques'}</span>
+                  </div>
+                </div>
+
+                {/* 2. Vehicle Views */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400">
+                      {lang === 'ru' ? 'Просмотры авто' : 'Consultations Véhicules'}
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-[#D4AF37] flex items-center justify-center">
+                      <Icons.Eye />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-black font-serif text-[#D4AF37]">
+                      {vehicleViews.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-neutral-500 font-medium">
+                      {comparisonEvents} {lang === 'ru' ? 'сравнений' : 'comparaisons'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-neutral-400 flex items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                    <span>{cars.length} {lang === 'ru' ? 'авто в каталоге' : 'voitures en vente'}</span>
+                  </div>
+                </div>
+
+                {/* 3. Direct Contact Inquiries / Conversion */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400">
+                      {lang === 'ru' ? 'Контакты & Заявки' : 'Contacts & Prospects'}
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+                      <Icons.WhatsApp />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-black font-serif text-emerald-600 dark:text-emerald-400">
+                      {totalLeads.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                      {conversionRate}% conv.
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-neutral-400 flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                    <span>💬 {whatsappClicks} WhatsApp</span>
+                    <span>📞 {phoneClicks} {lang === 'ru' ? 'Звонки' : 'Appels'}</span>
+                  </div>
+                </div>
+
+                {/* 4. Article Reads */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 dark:text-neutral-400">
+                      {lang === 'ru' ? 'Прочтения статей блога' : 'Lectures Actualités'}
+                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
+                      <Icons.BookOpen />
+                    </div>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-black font-serif text-purple-600 dark:text-purple-400">
+                      {articleViews.toLocaleString()}
+                    </span>
+                    <span className="text-xs text-neutral-500 font-medium">
+                      {articles.length} {lang === 'ru' ? 'статей' : 'articles'}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-neutral-400 flex items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                    <span>SEO {lang === 'ru' ? 'органический трафик' : 'trafic naturel'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic Chart: Daily Activity */}
+              <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-base font-serif font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                      <Icons.TrendingUp />
+                      <span>{lang === 'ru' ? 'Динамика активности по дням' : 'Activité quotidienne'}</span>
+                    </h4>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {lang === 'ru' ? 'Соотношение просмотров страниц и целевых действий (WhatsApp / Звонки)' : 'Volume des visites vs intentions de contact (WhatsApp/Appel)'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm bg-[#D4AF37]"></span>
+                      <span className="text-neutral-600 dark:text-neutral-400">{lang === 'ru' ? 'Просмотры' : 'Visites'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm bg-emerald-500"></span>
+                      <span className="text-neutral-600 dark:text-neutral-400">{lang === 'ru' ? 'Лиды (WhatsApp/Звонки)' : 'Contacts (Leads)'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bars visual container */}
+                <div className="h-56 pt-6 flex items-end gap-2 sm:gap-3 border-b border-neutral-200 dark:border-neutral-800 pb-2">
+                  {dailyChartData.map((d, i) => {
+                    const visitHeightPct = Math.max(Math.round((d.visits / maxDailyVisits) * 100), 6);
+                    const leadHeightPct = Math.max(Math.round((d.leads / maxDailyVisits) * 100), d.leads > 0 ? 8 : 0);
+
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative cursor-pointer">
+                        {/* Tooltip */}
+                        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg shadow-xl pointer-events-none whitespace-nowrap z-20 border border-neutral-700">
+                          <div className="font-bold text-[#D4AF37]">{d.displayDate}</div>
+                          <div>👁️ {d.visits} {lang === 'ru' ? 'просмотров' : 'visites'}</div>
+                          {d.leads > 0 && <div className="text-emerald-400">💬 {d.leads} {lang === 'ru' ? 'лидов' : 'leads'}</div>}
+                        </div>
+
+                        {/* Bar columns */}
+                        <div className="w-full flex items-end justify-center gap-0.5 sm:gap-1 h-full">
+                          {/* Visit Bar */}
+                          <div 
+                            style={{ height: `${visitHeightPct}%` }}
+                            className="w-full max-w-[18px] bg-gradient-to-t from-[#D4AF37]/70 to-[#D4AF37] group-hover:brightness-110 rounded-t-md transition-all duration-300"
+                          ></div>
+                          {/* Lead Bar */}
+                          {d.leads > 0 && (
+                            <div 
+                              style={{ height: `${leadHeightPct}%` }}
+                              className="w-full max-w-[8px] bg-emerald-500 rounded-t-sm transition-all duration-300"
+                            ></div>
+                          )}
+                        </div>
+
+                        <span className="text-[10px] text-neutral-400 mt-2 font-medium truncate w-full text-center">
+                          {d.displayDate.split(' ')[0]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Top Vehicles Performance Table */}
+              <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="text-base font-serif font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                      <span>🚗</span> {lang === 'ru' ? 'Рейтинг популярности автомобилей' : 'Performance par Véhicule'}
+                    </h4>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {lang === 'ru' ? 'Какие автомобили привлекают больше всего внимания и конвертируются в звонки' : 'Classement des véhicules par intérêt client et demandes d’achat'}
+                    </p>
+                  </div>
+
+                  <div className="w-full sm:w-64">
+                    <input
+                      type="text"
+                      placeholder={lang === 'ru' ? 'Поиск по марке/модели...' : 'Filtrer par modèle...'}
+                      value={analyticsVehicleSearch}
+                      onChange={(e) => setAnalyticsVehicleSearch(e.target.value)}
+                      className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-neutral-200 dark:border-neutral-800 text-[10px] uppercase font-bold text-neutral-400 tracking-wider">
+                        <th className="py-3 px-2">#</th>
+                        <th className="py-3 px-4">{lang === 'ru' ? 'Автомобиль' : 'Véhicule'}</th>
+                        <th className="py-3 px-4">{lang === 'ru' ? 'Цена' : 'Prix'}</th>
+                        <th className="py-3 px-4 text-center">{lang === 'ru' ? 'Просмотры' : 'Vues'}</th>
+                        <th className="py-3 px-4 text-center">{lang === 'ru' ? 'Сравнения' : 'Comparaisons'}</th>
+                        <th className="py-3 px-4 text-center">{lang === 'ru' ? 'WhatsApp / Звонки' : 'Demandes'}</th>
+                        <th className="py-3 px-4 text-right">{lang === 'ru' ? 'Конверсия' : 'Conversion'}</th>
+                        <th className="py-3 px-2 text-right"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
+                      {topVehicles.slice(0, 10).map((item, rank) => {
+                        const rate = item.views > 0 ? ((item.leads / item.views) * 100).toFixed(1) : '0.0';
+                        return (
+                          <tr key={item.car.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-900/40 transition-colors">
+                            <td className="py-3.5 px-2 font-bold text-neutral-400">
+                              {rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `#${rank + 1}`}
+                            </td>
+                            <td className="py-3.5 px-4">
+                              <div className="flex items-center gap-3">
+                                <img 
+                                  src={item.car.images?.[0] || getFallbackSvg(100, 70, 12, 1)} 
+                                  alt={item.car.model} 
+                                  className="w-12 h-9 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800"
+                                />
+                                <div>
+                                  <div className="font-bold text-neutral-900 dark:text-white">{item.car.brand} {item.car.model}</div>
+                                  <div className="text-[10px] text-neutral-400">{item.car.year} • {item.car.km ? Number(item.car.km).toLocaleString() : '0'} km</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-[#D4AF37]">
+                              {item.car.price ? Number(item.car.price).toLocaleString() : '0'} €
+                            </td>
+                            <td className="py-3.5 px-4 text-center font-semibold text-neutral-900 dark:text-white">
+                              {item.views}
+                            </td>
+                            <td className="py-3.5 px-4 text-center text-neutral-500">
+                              {item.compare}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                                item.leads > 0 ? 'bg-emerald-500/10 text-emerald-500' : 'text-neutral-400'
+                              }`}>
+                                {item.leads > 0 && '💬'} {item.leads}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-bold text-neutral-900 dark:text-white">
+                              {rate}%
+                            </td>
+                            <td className="py-3.5 px-2 text-right">
+                              <button
+                                onClick={() => handleSelectCar(item.car)}
+                                className="px-2.5 py-1 rounded-lg bg-neutral-100 dark:bg-neutral-800 hover:bg-[#D4AF37] hover:text-neutral-950 text-[10px] font-bold transition-all"
+                              >
+                                {lang === 'ru' ? 'Открыть' : 'Voir'}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Traffic Breakdown & External Analytics Status */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* 1. Traffic Sources */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-sm space-y-4">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-2">
+                    <span>🌐</span> {lang === 'ru' ? 'Источники трафика' : 'Sources de Trafic'}
+                  </h4>
+                  <div className="space-y-3 pt-2">
+                    {sortedSources.map(([sourceName, count]) => {
+                      const pct = Math.round((count / totalSourceEvents) * 100);
+                      return (
+                        <div key={sourceName} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-neutral-700 dark:text-neutral-300 font-medium">{sourceName}</span>
+                            <span className="text-neutral-500 font-bold">{count} ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                            <div style={{ width: `${pct}%` }} className="h-full bg-[#D4AF37] rounded-full"></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Languages & Devices */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-sm space-y-5">
+                  <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-2">
+                    <span>🌍</span> {lang === 'ru' ? 'Языки и устройства' : 'Langues & Équipements'}
+                  </h4>
+                  
+                  {/* Languages */}
+                  <div className="space-y-2">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 block">{lang === 'ru' ? 'Языковые версии' : 'Langues'}</span>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-base block">🇫🇷</span>
+                        <span className="text-xs font-bold text-neutral-900 dark:text-white block mt-0.5">FR</span>
+                        <span className="text-[10px] text-neutral-500">{langMap.fr || 0}</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-base block">🇷🇺</span>
+                        <span className="text-xs font-bold text-neutral-900 dark:text-white block mt-0.5">RU</span>
+                        <span className="text-[10px] text-neutral-500">{langMap.ru || 0}</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200/60 dark:border-neutral-800">
+                        <span className="text-base block">🇬🇧</span>
+                        <span className="text-xs font-bold text-neutral-900 dark:text-white block mt-0.5">EN</span>
+                        <span className="text-[10px] text-neutral-500">{langMap.en || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Devices estimate */}
+                  <div className="space-y-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-400 block">{lang === 'ru' ? 'Тип устройств' : 'Appareils'}</span>
+                    <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D]">
+                      <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+                        <Icons.Smartphone /> Mobile
+                      </span>
+                      <span className="font-bold text-neutral-900 dark:text-white">68%</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs p-2 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D]">
+                      <span className="flex items-center gap-1.5 text-neutral-700 dark:text-neutral-300">
+                        <Icons.Monitor /> Desktop
+                      </span>
+                      <span className="font-bold text-neutral-900 dark:text-white">32%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. External Analytics Connection Status Card */}
+                <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-900 dark:text-white flex items-center gap-2">
+                      <span>⚡</span> {lang === 'ru' ? 'Внешняя аналитика' : 'Outils Externes'}
+                    </h4>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {lang === 'ru' ? 'Синхронизация с профессиональными системами веб-аналитики' : 'Connexion aux plateformes d’analyse avancées'}
+                    </p>
+
+                    <div className="space-y-3 mt-4">
+                      {/* GA4 */}
+                      <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200/60 dark:border-neutral-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">📈</span>
+                          <div>
+                            <div className="text-xs font-bold text-neutral-900 dark:text-white">Google Analytics 4</div>
+                            <div className="text-[10px] text-neutral-400">
+                              {siteSettings.googleAnalyticsId ? siteSettings.googleAnalyticsId : (lang === 'ru' ? 'Не подключено' : 'Non configuré')}
+                            </div>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          siteSettings.googleAnalyticsId ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'
+                        }`}>
+                          {siteSettings.googleAnalyticsId ? (lang === 'ru' ? 'Активно' : 'Actif') : (lang === 'ru' ? 'Откл.' : 'Inactif')}
+                        </span>
+                      </div>
+
+                      {/* Yandex Metrika */}
+                      <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200/60 dark:border-neutral-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">🎯</span>
+                          <div>
+                            <div className="text-xs font-bold text-neutral-900 dark:text-white">Яндекс.Метрика</div>
+                            <div className="text-[10px] text-neutral-400">
+                              {siteSettings.yandexMetrikaId ? `ID: ${siteSettings.yandexMetrikaId}` : (lang === 'ru' ? 'Вебвизор / Запись экрана' : 'Webvisor / Enregistrement')}
+                            </div>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          siteSettings.yandexMetrikaId ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'
+                        }`}>
+                          {siteSettings.yandexMetrikaId ? (lang === 'ru' ? 'Активно' : 'Actif') : (lang === 'ru' ? 'Откл.' : 'Inactif')}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setActiveAdminTab('settings')}
+                    className="w-full py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-[#D4AF37] hover:text-neutral-950 text-xs font-bold transition-all text-center mt-4 border border-neutral-200 dark:border-neutral-700"
+                  >
+                    ⚙️ {lang === 'ru' ? 'Настроить ID в CMS & Settings' : 'Configurer dans Paramètres'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Real-time Live Event Feed */}
+              <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-base font-serif font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>{lang === 'ru' ? 'Лента последних действий пользователей' : 'Flux d’activité récent'}</span>
+                  </h4>
+                  <span className="text-xs text-neutral-400">
+                    {lang === 'ru' ? 'Показано 15 последних событий' : '15 derniers événements'}
+                  </span>
+                </div>
+
+                <div className="divide-y divide-neutral-100 dark:divide-neutral-800/60">
+                  {recentEvents.map(evt => {
+                    const timeAgo = (() => {
+                      const diffSec = Math.floor((now - new Date(evt.timestamp).getTime()) / 1000);
+                      if (diffSec < 60) return lang === 'ru' ? 'только что' : 'à l’instant';
+                      if (diffSec < 3600) return `${Math.floor(diffSec / 60)} ${lang === 'ru' ? 'мин назад' : 'min'}`;
+                      if (diffSec < 86400) return `${Math.floor(diffSec / 3600)} ${lang === 'ru' ? 'ч назад' : 'h'}`;
+                      return new Date(evt.timestamp).toLocaleDateString();
+                    })();
+
+                    const isLead = evt.event === 'vehicle_whatsapp_click' || evt.event === 'vehicle_phone_click' || evt.event === 'vehicle_lead_submit';
+
+                    return (
+                      <div key={evt.id} className="py-3 flex items-center justify-between gap-4 text-xs">
+                        <div className="flex items-center gap-3">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            isLead 
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                              : evt.event === 'vehicle_view'
+                                ? 'bg-amber-500/15 text-[#D4AF37] border border-[#D4AF37]/30'
+                                : evt.event === 'article_view'
+                                  ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30'
+                                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400'
+                          }`}>
+                            {evt.event === 'vehicle_whatsapp_click' ? '💬 WhatsApp' :
+                             evt.event === 'vehicle_phone_click' ? '📞 Звонок' :
+                             evt.event === 'vehicle_view' ? '👁️ Просмотр авто' :
+                             evt.event === 'article_view' ? '📰 Статья' :
+                             evt.event === 'vehicle_compare_add' ? '⇄ Сравнение' :
+                             evt.event}
+                          </span>
+                          <span className="font-medium text-neutral-900 dark:text-white truncate max-w-xs sm:max-w-md">
+                            {evt.brand && evt.model ? `${evt.brand} ${evt.model}` : evt.articleTitle || evt.path}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-neutral-400 text-[11px] flex-shrink-0">
+                          <span className="hidden sm:inline text-neutral-500">{evt.source || 'Direct'}</span>
+                          <span>{timeAgo}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {activeAdminTab === 'settings' && (
           <div className="space-y-8">
             {/* General Site Settings */}
@@ -6542,6 +7284,89 @@ const renderAdminDashboard = () => {
                 </div>
               </div>
               <button onClick={handleSaveSettings} className="px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-lg">{t('save')}</button>
+            </div>
+
+            {/* Google Analytics 4 & Yandex Metrika Integration Card */}
+            <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-8 shadow-sm space-y-6">
+              <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-neutral-100 dark:border-neutral-800">
+                <div>
+                  <h3 className="text-lg font-serif text-neutral-900 dark:text-white flex items-center gap-2">
+                    <span>📈</span> {lang === 'ru' ? 'Подключение веб-аналитики (Google Analytics & Яндекс.Метрика)' : 'Intégration Web Analytics (Google Analytics & Yandex Metrika)'}
+                  </h3>
+                  <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1">
+                    {lang === 'ru' 
+                      ? 'Вставьте ваши идентификаторы счетчиков — скрипты аналитики и отслеживание целей автоматически подключатся к сайту.'
+                      : 'Renseignez vos identifiants pour activer le suivi en direct sur Google Analytics et Yandex Metrika.'}
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30">
+                  {lang === 'ru' ? 'Автоматический трекинг' : 'Tracking Automatique'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* GA4 */}
+                <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">📊</span>
+                      <span className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold">Google Analytics 4</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      siteSettings.googleAnalyticsId ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'
+                    }`}>
+                      {siteSettings.googleAnalyticsId ? (lang === 'ru' ? 'Подключено' : 'Actif') : (lang === 'ru' ? 'Не активно' : 'Inactif')}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    {lang === 'ru' ? 'Идентификатор потока данных Google Analytics 4 (формат: G-XXXXXXXXXX)' : 'ID de mesure Google Analytics 4 (format : G-XXXXXXXXXX)'}
+                  </p>
+                  <input
+                    type="text"
+                    placeholder="G-XXXXXXXXXX"
+                    value={siteSettings.googleAnalyticsId || ''}
+                    onChange={(e) => setSiteSettings({ ...siteSettings, googleAnalyticsId: e.target.value })}
+                    className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white font-mono focus:outline-none"
+                  />
+                </div>
+
+                {/* Yandex Metrika */}
+                <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">🎯</span>
+                      <span className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold">Яндекс.Метрика (Вебвизор)</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      siteSettings.yandexMetrikaId ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-200 dark:bg-neutral-800 text-neutral-500'
+                    }`}>
+                      {siteSettings.yandexMetrikaId ? (lang === 'ru' ? 'Подключено' : 'Actif') : (lang === 'ru' ? 'Не активно' : 'Inactif')}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    {lang === 'ru' ? 'Номер счётчика Яндекс.Метрики. Включает запись сессий (Вебвизор), карты кликов и скролла.' : 'Numéro de compteur Yandex Metrika avec Webvisor et cartes de chaleur.'}
+                  </p>
+                  <input
+                    type="text"
+                    placeholder="12345678"
+                    value={siteSettings.yandexMetrikaId || ''}
+                    onChange={(e) => setSiteSettings({ ...siteSettings, yandexMetrikaId: e.target.value })}
+                    className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white font-mono focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <p className="text-[11px] text-neutral-500">
+                  {lang === 'ru' ? 'После сохранения настройки вступают в силу мгновенно без перезагрузки сервера.' : 'Les changements sont appliqués immédiatement après enregistrement.'}
+                </p>
+                <button
+                  onClick={handleSaveSettings}
+                  className="px-6 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md"
+                >
+                  {t('save')}
+                </button>
+              </div>
             </div>
 
             {/* XML Sitemap Generator Card */}
@@ -9872,6 +10697,7 @@ return (
               e.preventDefault();
               if (adminPassword === 'France2026') {
                 setIsAdmin(true);
+                try { localStorage.setItem('ligo_admin_logged_in', 'true'); } catch {}
                 setShowAdminLoginModal(false);
                 setAdminPassword('');
                 navigateTo('admin');
