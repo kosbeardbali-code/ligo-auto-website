@@ -53,37 +53,65 @@ export function generateArticleSlug(title: string, lang: string = "fr"): string 
     .replace(/^-+|-+$/g, "");
 }
 
-export function getArticleTitle(article: any, l: string = "fr"): string {
+export function getArticleTitle(article: any, l?: string): string {
   if (!article) return "";
-  return article.translations?.[l]?.title || 
-         article.translations?.fr?.title || 
+  const target = l || "fr";
+  if (article.translations?.[target]?.title?.trim()) {
+    return article.translations[target].title;
+  }
+  if (target === 'ru' && article.title_ru?.trim()) return article.title_ru;
+  if (target === 'en' && article.title_en?.trim()) return article.title_en;
+  if (target === 'fr' && article.title?.trim()) return article.title;
+
+  return article.translations?.fr?.title || 
          article.translations?.ru?.title || 
          article.translations?.en?.title || 
-         article.title || "";
+         article.title || article.title_ru || article.title_en || "";
 }
 
-export function getArticleExcerpt(article: any, l: string = "fr"): string {
+export function getArticleExcerpt(article: any, l?: string): string {
   if (!article) return "";
-  return article.translations?.[l]?.excerpt || 
-         article.translations?.fr?.excerpt || 
+  const target = l || "fr";
+  if (article.translations?.[target]?.excerpt?.trim()) {
+    return article.translations[target].excerpt;
+  }
+  if (target === 'ru' && article.excerpt_ru?.trim()) return article.excerpt_ru;
+  if (target === 'en' && article.excerpt_en?.trim()) return article.excerpt_en;
+  if (target === 'fr' && article.excerpt?.trim()) return article.excerpt;
+
+  return article.translations?.fr?.excerpt || 
          article.translations?.ru?.excerpt || 
          article.translations?.en?.excerpt || 
-         article.excerpt || "";
+         article.excerpt || article.excerpt_ru || article.excerpt_en || "";
 }
 
-export function getArticleContent(article: any, l: string = "fr"): string {
+export function getArticleContent(article: any, l?: string): string {
   if (!article) return "";
-  return article.translations?.[l]?.content || 
-         article.translations?.fr?.content || 
+  const target = l || "fr";
+  if (article.translations?.[target]?.content?.trim()) {
+    return article.translations[target].content;
+  }
+  if (target === 'ru' && article.content_ru?.trim()) return article.content_ru;
+  if (target === 'en' && article.content_en?.trim()) return article.content_en;
+  if (target === 'fr' && article.content?.trim()) return article.content;
+
+  return article.translations?.fr?.content || 
          article.translations?.ru?.content || 
          article.translations?.en?.content || 
-         article.content || "";
+         article.content || article.content_ru || article.content_en || "";
 }
 
-export function getArticleSlug(article: any, l: string = "fr"): string {
+export function getArticleSlug(article: any, l?: string): string {
   if (!article) return "";
-  return article.translations?.[l]?.slug || 
-         article.translations?.fr?.slug || 
+  const target = l || "fr";
+  if (article.translations?.[target]?.slug?.trim()) {
+    return article.translations[target].slug;
+  }
+  if (target === 'ru' && article.slug_ru?.trim()) return article.slug_ru;
+  if (target === 'en' && article.slug_en?.trim()) return article.slug_en;
+  if (target === 'fr' && article.slug?.trim()) return article.slug;
+
+  return article.translations?.fr?.slug || 
          article.translations?.ru?.slug || 
          article.translations?.en?.slug || 
          article.slug || "";
@@ -2289,16 +2317,61 @@ export const getArticleLang = (article: Article | Partial<Article> | null | unde
   }
   const l = (currentLang || 'fr') as 'fr' | 'en' | 'ru';
   const target = article.translations?.[l];
-  if (target && target.title?.trim() && target.content?.trim()) {
-    return target;
+  if (target && (target.title?.trim() || target.content?.trim())) {
+    const fr = article.translations?.fr;
+    return {
+      title: target.title || fr?.title || article.title || '',
+      slug: target.slug || fr?.slug || article.slug || '',
+      excerpt: target.excerpt || fr?.excerpt || article.excerpt || '',
+      content: target.content || fr?.content || article.content || '',
+      seoTitle: target.seoTitle || fr?.seoTitle || article.seoTitle || target.title || '',
+      metaDescription: target.metaDescription || fr?.metaDescription || article.metaDescription || target.excerpt || '',
+      focusKeyword: target.focusKeyword || fr?.focusKeyword || article.focusKeyword || '',
+      imageAlt: target.imageAlt || fr?.imageAlt || article.featuredImageAlt || '',
+      ogTitle: target.ogTitle || fr?.ogTitle || article.ogTitle || target.title || '',
+      ogDescription: target.ogDescription || fr?.ogDescription || article.ogDescription || target.metaDescription || '',
+      readingTime: target.readingTime || fr?.readingTime || article.readingTime || 5
+    };
   }
-  // Fallbacks
+  // Check direct localized fields like title_ru / content_ru
+  if (l === 'ru' && ((article as any).title_ru || (article as any).content_ru)) {
+    return {
+      title: (article as any).title_ru || article.title || '',
+      slug: (article as any).slug_ru || article.slug || '',
+      excerpt: (article as any).excerpt_ru || article.excerpt || '',
+      content: (article as any).content_ru || article.content || '',
+      seoTitle: (article as any).seoTitle_ru || '',
+      metaDescription: (article as any).metaDescription_ru || '',
+      focusKeyword: (article as any).focusKeyword_ru || '',
+      imageAlt: (article as any).featuredImageAlt_ru || article.featuredImageAlt || '',
+      ogTitle: (article as any).ogTitle_ru || '',
+      ogDescription: (article as any).ogDescription_ru || '',
+      readingTime: 5
+    };
+  }
+  if (l === 'en' && ((article as any).title_en || (article as any).content_en)) {
+    return {
+      title: (article as any).title_en || article.title || '',
+      slug: (article as any).slug_en || article.slug || '',
+      excerpt: (article as any).excerpt_en || article.excerpt || '',
+      content: (article as any).content_en || article.content || '',
+      seoTitle: (article as any).seoTitle_en || '',
+      metaDescription: (article as any).metaDescription_en || '',
+      focusKeyword: (article as any).focusKeyword_en || '',
+      imageAlt: (article as any).featuredImageAlt_en || article.featuredImageAlt || '',
+      ogTitle: (article as any).ogTitle_en || '',
+      ogDescription: (article as any).ogDescription_en || '',
+      readingTime: 5
+    };
+  }
+
+  // Fallbacks: fr -> ru -> en -> base
   const fr = article.translations?.fr;
-  if (fr && fr.title?.trim()) return fr;
-  const en = article.translations?.en;
-  if (en && en.title?.trim()) return en;
+  if (fr && (fr.title?.trim() || fr.content?.trim())) return fr;
   const ru = article.translations?.ru;
-  if (ru && ru.title?.trim()) return ru;
+  if (ru && (ru.title?.trim() || ru.content?.trim())) return ru;
+  const en = article.translations?.en;
+  if (en && (en.title?.trim() || en.content?.trim())) return en;
 
   return {
     title: article.title || '',
@@ -6906,7 +6979,7 @@ return (
                     <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
                       <img 
                         src={article.featuredImage || getFallbackSvg(600, 375, 20, 3)} 
-                        alt={article.featuredImageAlt || getArticleTitle(article)} 
+                        alt={article.featuredImageAlt || getArticleTitle(article, lang)} 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         onError={(e: any) => { e.currentTarget.src = getFallbackSvg(600, 375, 20, 3); }}
                       />
@@ -6921,10 +6994,10 @@ return (
                         <span>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</span>
                       </div>
                       <h2 className="font-serif font-bold text-xl text-neutral-900 dark:text-white group-hover:text-[#D4AF37] transition-colors leading-snug line-clamp-2">
-                        {getArticleTitle(article)}
+                        {getArticleTitle(article, lang)}
                       </h2>
                       <p className="text-xs text-neutral-600 dark:text-neutral-400 font-light line-clamp-3 leading-relaxed">
-                        {getArticleExcerpt(article)}
+                        {getArticleExcerpt(article, lang)}
                       </p>
                     </div>
                   </div>
@@ -6971,7 +7044,7 @@ return (
             <span>/</span>
             <button onClick={() => { setCurrentView('actualites'); window.history.pushState(null, '', '/actualites'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{lang === 'ru' ? 'Статьи' : lang === 'en' ? 'Articles' : 'Actualités'}</button>
             <span>/</span>
-            <span className="text-neutral-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-xs">{getArticleTitle(selectedArticle)}</span>
+            <span className="text-neutral-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-xs">{getArticleTitle(selectedArticle, lang)}</span>
           </nav>
 
           {/* Article Header */}
@@ -6988,7 +7061,7 @@ return (
 
             {/* 1. Title */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-black text-neutral-900 dark:text-white leading-[1.2] tracking-tight">
-              {getArticleTitle(selectedArticle)}
+              {getArticleTitle(selectedArticle, lang)}
             </h1>
           </header>
 
@@ -6997,7 +7070,7 @@ return (
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[16/9] bg-neutral-900 border border-neutral-200 dark:border-neutral-800">
               <img 
                 src={selectedArticle.featuredImage} 
-                alt={selectedArticle.featuredImageAlt || getArticleTitle(selectedArticle)} 
+                alt={selectedArticle.featuredImageAlt || getArticleTitle(selectedArticle, lang)} 
                 className="w-full h-full object-cover"
                 onError={(e: any) => { e.currentTarget.src = getFallbackSvg(1200, 675, 32, 4); }}
               />
@@ -7005,16 +7078,16 @@ return (
           )}
 
           {/* 3. Excerpt Quote */}
-          {getArticleExcerpt(selectedArticle) && (
+          {getArticleExcerpt(selectedArticle, lang) && (
             <p className="text-base sm:text-lg text-neutral-700 dark:text-neutral-300 font-light leading-relaxed border-l-4 border-[#D4AF37] pl-5 py-3 italic bg-neutral-50 dark:bg-[#141416] rounded-r-2xl shadow-sm">
-              {getArticleExcerpt(selectedArticle)}
+              {getArticleExcerpt(selectedArticle, lang)}
             </p>
           )}
 
           {/* 4. Article Main Content & 5. Author at bottom */}
           <div className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 rounded-3xl p-8 sm:p-14 shadow-sm space-y-12">
             <div>
-              {renderArticleContent(getArticleContent(selectedArticle))}
+              {renderArticleContent(getArticleContent(selectedArticle, lang))}
             </div>
 
             {/* 5. Author at bottom */}
