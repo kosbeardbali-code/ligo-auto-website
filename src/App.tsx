@@ -3723,7 +3723,21 @@ export function App() {
   };
 
   // Main navigation view
-  const [currentView, setCurrentView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison'>(() => {
+    try {
+      const path = window.location.pathname;
+      if (path.startsWith('/admin')) return 'admin';
+      if (path.startsWith('/actualites')) {
+        const parts = path.split('/').filter(Boolean);
+        if (parts.length >= 2 && parts[1] !== 'category') return 'article-details';
+        return 'actualites';
+      }
+      if (path.startsWith('/catalogue') || path.startsWith('/catalog')) return 'catalog';
+      if (path.startsWith('/vehicules')) return 'car-details';
+      if (path.startsWith('/comparateur') || path.startsWith('/comparaison') || path.startsWith('/comparison') || path.startsWith('/compare')) return 'comparison';
+    } catch {}
+    return 'home';
+  });
   const [previousView, setPreviousView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison'>('home');
 
   // Selected entities
@@ -3829,7 +3843,26 @@ export function App() {
   const [currentCarGallery, setCurrentCarGallery] = useState<string[]>([]);
   const [showLightbox, setShowLightbox] = useState<boolean>(false);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
-  const [activeDetailsTab, setActiveDetailsTab] = useState<'specs' | 'desc' | 'equipments' | 'faq' | 'testdrive'>('specs');
+  const [activeDetailsTab, setActiveDetailsTab] = useState<'specs' | 'desc' | 'equipments' | 'faq' | 'testdrive'>(() => {
+    try {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (['specs', 'desc', 'equipments', 'faq', 'testdrive'].includes(hash)) {
+        return hash as any;
+      }
+      const saved = localStorage.getItem('ligo_active_details_tab');
+      if (saved && ['specs', 'desc', 'equipments', 'faq', 'testdrive'].includes(saved)) {
+        return saved as any;
+      }
+    } catch {}
+    return 'specs';
+  });
+
+  const handleSelectDetailsTab = (tab: 'specs' | 'desc' | 'equipments' | 'faq' | 'testdrive') => {
+    setActiveDetailsTab(tab);
+    try {
+      localStorage.setItem('ligo_active_details_tab', tab);
+    } catch {}
+  };
 
   // Admin Auth state
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
@@ -3842,7 +3875,31 @@ export function App() {
   const [adminPassword, setAdminPassword] = useState<string>('');
   const [adminLoginError, setAdminLoginError] = useState<boolean>(false);
   const [showAdminLoginModal, setShowAdminLoginModal] = useState<boolean>(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<'featured' | 'vehicles' | 'articles' | 'inquiries' | 'analytics' | 'settings'>('featured');
+  
+  const [activeAdminTab, setActiveAdminTab] = useState<'featured' | 'vehicles' | 'articles' | 'inquiries' | 'analytics' | 'settings'>(() => {
+    try {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      const validTabs = ['featured', 'vehicles', 'articles', 'inquiries', 'analytics', 'settings'];
+      if (validTabs.includes(hash)) {
+        return hash as any;
+      }
+      const saved = localStorage.getItem('ligo_active_admin_tab');
+      if (saved && validTabs.includes(saved)) {
+        return saved as any;
+      }
+    } catch {}
+    return 'featured';
+  });
+
+  const handleSelectAdminTab = (tab: 'featured' | 'vehicles' | 'articles' | 'inquiries' | 'analytics' | 'settings') => {
+    setActiveAdminTab(tab);
+    try {
+      localStorage.setItem('ligo_active_admin_tab', tab);
+      if (window.location.pathname.startsWith('/admin')) {
+        window.history.replaceState(null, '', `/admin#${tab}`);
+      }
+    } catch {}
+  };
 
   // Catalog Filter states
   const [selectedBrand, setSelectedBrand] = useState<string>('');
@@ -3908,7 +3965,22 @@ export function App() {
 
   // Analytics state
   const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>(() => loadLocalAnalyticsEvents(cars, loadLocalArticles()));
-  const [analyticsPeriod, setAnalyticsPeriod] = useState<'today' | '7d' | '30d' | '90d' | 'custom'>('30d');
+  const [analyticsPeriod, setAnalyticsPeriod] = useState<'today' | '7d' | '30d' | '90d' | 'all' | 'custom'>(() => {
+    try {
+      const saved = localStorage.getItem('ligo_analytics_period');
+      if (saved && ['today', '7d', '30d', '90d', 'all', 'custom'].includes(saved)) {
+        return saved as any;
+      }
+    } catch {}
+    return '30d';
+  });
+
+  const handleSelectAnalyticsPeriod = (period: 'today' | '7d' | '30d' | '90d' | 'all' | 'custom') => {
+    setAnalyticsPeriod(period);
+    try {
+      localStorage.setItem('ligo_analytics_period', period);
+    } catch {}
+  };
   const [customStartDate, setCustomStartDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 30);
@@ -4275,7 +4347,8 @@ export function App() {
     } else if (view === 'comparison' || (view as any) === 'comparaison') {
       newPath = '/comparateur/';
     } else if (view === 'admin') {
-      newPath = '/admin/';
+      const savedTab = localStorage.getItem('ligo_active_admin_tab') || activeAdminTab || 'featured';
+      newPath = `/admin/#${savedTab}`;
     }
     
     try {
@@ -4288,14 +4361,24 @@ export function App() {
   // Popstate & Initial Route Resolver
   useEffect(() => {
     const handleRoute = (isPopstate = false) => {
-      // Never kick the admin out of the admin panel on background data changes
-      if (!isPopstate && currentView === 'admin') {
-        return;
-      }
-
       const path = window.location.pathname;
       if (path.startsWith('/admin')) {
         setCurrentView('admin');
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        const validTabs = ['featured', 'vehicles', 'articles', 'inquiries', 'analytics', 'settings'];
+        if (validTabs.includes(hash)) {
+          setActiveAdminTab(hash as any);
+        } else {
+          const saved = localStorage.getItem('ligo_active_admin_tab');
+          if (saved && validTabs.includes(saved)) {
+            setActiveAdminTab(saved as any);
+          }
+        }
+        return;
+      }
+
+      // Never kick the admin out of the admin panel on background data changes
+      if (!isPopstate && currentView === 'admin') {
         return;
       }
       if (path.startsWith('/actualites')) {
@@ -4368,8 +4451,21 @@ export function App() {
       handleRoute(false);
     }
     const onPop = () => handleRoute(true);
+    const onHash = () => {
+      if (window.location.pathname.startsWith('/admin')) {
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        const validTabs = ['featured', 'vehicles', 'articles', 'inquiries', 'analytics', 'settings'];
+        if (validTabs.includes(hash)) {
+          setActiveAdminTab(hash as any);
+        }
+      }
+    };
     window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+    window.addEventListener('hashchange', onHash);
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      window.removeEventListener('hashchange', onHash);
+    };
   }, [articles, cars, currentView]);
 
   // Dynamic SEO & Meta Tags
@@ -5938,18 +6034,18 @@ const renderAdminDashboard = () => {
         </div>
 
         <div className="flex flex-wrap gap-3 mb-8">
-          <button onClick={() => setActiveAdminTab('featured')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'featured' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
+          <button onClick={() => handleSelectAdminTab('featured')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'featured' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
             <span>⭐</span> {t('featuredAdminTab')} ({cars.filter(c => c.featuredOnHomepage).length}/10)
           </button>
-          <button onClick={() => setActiveAdminTab('vehicles')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'vehicles' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>{t('catalog')} ({cars.length})</button>
-          <button onClick={() => setActiveAdminTab('articles')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'articles' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
+          <button onClick={() => handleSelectAdminTab('vehicles')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'vehicles' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>{t('catalog')} ({cars.length})</button>
+          <button onClick={() => handleSelectAdminTab('articles')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'articles' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
             <span>📝</span> {t('articlesAdminTab')} ({articles.length})
           </button>
-          <button onClick={() => setActiveAdminTab('inquiries')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'inquiries' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>{t('inquiries')} ({inquiries.length})</button>
-          <button onClick={() => setActiveAdminTab('analytics')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'analytics' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
+          <button onClick={() => handleSelectAdminTab('inquiries')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'inquiries' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>{t('inquiries')} ({inquiries.length})</button>
+          <button onClick={() => handleSelectAdminTab('analytics')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${activeAdminTab === 'analytics' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>
             <span>📊</span> {lang === 'ru' ? 'Аналитика' : lang === 'en' ? 'Analytics' : 'Statistiques'}
           </button>
-          <button onClick={() => setActiveAdminTab('settings')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'settings' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>CMS & Sitemap</button>
+          <button onClick={() => handleSelectAdminTab('settings')} className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${activeAdminTab === 'settings' ? 'bg-[#D4AF37] text-neutral-950 shadow-lg' : 'bg-neutral-100 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-400 hover:border-[#D4AF37]'}`}>CMS & Sitemap</button>
         </div>
 
         {activeAdminTab === 'featured' && (
@@ -6018,7 +6114,7 @@ const renderAdminDashboard = () => {
                 <div className="text-4xl">⭐</div>
                 <h4 className="text-base font-serif text-neutral-900 dark:text-white">{t('noFeaturedCars')}</h4>
                 <button
-                  onClick={() => setActiveAdminTab('vehicles')}
+                  onClick={() => handleSelectAdminTab('vehicles')}
                   className="px-6 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all"
                 >
                   {t('catalog')}
@@ -6598,7 +6694,7 @@ const renderAdminDashboard = () => {
                       <button
                         key={p}
                         type="button"
-                        onClick={() => setAnalyticsPeriod(p)}
+                        onClick={() => handleSelectAnalyticsPeriod(p)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           analyticsPeriod === p
                             ? 'bg-[#D4AF37] text-neutral-950 shadow-sm'
@@ -7023,7 +7119,7 @@ const renderAdminDashboard = () => {
                   </div>
 
                   <button
-                    onClick={() => setActiveAdminTab('settings')}
+                    onClick={() => handleSelectAdminTab('settings')}
                     className="w-full py-2.5 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-[#D4AF37] hover:text-neutral-950 text-xs font-bold transition-all text-center mt-4 border border-neutral-200 dark:border-neutral-700"
                   >
                     ⚙️ {lang === 'ru' ? 'Настроить ID в CMS & Settings' : 'Configurer dans Paramètres'}
@@ -8064,7 +8160,7 @@ return (
               <div className="space-y-4 pt-2">
                 <div className="flex gap-4 border-b border-neutral-200 dark:border-neutral-800">
                   <button 
-                    onClick={() => setActiveDetailsTab('specs')} 
+                    onClick={() => handleSelectDetailsTab('specs')} 
                     className={`pb-3 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${
                       activeDetailsTab === 'specs' ? 'border-[#D4AF37] text-[#D4AF37]' : 'border-transparent text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                     }`}
@@ -8072,7 +8168,7 @@ return (
                     {t('contact')}
                   </button>
                   <button 
-                    onClick={() => setActiveDetailsTab('testdrive')} 
+                    onClick={() => handleSelectDetailsTab('testdrive')} 
                     className={`pb-3 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${
                       activeDetailsTab === 'testdrive' ? 'border-[#D4AF37] text-[#D4AF37]' : 'border-transparent text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
                     }`}
