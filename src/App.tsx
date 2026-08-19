@@ -412,6 +412,43 @@ categoryDeleted: "Catégorie supprimée !",
       contactSubtitle: "DISCUTONS DE VOTRE PROJET",
       similarVehicles: "Véhicules similaires",
       similarVehiclesTitle: "Vous pourriez aussi aimer",
+      compareAction: "Comparer",
+      compareAdded: "Ajouté",
+      compareFloatingCount: "véhicules en comparaison",
+      compareFloatingBtn: "Comparer",
+      comparePageTitle: "Comparateur de Véhicules",
+      comparePageSubtitle: "Comparez les prix, caractéristiques techniques, équipements et options de votre sélection.",
+      compareEmptyTitle: "Aucun véhicule sélectionné",
+      compareEmptyDesc: "Ajoutez jusqu'à 4 véhicules depuis le catalogue pour comparer leurs caractéristiques et équipements côte à côte.",
+      compareBackToCatalog: "Retour au catalogue",
+      compareShowDiffOnly: "Afficher uniquement les différences",
+      compareClearAll: "Effacer la comparaison",
+      vehiclesCountLabel: "véhicules sélectionnés",
+      compareParamPrice: "Prix TTC",
+      compareBestPrice: "Meilleur prix",
+      compareParamYear: "Année modèle",
+      compareNewestYear: "Plus récent",
+      compareParamKm: "Kilométrage",
+      compareLowestKm: "Moins kilométré",
+      compareParamFuel: "Carburant",
+      compareParamTransmission: "Boîte de vitesses",
+      compareParamPower: "Puissance moteur",
+      compareParamEngine: "Cylindrée",
+      compareParamCo2: "Puissance fiscale (P6)",
+      compareParamColor: "Couleur extérieure",
+      compareParamBody: "Carrosserie",
+      compareParamDoors: "Nombre de portes",
+      compareParamSeats: "Nombre de places",
+      compareParamVin: "VIN vérifié",
+      compareParamWarranty: "Garantie",
+      compareParamStatus: "Disponibilité",
+      compareViewCar: "Voir la fiche",
+      characteristics: "Caractéristiques",
+      taxIncludedTradeIn: "TTC • Reprise possible",
+      home: "Accueil",
+      doorsCount: "portes",
+      seatsCount: "places",
+      removeFromCompare: "Retirer de la comparaison",
 },
   en: {
 catalog: "Catalogue",
@@ -666,6 +703,43 @@ availability: "Availability",
       contactSubtitle: "LET'S DISCUSS YOUR PROJECT",
       similarVehicles: "Similar Vehicles",
       similarVehiclesTitle: "You might also like",
+      compareAction: "Compare",
+      compareAdded: "Added",
+      compareFloatingCount: "vehicles in comparison",
+      compareFloatingBtn: "Compare",
+      comparePageTitle: "Vehicle Comparison",
+      comparePageSubtitle: "Compare prices, technical specifications, equipment and options of your selection.",
+      compareEmptyTitle: "No vehicles selected",
+      compareEmptyDesc: "Add up to 4 vehicles from the catalogue to compare their specifications and features side by side.",
+      compareBackToCatalog: "Back to catalogue",
+      compareShowDiffOnly: "Show differences only",
+      compareClearAll: "Clear comparison",
+      vehiclesCountLabel: "vehicles selected",
+      compareParamPrice: "Price (incl. VAT)",
+      compareBestPrice: "Best price",
+      compareParamYear: "Model year",
+      compareNewestYear: "Newest",
+      compareParamKm: "Mileage",
+      compareLowestKm: "Lowest mileage",
+      compareParamFuel: "Fuel",
+      compareParamTransmission: "Transmission",
+      compareParamPower: "Engine power",
+      compareParamEngine: "Engine size",
+      compareParamCo2: "Fiscal power (P6)",
+      compareParamColor: "Exterior color",
+      compareParamBody: "Body type",
+      compareParamDoors: "Number of doors",
+      compareParamSeats: "Number of seats",
+      compareParamVin: "Verified VIN",
+      compareParamWarranty: "Warranty",
+      compareParamStatus: "Availability",
+      compareViewCar: "View vehicle",
+      characteristics: "Specifications",
+      taxIncludedTradeIn: "Incl. VAT • Trade-in",
+      home: "Home",
+      doorsCount: "doors",
+      seatsCount: "seats",
+      removeFromCompare: "Remove from comparison",
     },
   ru: {
       catalog: "Каталог",
@@ -920,6 +994,43 @@ availability: "Availability",
       contactSubtitle: "ОБСУДИМ ВАШ ПРОЕКТ",
       similarVehicles: "Похожие автомобили",
       similarVehiclesTitle: "Вам также может понравиться",
+      compareAction: "Сравнить",
+      compareAdded: "В сравнении",
+      compareFloatingCount: "авто в сравнении",
+      compareFloatingBtn: "Сравнить",
+      comparePageTitle: "Сравнение автомобилей",
+      comparePageSubtitle: "Сравните цены, технические характеристики, комплектации и опции выбранных авто.",
+      compareEmptyTitle: "Нет авто для сравнения",
+      compareEmptyDesc: "Добавьте до 4 автомобилей из каталога, чтобы сравнить их характеристики и комплектации бок о бок.",
+      compareBackToCatalog: "Вернуться в каталог",
+      compareShowDiffOnly: "Только отличия",
+      compareClearAll: "Очистить список",
+      vehiclesCountLabel: "авто выбрано",
+      compareParamPrice: "Цена",
+      compareBestPrice: "Лучшая цена",
+      compareParamYear: "Год выпуска",
+      compareNewestYear: "Новее",
+      compareParamKm: "Пробег",
+      compareLowestKm: "Меньше пробег",
+      compareParamFuel: "Топливо",
+      compareParamTransmission: "КПП",
+      compareParamPower: "Мощность",
+      compareParamEngine: "Объем двигателя",
+      compareParamCo2: "Налоговая мощность (P6)",
+      compareParamColor: "Цвет кузова",
+      compareParamBody: "Тип кузова",
+      compareParamDoors: "Количество дверей",
+      compareParamSeats: "Количество мест",
+      compareParamVin: "VIN проверен",
+      compareParamWarranty: "Гарантия",
+      compareParamStatus: "Статус",
+      compareViewCar: "Подробнее",
+      characteristics: "Характеристики",
+      taxIncludedTradeIn: "Вкл. НДС • Trade-in",
+      home: "Главная",
+      doorsCount: "дверей",
+      seatsCount: "мест",
+      removeFromCompare: "Удалить из сравнения",
     }
 };
 
@@ -3796,8 +3907,8 @@ export function App() {
   };
 
   // Main navigation view
-  const [currentView, setCurrentView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details'>('home');
-  const [previousView, setPreviousView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison'>('home');
+  const [previousView, setPreviousView] = useState<'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison'>('home');
 
   // Selected entities
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
@@ -4022,9 +4133,7 @@ export function App() {
   };
 
   const handleOpenComparison = () => {
-    setPreviousView(currentView);
-    setCurrentView('catalog');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigateTo('comparison');
   };
 
   const handleUpdateGalleryAlt = (index: number, altText: string) => {
@@ -4290,8 +4399,8 @@ export function App() {
       const c = options?.car || selectedCar;
       const slug = c?.slug || generateCarSlug(c) || c?.id;
       newPath = `/vehicules/${slug}/`;
-    } else if (view === 'comparaison') {
-      newPath = '/comparaison/';
+    } else if (view === 'comparison' || (view as any) === 'comparaison') {
+      newPath = '/comparateur/';
     } else if (view === 'admin') {
       newPath = '/admin/';
     }
@@ -4373,8 +4482,10 @@ export function App() {
         } else {
           setCurrentView('catalog');
         }
-      } else if (path.startsWith('/comparaison')) {
-        setCurrentView('comparaison');
+      } else if (path.startsWith('/comparateur') || path.startsWith('/comparaison') || path.startsWith('/comparison') || path.startsWith('/compare')) {
+        setCurrentView('comparison');
+        setSelectedCar(null);
+        setSelectedArticle(null);
       } else if (path === '/' || path === '') {
         setCurrentView('home');
       }
@@ -4423,6 +4534,8 @@ export function App() {
       document.title = `${t('actualitesTitle')} - Ligo Automobiles`;
     } else if (currentView === 'catalog') {
       document.title = `Catalogue des véhicules d'occasion - Ligo Automobiles`;
+    } else if (currentView === 'comparison') {
+      document.title = `${t('comparePageTitle')} - Ligo Automobiles`;
     } else {
       document.title = "Ligo Automobiles - L'excellence automobile à Paris";
     }
@@ -5538,9 +5651,9 @@ const renderComparisonView = () => {
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center space-y-6 animate-fadeIn">
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center justify-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 py-1">
-            <button onClick={() => { setCurrentView('home'); window.history.pushState(null, '', '/'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
+            <button onClick={() => navigateTo('home')} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
             <span>/</span>
-            <button onClick={() => { setCurrentView('catalog'); window.history.pushState(null, '', '/catalog'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
+            <button onClick={() => navigateTo('catalog')} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
             <span>/</span>
             <span className="text-neutral-900 dark:text-white font-semibold">{t('comparePageTitle')}</span>
           </nav>
@@ -5560,11 +5673,7 @@ const renderComparisonView = () => {
 
           <div className="pt-4">
             <button
-              onClick={() => {
-                setCurrentView('catalog');
-                window.history.pushState(null, '', '/catalog');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onClick={() => navigateTo('catalog')}
               className="px-8 py-4 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-widest transition-all shadow-xl shadow-[#D4AF37]/20 hover:scale-105"
             >
               {t('compareBackToCatalog')}
@@ -5579,9 +5688,9 @@ const renderComparisonView = () => {
         {/* Breadcrumbs & Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-            <button onClick={() => { setCurrentView('home'); window.history.pushState(null, '', '/'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
+            <button onClick={() => navigateTo('home')} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
             <span>/</span>
-            <button onClick={() => { setCurrentView('catalog'); window.history.pushState(null, '', '/catalog'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
+            <button onClick={() => navigateTo('catalog')} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
             <span>/</span>
             <span className="text-neutral-900 dark:text-white font-semibold">{t('comparePageTitle')}</span>
           </nav>
@@ -7107,16 +7216,30 @@ return (
       {/* Car details page */}
       {currentView === 'car-details' && selectedCar && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          {/* Breadcrumb Navigation */}
-          <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 mb-6 flex-wrap">
-            <button onClick={() => navigateTo('home')} className="hover:text-[#D4AF37] transition-colors">{t('backToHome')}</button>
-            <span>/</span>
-            <button onClick={() => navigateTo('catalog')} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
-            <span>/</span>
-            <button onClick={() => { setSelectedBrand(selectedCar.brand); navigateTo('catalog'); }} className="hover:text-[#D4AF37] transition-colors font-medium">{selectedCar.brand}</button>
-            <span>/</span>
-            <span className="text-neutral-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-xs">{selectedCar.model}</span>
-          </nav>
+          {/* Breadcrumb Navigation & Top Actions */}
+          <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 flex-wrap">
+              <button onClick={() => navigateTo('home')} className="hover:text-[#D4AF37] transition-colors">{t('backToHome')}</button>
+              <span>/</span>
+              <button onClick={() => navigateTo('catalog')} className="hover:text-[#D4AF37] transition-colors">{t('catalog')}</button>
+              <span>/</span>
+              <button onClick={() => { setSelectedBrand(selectedCar.brand); navigateTo('catalog'); }} className="hover:text-[#D4AF37] transition-colors font-medium">{selectedCar.brand}</button>
+              <span>/</span>
+              <span className="text-neutral-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-xs">{selectedCar.model}</span>
+            </nav>
+
+            <button
+              onClick={() => handleToggleCompare(selectedCar)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all ${
+                isCompared(selectedCar.id)
+                  ? 'bg-[#D4AF37] text-neutral-950 shadow-md ring-2 ring-[#D4AF37]/30'
+                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:text-[#D4AF37] border border-neutral-200 dark:border-neutral-700 hover:border-[#D4AF37]'
+              }`}
+            >
+              <Icons.Compare />
+              <span>{isCompared(selectedCar.id) ? t('compareAdded') : t('compareAction')}</span>
+            </button>
+          </div>
 
           {/* Sold Vehicle Banner */}
           {selectedCar.status === 'Vendu' && (
@@ -7501,6 +7624,9 @@ return (
         </section>
       )}
 
+      {/* Comparison page */}
+      {currentView === 'comparison' && renderComparisonView()}
+
       {/* Catalog page */}
       {(currentView === 'catalog' || (currentView === 'home' && false)) && (
         <>
@@ -7789,6 +7915,24 @@ return (
                       </span>
                     )}
                   </div>
+
+                  {/* Compare Button */}
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleCompare(car);
+                    }}
+                    className={`absolute top-4 right-4 z-10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all backdrop-blur-md shadow-lg ${
+                      isCompared(car.id)
+                        ? 'bg-[#D4AF37] text-neutral-950 border border-[#D4AF37] ring-2 ring-[#D4AF37]/30 scale-105'
+                        : 'bg-black/60 hover:bg-black/80 text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]'
+                    }`}
+                    title={isCompared(car.id) ? t('compareAdded') : t('compareAction')}
+                  >
+                    <Icons.Compare />
+                    <span>{isCompared(car.id) ? t('compareAdded') : t('compareAction')}</span>
+                  </button>
                 </div>
 
                 {/* Основное описание */}
@@ -7904,7 +8048,7 @@ return (
 
 
       {/* Floating Comparison Bottom Bar */}
-      {comparedCarIds.length > 0 && (
+      {comparedCarIds.length > 0 && currentView !== 'comparison' && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white/95 dark:bg-[#121214]/95 backdrop-blur-md border border-[#D4AF37]/50 shadow-2xl rounded-2xl p-4 flex items-center gap-4 max-w-lg w-[90%]">
           <div className="flex -space-x-2">
             {comparedCarIds.map(id => {
