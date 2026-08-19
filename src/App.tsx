@@ -6,6 +6,7 @@ import {
   doc, 
   setDoc, 
   getDoc, 
+  getDocs,
   addDoc, 
   deleteDoc, 
   updateDoc, 
@@ -4106,12 +4107,21 @@ export function App() {
     showNotification(lang === 'ru' ? 'Файл аналитики скачан!' : 'Analytics CSV downloaded!', 'success');
   };
 
-  const handleResetAnalytics = () => {
+  const handleResetAnalytics = async () => {
     if (window.confirm(lang === 'ru' ? 'Вы уверены, что хотите обнулить всю статистику посещений?' : 'Êtes-vous sûr de vouloir réinitialiser toutes les statistiques ?')) {
       setAnalyticsEvents([]);
       try {
         localStorage.setItem('ligo_analytics_events', JSON.stringify([]));
       } catch {}
+      try {
+        const analyticsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'analytics_events');
+        const snap = await getDocs(query(analyticsCollectionRef));
+        snap.forEach(d => {
+          deleteDoc(d.ref).catch(() => {});
+        });
+      } catch (e) {
+        console.warn('Failed to clear Firestore analytics events:', e);
+      }
       showNotification(lang === 'ru' ? 'Статистика успешно обнулена!' : 'Statistiques réinitialisées !', 'success');
     }
   };
@@ -4607,10 +4617,38 @@ export function App() {
       console.warn('Firestore inquiries sync warning:', err);
     });
 
+    const analyticsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'analytics_events');
+    const unsubscribeAnalytics = onSnapshot(query(analyticsCollectionRef), (snapshot) => {
+      const firestoreList: AnalyticsEvent[] = [];
+      snapshot.forEach((docSnap) => {
+        firestoreList.push({ id: docSnap.id, ...docSnap.data() } as AnalyticsEvent);
+      });
+      
+      setAnalyticsEvents(prev => {
+        if (snapshot.empty) {
+          return prev;
+        }
+
+        const map = new Map<string, AnalyticsEvent>();
+        firestoreList.forEach(e => map.set(e.id, e));
+        prev.forEach(e => {
+          if (!map.has(e.id)) map.set(e.id, e);
+        });
+        const merged = Array.from(map.values()).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 3000);
+        try {
+          localStorage.setItem('ligo_analytics_events', JSON.stringify(merged));
+        } catch {}
+        return merged;
+      });
+    }, (err) => {
+      console.warn('Firestore analytics sync warning:', err);
+    });
+
     return () => {
       unsubscribeCars();
       unsubscribeArticles();
       unsubscribeInquiries();
+      unsubscribeAnalytics();
     };
   }, [appId]);
 
@@ -5108,26 +5146,26 @@ export function App() {
       const newEvent: AnalyticsEvent = {
         id: `evt_${now}_${Math.random().toString(36).substring(2, 7)}`,
         event: eventName,
-        vehicleId: data.vehicleId,
-        brand: data.brand,
-        model: data.model,
-        articleId: data.articleId,
-        articleTitle: data.articleTitle,
-        comparedVehicleIds: data.comparedVehicleIds,
-        comparedPairs: comparedPairs.length > 0 ? comparedPairs : data.comparedPairs,
+        vehicleId: data.vehicleId || '',
+        brand: data.brand || '',
+        model: data.model || '',
+        articleId: data.articleId || '',
+        articleTitle: data.articleTitle || '',
+        comparedVehicleIds: data.comparedVehicleIds || [],
+        comparedPairs: comparedPairs.length > 0 ? comparedPairs : data.comparedPairs || [],
         visitorId,
         sessionId,
-        source: trafficInfo.source,
-        utmSource: trafficInfo.utmSource,
-        utmMedium: trafficInfo.utmMedium,
-        utmCampaign: trafficInfo.utmCampaign,
-        utmContent: trafficInfo.utmContent,
-        utmTerm: trafficInfo.utmTerm,
-        referrer: trafficInfo.referrer,
+        source: trafficInfo.source || 'Direct',
+        utmSource: trafficInfo.utmSource || '',
+        utmMedium: trafficInfo.utmMedium || '',
+        utmCampaign: trafficInfo.utmCampaign || '',
+        utmContent: trafficInfo.utmContent || '',
+        utmTerm: trafficInfo.utmTerm || '',
+        referrer: trafficInfo.referrer || '',
         path: data.path || window.location.pathname,
-        language: lang,
+        language: lang || 'fr',
         timestamp: new Date().toISOString(),
-        meta: data.meta
+        meta: data.meta || {}
       };
 
       window.dispatchEvent(new CustomEvent('ligo_analytics', { detail: newEvent }));
@@ -5140,9 +5178,19 @@ export function App() {
       });
 
       try {
+        const cleanPayload: any = {};
+        Object.entries(newEvent).forEach(([key, val]) => {
+          if (val !== undefined) {
+            cleanPayload[key] = val;
+          }
+        });
         const docRef = collection(db, 'artifacts', appId, 'public', 'data', 'analytics_events');
-        addDoc(docRef, newEvent).catch(() => {});
-      } catch {}
+        addDoc(docRef, cleanPayload).catch(err => {
+          console.warn('Firestore analytics save error:', err);
+        });
+      } catch (err) {
+        console.warn('Firestore analytics error:', err);
+      }
 
       // Forward to Google Analytics 4 if configured
       if (typeof window !== 'undefined' && (window as any).gtag && siteSettings?.googleAnalyticsId) {
@@ -5175,6 +5223,38 @@ export function App() {
       console.error('Analytics tracking error:', e);
     }
   };
+
+  // Automatic Page View Tracking for visitor sessions on route/view changes
+  useEffect(() => {
+    if (currentView === 'admin') return; // Do not track admin visits to own panel
+
+    const timer = setTimeout(() => {
+      if (currentView === 'home') {
+        trackAnalyticsEvent('page_view', { path: '/' });
+      } else if (currentView === 'catalog') {
+        trackAnalyticsEvent('catalog_view', { path: '/catalogue/' });
+      } else if (currentView === 'actualites') {
+        trackAnalyticsEvent('page_view', { path: '/actualites/' });
+      } else if (currentView === 'article-details' && selectedArticle) {
+        trackAnalyticsEvent('article_view', {
+          articleId: selectedArticle.id,
+          articleTitle: selectedArticle.title,
+          path: `/actualites/${selectedArticle.slug || selectedArticle.id}/`
+        });
+      } else if (currentView === 'car-details' && selectedCar) {
+        trackAnalyticsEvent('vehicle_view', {
+          vehicleId: selectedCar.id,
+          brand: selectedCar.brand,
+          model: selectedCar.model,
+          path: `/vehicules/${selectedCar.slug || selectedCar.id}/`
+        });
+      } else if (currentView === 'comparison') {
+        trackAnalyticsEvent('comparison_view', { path: '/comparateur/' });
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [currentView, selectedCar?.id, selectedArticle?.id]);
 
   const isCompared = (carId: string) => comparedCarIds.includes(carId);
 
