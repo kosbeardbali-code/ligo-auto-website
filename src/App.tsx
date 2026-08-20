@@ -6,13 +6,19 @@ import {
   doc, 
   setDoc, 
   getDoc, 
-  getDocs,
+  getDocs, 
   addDoc, 
   deleteDoc, 
   updateDoc, 
   query, 
   onSnapshot 
 } from "firebase/firestore";
+import { 
+  getStorage, 
+  ref as storageRef, 
+  uploadBytesResumable, 
+  getDownloadURL 
+} from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCDtqzoVTjat0DLJ161aiEjfpmKeeYn6I8",
@@ -25,6 +31,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const appId = "ligo-auto";
 
 const withTimeout = (promise: Promise<any>, timeoutMs: number = 3000) => {
@@ -118,6 +125,64 @@ export function getArticleSlug(article: any, l?: string): string {
          article.slug || "";
 }
 
+export function compressImageToWebpBlob(file: File, maxWidth: number = 1600, maxHeight: number = 1200, quality: number = 0.85): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Canvas context creation failed"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              canvas.toBlob(
+                (jpegBlob) => {
+                  if (jpegBlob) resolve(jpegBlob);
+                  else reject(new Error("Image compression failed"));
+                },
+                "image/jpeg",
+                quality
+              );
+            }
+          },
+          "image/webp",
+          quality
+        );
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
 export function compressImage(file: File, maxWidth: number = 1200, maxHeight: number = 800, quality: number = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -156,6 +221,99 @@ export function compressImage(file: File, maxWidth: number = 1200, maxHeight: nu
     };
     reader.onerror = (error) => reject(error);
   });
+}
+
+export async function uploadImageFile(file: File, onProgress?: (pct: number) => void): Promise<string> {
+  // 1. Сжатие и конвертация в WebP Blob
+  const blob = await compressImageToWebpBlob(file, 1600, 1200, 0.85);
+  const cleanName = (file.name || 'photo').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+  const storagePath = `cars/${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${cleanName}.webp`;
+
+  // 2. Первичное постоянное хранилище: Firebase Storage
+  try {
+    const fileRef = storageRef(storage, storagePath);
+    const uploadTask = uploadBytesResumable(fileRef, blob, {
+      contentType: blob.type || 'image/webp'
+    });
+
+    const fbUrl = await new Promise<string>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        uploadTask.cancel();
+        reject(new Error("Firebase Storage upload timeout"));
+      }, 30000);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          if (snapshot.totalBytes > 0 && onProgress) {
+            const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            onProgress(pct);
+          }
+        },
+        (error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        },
+        async () => {
+          clearTimeout(timeoutId);
+          try {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(url);
+          } catch (e) {
+            reject(e);
+          }
+        }
+      );
+    });
+
+    if (fbUrl && fbUrl.startsWith('https://')) {
+      return fbUrl;
+    }
+  } catch (fbError) {
+    console.warn("Firebase Storage upload failed or not permitted, trying persistent cloud storage fallback:", fbError);
+  }
+
+  // 3. Fallback: FreeImage API permanent direct image hosting
+  try {
+    const formData = new FormData();
+    formData.append('image', blob, `${Date.now()}_${cleanName}.webp`);
+    
+    const response = await fetch('https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.image?.url) {
+        return data.image.url;
+      }
+    }
+  } catch (fallbackError) {
+    console.warn("Permanent cloud fallback 1 failed:", fallbackError);
+  }
+
+  // 4. Secondary Cloud Fallback: ImgBB
+  try {
+    const formData = new FormData();
+    formData.append('image', blob, `${Date.now()}_${cleanName}.webp`);
+    
+    const response = await fetch('https://api.imgbb.com/1/upload?key=740bf38f8f04787a27eb2a297e682eb6', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data?.data?.url) {
+        return data.data.url;
+      }
+    }
+  } catch (fallback2Error) {
+    console.warn("Permanent cloud fallback 2 failed:", fallback2Error);
+  }
+
+  throw new Error("Не удалось сохранить изображение в постоянное хранилище. Проверьте подключение к интернету.");
 }
 
 
@@ -2805,29 +2963,29 @@ export interface CustomEquipment {
 }
 
 export const STANDARD_EQUIPMENTS: EquipmentItem[] = [
-  { id: 'gps_navigation', category: 'tech', fr: 'GPS Navigation grand écran', en: 'Large Screen GPS Navigation', ru: 'GPS-навигация (большой экран)' },
-  { id: 'rear_camera', category: 'safety', fr: 'Caméra de recul', en: 'Rear view camera', ru: 'Камера заднего вида' },
-  { id: 'parking_sensors', category: 'safety', fr: 'Radars avant / arrière', en: 'Front / Rear parking sensors', ru: 'Парктроники (перед / зад)' },
-  { id: 'panoramic_roof', category: 'comfort', fr: 'Toit ouvrant panoramique', en: 'Panoramic sunroof', ru: 'Панорамная крыша с люком' },
+  { id: 'gps_navigation', category: 'tech', fr: 'Système de navigation GPS', en: 'GPS Navigation System', ru: 'GPS-навигация' },
+  { id: 'rear_camera', category: 'safety', fr: 'Caméra de recul', en: 'Rear-view camera', ru: 'Камера заднего вида' },
+  { id: 'parking_sensors', category: 'safety', fr: 'Radars avant / arrière', en: 'Front & rear parking sensors', ru: 'Парктроники' },
+  { id: 'panoramic_roof', category: 'comfort', fr: 'Toit ouvrant panoramique', en: 'Panoramic sunroof', ru: 'Панорамная крыша' },
   { id: 'heated_seats', category: 'comfort', fr: 'Sièges chauffants', en: 'Heated seats', ru: 'Подогрев сидений' },
   { id: 'leather_seats', category: 'comfort', fr: 'Sellerie cuir', en: 'Leather upholstery', ru: 'Кожаный салон' },
   { id: 'adaptive_cruise_control', category: 'safety', fr: 'Régulateur de vitesse adaptatif', en: 'Adaptive cruise control', ru: 'Адаптивный круиз-контроль' },
-  { id: 'apple_carplay_android_auto', category: 'tech', fr: 'Apple CarPlay & Android Auto', en: 'Apple CarPlay & Android Auto', ru: 'Apple CarPlay и Android Auto' },
-  { id: 'dual_zone_climate', category: 'comfort', fr: 'Climatisation automatique bi-zone', en: 'Dual-zone automatic climate control', ru: 'Двухзонный климат-контроль' },
-  { id: 'alloy_wheels', category: 'design', fr: 'Jantes alliage sport', en: 'Sport alloy wheels', ru: 'Легкосплавные диски' },
-  { id: 'matrix_led', category: 'tech', fr: 'Projecteurs Full LED Matrix', en: 'Full LED Matrix headlights', ru: 'Матричные фары Full LED Matrix' },
-  { id: 'keyless_entry', category: 'comfort', fr: 'Accès & Démarrage mains libres (Keyless)', en: 'Keyless entry & start', ru: 'Бесключевой доступ и запуск (Keyless)' },
-  { id: 'sport_package', category: 'design', fr: 'Pack Sport', en: 'Sport Styling Package', ru: 'Спортивный пакет' },
+  { id: 'apple_carplay_android_auto', category: 'tech', fr: 'Apple CarPlay & Android Auto', en: 'Apple CarPlay & Android Auto', ru: 'Apple CarPlay / Android Auto' },
+  { id: 'dual_zone_climate', category: 'comfort', fr: 'Climatisation automatique bi-zone', en: 'Dual-zone automatic climate control', ru: 'Климат-контроль' },
+  { id: 'alloy_wheels', category: 'design', fr: 'Jantes alliage', en: 'Alloy wheels', ru: 'Легкосплавные диски' },
+  { id: 'matrix_led', category: 'tech', fr: 'Projecteurs Full LED Matrix', en: 'Full LED Matrix headlights', ru: 'Матричные фары Matrix LED' },
+  { id: 'keyless_entry', category: 'comfort', fr: 'Accès & Démarrage mains libres (Keyless)', en: 'Keyless entry & start', ru: 'Бесключевой доступ (Keyless)' },
+  { id: 'sport_package', category: 'design', fr: 'Pack Sport', en: 'Sport Package', ru: 'Спортивный пакет' },
   { id: 'blind_spot_monitoring', category: 'safety', fr: 'Avertisseur d\'angles morts', en: 'Blind spot monitoring', ru: 'Мониторинг слепых зон' },
-  { id: 'digital_cockpit', category: 'tech', fr: 'Cockpit digital / Compteur numérique', en: 'Virtual Digital Cockpit', ru: 'Цифровая приборная панель' },
-  { id: 'lane_assist', category: 'safety', fr: 'Aide au maintien dans la voie', en: 'Lane keeping assist', ru: 'Удержание в полосе движения' },
+  { id: 'digital_cockpit', category: 'tech', fr: 'Cockpit digital', en: 'Virtual Digital Cockpit', ru: 'Цифровая приборная панель' },
+  { id: 'lane_assist', category: 'safety', fr: 'Aide au maintien dans la voie', en: 'Lane keeping assist', ru: 'Удержание в полосе' },
   { id: 'premium_audio', category: 'tech', fr: 'Système audio Premium Hi-Fi', en: 'Premium Hi-Fi sound system', ru: 'Премиум-аудиосистема Hi-Fi' },
-  { id: 'bluetooth_usb', category: 'tech', fr: 'Bluetooth & Ports USB', en: 'Bluetooth & USB ports', ru: 'Bluetooth и порты USB' },
-  { id: 'electric_mirrors', category: 'comfort', fr: 'Rétroviseurs électriques rabattables', en: 'Electric folding heated mirrors', ru: 'Электрозеркала с обогревом и складыванием' },
-  { id: 'rain_light_sensors', category: 'safety', fr: 'Capteurs de pluie & Allumage auto des feux', en: 'Rain sensor & auto headlights', ru: 'Датчик дождя и света' },
-  { id: 'tow_bar', category: 'comfort', fr: 'Attelage amovible', en: 'Removable tow bar', ru: 'Съемный фаркоп' },
+  { id: 'bluetooth_usb', category: 'tech', fr: 'Bluetooth & Ports USB', en: 'Bluetooth & USB ports', ru: 'Bluetooth / USB' },
+  { id: 'electric_mirrors', category: 'comfort', fr: 'Rétroviseurs électriques rabattables', en: 'Electric folding heated mirrors', ru: 'Электрозеркала' },
+  { id: 'rain_light_sensors', category: 'safety', fr: 'Capteurs de pluie & luminosité', en: 'Rain & light sensors', ru: 'Датчик дождя и света' },
+  { id: 'tow_bar', category: 'comfort', fr: 'Attelage amovible', en: 'Removable tow bar', ru: 'Фаркоп' },
   { id: 'isofix', category: 'safety', fr: 'Fixations ISOFIX', en: 'ISOFIX child seat anchors', ru: 'Крепления ISOFIX' },
-  { id: 'tinted_windows', category: 'design', fr: 'Vitres arrière surteintées', en: 'Rear privacy glass', ru: 'Тонированные задние стекла' }
+  { id: 'tinted_windows', category: 'design', fr: 'Vitres arrière surteintées', en: 'Rear privacy glass', ru: 'Тонированные стекла' }
 ];
 
 export function normalizeEquipmentKey(raw: string): string {
@@ -2872,7 +3030,7 @@ export function translateEquipment(eq: string = '', lang: string = 'fr', customE
   
   if (customEquipments && customEquipments.length > 0) {
     const custom = customEquipments.find(c => c.id === key || c.id === eq || c.fr === eq || c.ru === eq || c.en === eq);
-    if (custom) return (custom as any)[lang] || custom.fr || custom.ru || custom.en;
+    if (custom) return (custom as any)[lang] || (lang === 'ru' ? custom.ru : lang === 'en' ? custom.en : custom.fr) || custom.fr;
   }
   
   return eq;
@@ -2969,12 +3127,8 @@ export function getCarLocalizationStatus(car: Partial<Car>): { fr: LocalizationS
     const missing: string[] = [];
 
     const hasShortDesc = !!(t.description?.trim() || (l === 'fr' ? car.description : l === 'en' ? car.description_en : car.description_ru)?.trim());
-    const hasDetailedDesc = !!(t.detailedSeoDescription?.trim() || (l === 'fr' ? car.detailedSeoDescription : '')?.trim());
-    const hasCondition = !!(t.vehicleCondition?.trim() || (l === 'fr' ? car.vehicleCondition : '')?.trim());
 
-    if (!hasShortDesc) missing.push(l === 'ru' ? 'краткое описание' : l === 'en' ? 'short summary' : 'résumé court');
-    if (!hasDetailedDesc && l !== 'fr') missing.push(l === 'ru' ? 'полное описание' : 'full presentation');
-    if (!hasCondition && l !== 'fr') missing.push(l === 'ru' ? 'состояние авто' : 'condition details');
+    if (!hasShortDesc) missing.push(l === 'ru' ? 'краткое описание' : l === 'en' ? 'short description' : 'description courte');
 
     return {
       complete: missing.length === 0,
@@ -4297,17 +4451,23 @@ export function App() {
     });
   };
 
-  const handleAddCustomEquipment = () => {
-    if (!customEqForm.fr?.trim()) {
-      showNotification("Nom d'équipement obligatoire (FR)", "error");
+  const handleAddCustomEquipment = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const frVal = customEqForm.fr?.trim() || customEqForm.ru?.trim() || customEqForm.en?.trim() || '';
+    const enVal = customEqForm.en?.trim() || customEqForm.fr?.trim() || customEqForm.ru?.trim() || '';
+    const ruVal = customEqForm.ru?.trim() || customEqForm.fr?.trim() || customEqForm.en?.trim() || '';
+
+    if (!frVal && !enVal && !ruVal) {
+      showNotification("Укажите название опции хотя бы на одном языке", "error");
       return;
     }
+
     const id = `custom_${Date.now()}`;
     const newCustom: CustomEquipment = {
       id,
-      fr: customEqForm.fr.trim(),
-      en: customEqForm.en?.trim() || customEqForm.fr.trim(),
-      ru: customEqForm.ru?.trim() || customEqForm.fr.trim()
+      fr: frVal,
+      en: enVal,
+      ru: ruVal
     };
     setFormData(prev => ({
       ...prev,
@@ -4316,7 +4476,7 @@ export function App() {
     }));
     setCustomEqForm({ fr: '', en: '', ru: '' });
     setShowCustomEquipmentModal(false);
-    showNotification("Équipement personnalisé ajouté", "success");
+    showNotification("Собственная опция успешно добавлена!", "success");
   };
 
   const handleRemoveCustomEquipment = (eqId: string) => {
@@ -4699,52 +4859,62 @@ export function App() {
   
   const handleArticleImageUpload = async (file: File) => {
     try {
-      showNotification("Сжатие и обработка изображения...", "info");
-      const compressed = await compressImage(file, 1200, 750, 0.85);
-      setArticleFormData(prev => ({ ...prev, featuredImage: compressed }));
+      showNotification("Загрузка изображения статьи в постоянное хранилище...", "info");
+      const url = await uploadImageFile(file);
+      setArticleFormData(prev => ({ ...prev, featuredImage: url }));
       showNotification("Изображение статьи успешно загружено!", "success");
-    } catch (e) {
-      showNotification("Ошибка при обработке изображения", "error");
+    } catch (e: any) {
+      showNotification(e?.message || "Ошибка при загрузке изображения статьи", "error");
     }
   };
 
   const handleMainImageUpload = async (file: File) => {
     try {
-      showNotification("Traitement de l'image...", "info");
-      const compressed = await compressImage(file, 1200, 800, 0.82);
-      setFormData(prev => ({ ...prev, image: compressed }));
-      showNotification("Image principale mise à jour", "success");
-    } catch (e) {
-      showNotification("Erreur lors du traitement de l'image", "error");
+      setMainImageUploading(true);
+      setMainImageProgress(10);
+      showNotification("Оптимизация и сохранение фото в постоянное хранилище...", "info");
+      const url = await uploadImageFile(file, (pct) => setMainImageProgress(pct));
+      setFormData(prev => ({ ...prev, image: url }));
+      showNotification("Главное фото успешно сохранено в постоянном хранилище!", "success");
+    } catch (e: any) {
+      showNotification(e?.message || "Ошибка при загрузке главного фото", "error");
+    } finally {
+      setMainImageUploading(false);
+      setMainImageProgress(0);
     }
   };
 
   const handleGalleryImagesUpload = async (files: FileList | File[]) => {
     try {
-      showNotification("Traitement de la galerie...", "info");
-      const compressedList: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const c = await compressImage(files[i], 1200, 800, 0.80);
-        compressedList.push(c);
+      setGalleryUploading(true);
+      const filesArr = Array.from(files);
+      showNotification(`Загрузка ${filesArr.length} фото в постоянное хранилище...`, "info");
+      const uploadedList: string[] = [];
+      for (let i = 0; i < filesArr.length; i++) {
+        showNotification(`Загрузка фото ${i + 1} из ${filesArr.length}...`, "info");
+        const url = await uploadImageFile(filesArr[i]);
+        uploadedList.push(url);
       }
       setFormData(prev => ({
         ...prev,
-        galleryImages: [...(prev.galleryImages || []), ...compressedList]
+        galleryImages: [...(prev.galleryImages || []), ...uploadedList]
       }));
-      showNotification(`${compressedList.length} images ajoutées à la galerie`, "success");
-    } catch (e) {
-      showNotification("Erreur lors du traitement de la galerie", "error");
+      showNotification(`${uploadedList.length} фото успешно добавлено в галерею!`, "success");
+    } catch (e: any) {
+      showNotification(e?.message || "Ошибка при загрузке фото в галерею", "error");
+    } finally {
+      setGalleryUploading(false);
     }
   };
 
   const handleArticleFeaturedImageUpload = async (file: File) => {
     try {
-      showNotification("Traitement de l'image de couverture...", "info");
-      const compressed = await compressImage(file, 1200, 675, 0.85);
-      setArticleFormData((prev: any) => ({ ...prev, featuredImage: compressed }));
-      showNotification("Image de couverture mise à jour", "success");
-    } catch (e) {
-      showNotification("Erreur lors du traitement de l'image", "error");
+      showNotification("Загрузка обложки статьи в постоянное хранилище...", "info");
+      const url = await uploadImageFile(file);
+      setArticleFormData((prev: any) => ({ ...prev, featuredImage: url }));
+      showNotification("Изображение обложки успешно обновлено!", "success");
+    } catch (e: any) {
+      showNotification(e?.message || "Ошибка при загрузке обложки", "error");
     }
   };
 
@@ -5518,7 +5688,7 @@ export function App() {
     const homepageOrder = Number(formData.homepageOrder) || 1;
     const galleryImages = formData.galleryImages || [];
     const galleryImagesAlt = formData.galleryImagesAlt || [];
-    const equipments = formData.equipments || [];
+    const equipments = (formData.equipments || []).map(normalizeEquipmentKey).filter(Boolean);
     const customEquipments = formData.customEquipments || [];
     const faq = (formData.faq && formData.faq.length > 0) ? formData.faq : generateCarDefaultFaq({ brand, model, engine, year, km, fuel, transmission, hp, price });
 
@@ -5800,7 +5970,15 @@ const renderComparisonView = () => {
       }
     ];
 
-    // Aggregated unique equipments
+    // Aggregated unique equipments & custom equipments
+    const allCustomEquipments = (() => {
+      const list: CustomEquipment[] = [];
+      comparedCars.forEach(c => (c.customEquipments || []).forEach(ce => {
+        if (ce && !list.some(x => x.id === ce.id)) list.push(ce);
+      }));
+      return list;
+    })();
+
     const allEquipments = (() => {
       const set = new Set<string>();
       comparedCars.forEach(c => (c.equipments || []).forEach(eq => {
@@ -6124,7 +6302,7 @@ const renderComparisonView = () => {
                   return (
                     <div key={eq} className="bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800/90 rounded-2xl p-3 shadow-sm space-y-1.5">
                       <div className="text-[11px] font-semibold text-neutral-800 dark:text-neutral-200 text-center leading-snug">
-                        {translateEquipment(eq, lang)}
+                        {translateEquipment(eq, lang, allCustomEquipments)}
                       </div>
                       <div className={`grid ${comparedCars.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-2 pt-1 border-t border-neutral-100 dark:border-neutral-800`}>
                         <div className="flex justify-center items-center">
@@ -6325,7 +6503,7 @@ const renderComparisonView = () => {
                       }`}
                     >
                       <td className="sticky left-0 z-10 py-3.5 px-6 font-semibold text-xs text-neutral-700 dark:text-neutral-300 bg-neutral-50/90 dark:bg-[#0E0E10]/90 backdrop-blur-sm border-r border-neutral-200 dark:border-neutral-800">
-                        {translateEquipment(eq, lang)}
+                        {translateEquipment(eq, lang, allCustomEquipments)}
                       </td>
 
                       {comparedCars.map((car) => {
@@ -8485,9 +8663,9 @@ return (
                 {(() => {
                   const getCarDesc = () => {
                     if (!selectedCar) return '';
-                    if (lang === 'en') return selectedCar.description_en || selectedCar.description || selectedCar.description_ru || '';
-                    if (lang === 'ru') return selectedCar.description_ru || selectedCar.description || selectedCar.description_en || '';
-                    return selectedCar.description || selectedCar.description_en || selectedCar.description_ru || '';
+                    if (lang === 'en') return selectedCar.translations?.en?.description || selectedCar.description_en || selectedCar.description || '';
+                    if (lang === 'ru') return selectedCar.translations?.ru?.description || selectedCar.description_ru || selectedCar.description || '';
+                    return selectedCar.translations?.fr?.description || selectedCar.description || selectedCar.description_en || selectedCar.description_ru || '';
                   };
                   const desc = getCarDesc();
                   return desc ? (
@@ -8681,7 +8859,7 @@ return (
                 {selectedCar.equipments.map((eq, eqIdx) => (
                   <div key={eqIdx} className="flex items-center gap-3 p-4 bg-neutral-50 dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 rounded-2xl">
                     <span className="text-emerald-500 font-bold text-sm">✓</span>
-                    <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{translateEquipment(eq, lang)}</span>
+                    <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">{translateEquipment(eq, lang, selectedCar.customEquipments)}</span>
                   </div>
                 ))}
               </div>
@@ -9640,20 +9818,20 @@ return (
                         Язык описания:
                       </span>
                       <span className="text-[11px] text-neutral-400">
-                        (редактируйте тексты для каждого языка в просторном поле)
+                        (выберите язык для редактирования краткого описания)
                       </span>
                     </div>
                     <div className="flex gap-1.5 p-1 bg-white dark:bg-[#18181b] rounded-xl border border-neutral-200 dark:border-neutral-800">
                       {[
-                        { id: 'fr', label: '🇫🇷 Français (FR)' },
-                        { id: 'en', label: '🇬🇧 English (EN)' },
-                        { id: 'ru', label: '🇷🇺 Русский (RU)' }
+                        { id: 'fr', label: '🇫🇷 FR' },
+                        { id: 'en', label: '🇬🇧 EN' },
+                        { id: 'ru', label: '🇷🇺 RU' }
                       ].map(l => (
                         <button
                           key={l.id}
                           type="button"
                           onClick={() => setCarDescLang(l.id as any)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                             carDescLang === l.id 
                               ? 'bg-[#D4AF37] text-neutral-950 shadow-sm' 
                               : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -9665,74 +9843,29 @@ return (
                     </div>
                   </div>
 
-                  {/* Active Language Workspace */}
-                  <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-5">
+                  {/* Active Language Workspace: Short Description ONLY */}
+                  <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-4">
                     <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base font-bold text-neutral-900 dark:text-white font-serif">
-                          Текстовые описания на языке: <span className="text-[#D4AF37]">{carDescLang.toUpperCase()}</span>
-                        </span>
-                      </div>
-                      <button 
-                        type="button" 
-                        onClick={handleAiGenerateCarSeo}
-                        className="text-xs font-bold text-[#D4AF37] hover:underline flex items-center gap-1.5 bg-[#D4AF37]/10 px-3 py-1.5 rounded-xl border border-[#D4AF37]/30"
-                      >
-                        ✨ Сгенерировать AI-тексты (FR/EN/RU)
-                      </button>
+                      <span className="text-sm font-bold text-neutral-900 dark:text-white font-serif">
+                        {carDescLang === 'fr' ? 'Французский (FR) — Краткое описание' : carDescLang === 'en' ? 'English (EN) — Short description' : 'Русский (RU) — Краткое описание'}
+                      </span>
                     </div>
 
-                    {/* Short Description */}
+                    {/* Single Short Description Textarea */}
                     <div className="space-y-1.5">
                       <label className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 font-bold">
-                        Краткое резюме ({carDescLang.toUpperCase()}) — для карточек и списков
+                        {carDescLang === 'ru' ? 'Краткое описание' : carDescLang === 'en' ? 'Short description' : 'Description courte'}
                       </label>
                       <textarea 
-                        rows={2} 
+                        rows={4} 
                         placeholder={
-                          carDescLang === 'ru' ? 'Краткое резюме автомобиля (1-2 предложения)...' :
-                          carDescLang === 'en' ? 'Short vehicle summary (1-2 sentences)...' :
-                          'Court résumé du véhicule (1-2 phrases)...'
+                          carDescLang === 'ru' ? 'Краткое описание автомобиля (1-2 предложения)...' :
+                          carDescLang === 'en' ? 'Short vehicle description (1-2 sentences)...' :
+                          'Description courte du véhicule (1-2 phrases)...'
                         } 
                         value={formData.translations?.[carDescLang]?.description ?? (carDescLang === 'fr' ? formData.description : carDescLang === 'en' ? formData.description_en : formData.description_ru) ?? ''} 
                         onChange={(e) => updateCarTranslation(carDescLang, 'description', e.target.value)} 
-                        className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl p-3 text-xs text-neutral-900 dark:text-white focus:outline-none" 
-                      />
-                    </div>
-
-                    {/* Detailed Presentation Description */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-wider text-[#D4AF37] font-bold flex items-center justify-between">
-                        <span>Полная презентация автомобиля ({carDescLang.toUpperCase()}) — для страницы авто и SEO</span>
-                      </label>
-                      <textarea 
-                        rows={6} 
-                        placeholder={
-                          carDescLang === 'ru' ? 'Подробный текст презентации автомобиля (история, особенности, комплектация, гарантия)...' :
-                          carDescLang === 'en' ? 'Comprehensive presentation text for landing page (history, features, warranty, servicing)...' :
-                          'Texte complet de présentation pour la page véhicule (historique, révision, équipements, garantie)...'
-                        } 
-                        value={formData.translations?.[carDescLang]?.detailedSeoDescription ?? (carDescLang === 'fr' ? formData.detailedSeoDescription : '') ?? ''} 
-                        onChange={(e) => updateCarTranslation(carDescLang, 'detailedSeoDescription', e.target.value)} 
-                        className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-2xl p-4 text-xs text-neutral-900 dark:text-white leading-relaxed focus:outline-none font-sans" 
-                      />
-                    </div>
-
-                    {/* Vehicle Condition & Warranty text */}
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] uppercase tracking-wider text-neutral-600 dark:text-neutral-400 font-bold">
-                        Состояние и гарантия ({carDescLang.toUpperCase()})
-                      </label>
-                      <textarea 
-                        rows={3} 
-                        placeholder={
-                          carDescLang === 'ru' ? 'Детали о техническом состоянии: пройдено ТО, состояние тормозов, шин, отсутствие ДТП...' :
-                          carDescLang === 'en' ? 'Details about vehicle condition: recent service, brakes & tires condition, accident-free certificate...' :
-                          "Détails sur l'état mécanique, carnet d'entretien, révision effectuée, non accidenté..."
-                        } 
-                        value={formData.translations?.[carDescLang]?.vehicleCondition ?? (carDescLang === 'fr' ? formData.vehicleCondition : '') ?? ''} 
-                        onChange={(e) => updateCarTranslation(carDescLang, 'vehicleCondition', e.target.value)} 
-                        className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-2xl p-3 text-xs text-neutral-900 dark:text-white focus:outline-none" 
+                        className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl p-3.5 text-xs text-neutral-900 dark:text-white leading-relaxed focus:outline-none" 
                       />
                     </div>
                   </div>
@@ -9753,14 +9886,14 @@ return (
                         onClick={() => setShowCustomEquipmentModal(true)}
                         className="px-3.5 py-2 rounded-xl bg-neutral-200 dark:bg-neutral-800 hover:bg-[#D4AF37] hover:text-neutral-950 text-xs font-bold transition-all flex items-center gap-1.5"
                       >
-                        <span>+ Добавить свою опцию (FR / EN / RU)</span>
+                        <span>+ Добавить свою опцию</span>
                       </button>
                     </div>
                     
                     {/* Standard suggestion chips */}
                     <div className="space-y-2">
                       <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
-                        Быстрый выбор стандартного оборудования:
+                        Быстрый выбор:
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {STANDARD_EQUIPMENTS.map((item) => {
@@ -9775,7 +9908,6 @@ return (
                                   ? 'bg-[#D4AF37] text-neutral-950 font-bold shadow-sm' 
                                   : 'bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:border-[#D4AF37]'
                               }`}
-                              title={`FR: ${item.fr}\nEN: ${item.en}\nRU: ${item.ru}`}
                             >
                               {isSelected ? '✓ ' : '+ '} {item.ru}
                             </button>
@@ -9788,7 +9920,7 @@ return (
                     {formData.equipments && formData.equipments.length > 0 ? (
                       <div className="space-y-2 pt-3 border-t border-neutral-200 dark:border-neutral-800">
                         <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
-                          Выбранная комплектация автомобиля:
+                          Выбранная комплектация:
                         </span>
                         <div className="flex flex-wrap gap-2">
                           {formData.equipments.map((eqKey) => {
@@ -9796,18 +9928,16 @@ return (
                             const std = STANDARD_EQUIPMENTS.find(e => e.id === key);
                             const custom = formData.customEquipments?.find(c => c.id === key);
                             const labelRu = std ? std.ru : custom ? custom.ru : eqKey;
-                            const labelFr = std ? std.fr : custom ? custom.fr : eqKey;
                             return (
                               <span key={key} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 text-xs text-neutral-900 dark:text-white">
                                 <span className="font-medium">{labelRu}</span>
-                                <span className="text-[10px] text-neutral-400">({labelFr})</span>
                                 <button 
                                   type="button" 
                                   onClick={() => {
                                     if (custom) handleRemoveCustomEquipment(custom.id);
                                     else handleToggleEquipment(key);
                                   }} 
-                                  className="text-neutral-400 hover:text-red-500 text-base font-bold ml-1"
+                                  className="text-neutral-400 hover:text-red-500 text-sm font-bold ml-1 transition-colors"
                                   title="Удалить опцию"
                                 >
                                   ×
