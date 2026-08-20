@@ -450,6 +450,7 @@ categoryDeleted: "Catégorie supprimée !",
       doorsCount: "portes",
       seatsCount: "places",
       removeFromCompare: "Retirer de la comparaison",
+      compareSwipeHint: "Faites glisser horizontalement pour comparer les véhicules →",
 },
   en: {
 catalog: "Catalogue",
@@ -741,6 +742,7 @@ availability: "Availability",
       doorsCount: "doors",
       seatsCount: "seats",
       removeFromCompare: "Remove from comparison",
+      compareSwipeHint: "Swipe horizontally to compare vehicles →",
     },
   ru: {
       catalog: "Каталог",
@@ -1032,6 +1034,7 @@ availability: "Availability",
       doorsCount: "дверей",
       seatsCount: "мест",
       removeFromCompare: "Удалить из сравнения",
+      compareSwipeHint: "Свайпайте вправо для сравнения характеристик →",
     }
 };
 
@@ -3698,14 +3701,13 @@ export function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Language state: 'fr' | 'en' | 'ru'
+  // Language state: 'fr' | 'en' | 'ru' (French by default)
   const [lang, setLang] = useState<'fr' | 'en' | 'ru'>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ligo_lang');
-      if (saved === 'fr' || saved === 'en' || saved === 'ru') return saved;
-      const navLang = navigator.language.slice(0, 2);
-      if (navLang === 'ru') return 'ru';
-      if (navLang === 'en') return 'en';
+      try {
+        const saved = localStorage.getItem('ligo_lang');
+        if (saved === 'fr' || saved === 'en' || saved === 'ru') return saved;
+      } catch {}
     }
     return 'fr';
   });
@@ -3838,6 +3840,43 @@ export function App() {
   }, [articles]);
 
   const [articleCategories, setArticleCategories] = useState<ArticleCategory[]>(loadLocalCategories);
+
+  // Manual Scroll Restoration & Robust View Scroll-to-Top Management
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      try {
+        window.history.scrollRestoration = 'manual';
+      } catch {}
+    }
+  }, []);
+
+  // Guarantee instant scroll-to-top whenever view or active article/car changes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Immediate reset
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Double frame safety for mobile browser layout shifts & iOS Safari scroll clamping
+    const rafId = requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+
+    const timerId = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 40);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timerId);
+    };
+  }, [currentView, selectedArticle?.id, selectedCar?.id]);
 
   // Gallery & Media state
   const [activeImage, setActiveImage] = useState<string>('');
@@ -4324,7 +4363,7 @@ export function App() {
 
   // Navigation Helper
   const navigateTo = (
-    view: 'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details',
+    view: 'home' | 'catalog' | 'car-details' | 'admin' | 'actualites' | 'article-details' | 'comparison',
     options?: { car?: any; article?: Article; categorySlug?: string }
   ) => {
     setPreviousView(currentView);
@@ -4354,7 +4393,7 @@ export function App() {
       const c = options?.car || selectedCar;
       const slug = c?.slug || generateCarSlug(c) || c?.id;
       newPath = `/vehicules/${slug}/`;
-    } else if (view === 'comparison' || (view as any) === 'comparaison') {
+    } else if (view === 'comparison') {
       newPath = '/comparateur/';
     } else if (view === 'admin') {
       const savedTab = localStorage.getItem('ligo_active_admin_tab') || activeAdminTab || 'featured';
@@ -4365,7 +4404,9 @@ export function App() {
       window.history.pushState({ view, carId: options?.car?.id, articleSlug: options?.article?.slug, categorySlug: options?.categorySlug }, '', newPath);
     } catch(e) {}
     
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   };
 
   // Popstate & Initial Route Resolver
@@ -5099,7 +5140,9 @@ export function App() {
     setActiveDetailsTab('specs');
     setActiveImage(normalized.image || '');
     setCurrentCarGallery([normalized.image, ...(normalized.galleryImages || [])].filter(Boolean));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     const slug = normalized.slug || generateCarSlug(normalized);
     try {
       window.history.pushState({ view: 'car-details', slug, carId: normalized.id }, '', `/vehicules/${slug}/`);
@@ -5818,7 +5861,7 @@ const renderComparisonView = () => {
     }
 
     return (
-      <section className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fadeIn">
+      <section className="max-w-[95rem] mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fadeIn">
         {/* Breadcrumbs & Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-800 pb-4">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
@@ -5829,11 +5872,11 @@ const renderComparisonView = () => {
             <span className="text-neutral-900 dark:text-white font-semibold">{t('comparePageTitle')}</span>
           </nav>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             {/* Show Differences Only Toggle */}
             <button
               onClick={() => setShowOnlyDifferences(!showOnlyDifferences)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all border ${
                 showOnlyDifferences
                   ? 'bg-[#D4AF37] text-neutral-950 border-[#D4AF37] shadow-sm'
                   : 'bg-white dark:bg-[#121214] text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]'
@@ -5850,7 +5893,7 @@ const renderComparisonView = () => {
             {/* Clear All */}
             <button
               onClick={handleClearComparison}
-              className="px-4 py-2 rounded-xl bg-neutral-100 dark:bg-[#121214] hover:bg-red-500/10 text-neutral-600 dark:text-neutral-400 hover:text-red-500 dark:hover:text-red-400 border border-neutral-200 dark:border-neutral-800 text-xs font-bold transition-all"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-neutral-100 dark:bg-[#121214] hover:bg-red-500/10 text-neutral-600 dark:text-neutral-400 hover:text-red-500 dark:hover:text-red-400 border border-neutral-200 dark:border-neutral-800 text-xs font-bold transition-all"
             >
               {t('compareClearAll')}
             </button>
@@ -5858,12 +5901,8 @@ const renderComparisonView = () => {
             {/* Add More Cars CTA */}
             {comparedCars.length < 4 && (
               <button
-                onClick={() => {
-                  setCurrentView('catalog');
-                  window.history.pushState(null, '', '/catalog');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="px-4 py-2 rounded-xl bg-white dark:bg-[#121214] text-[#D4AF37] border border-[#D4AF37]/40 hover:border-[#D4AF37] text-xs font-bold uppercase tracking-wider transition-all"
+                onClick={() => navigateTo('catalog')}
+                className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-[#121214] text-[#D4AF37] border border-[#D4AF37]/40 hover:border-[#D4AF37] text-xs font-bold uppercase tracking-wider transition-all"
               >
                 + {lang === 'ru' ? 'Добавить авто' : lang === 'en' ? 'Add vehicle' : 'Ajouter un véhicule'} ({comparedCars.length}/4)
               </button>
@@ -5877,33 +5916,39 @@ const renderComparisonView = () => {
             <Icons.Compare />
             <span>{comparedCars.length} / 4 {t('vehiclesCountLabel')}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-serif font-black text-neutral-900 dark:text-white">
+          <h1 className="text-2xl sm:text-4xl font-serif font-black text-neutral-900 dark:text-white">
             {t('comparePageTitle')}
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 font-light max-w-2xl">
+          <p className="text-xs sm:text-sm text-neutral-600 dark:text-neutral-400 font-light max-w-2xl">
             {t('comparePageSubtitle')}
           </p>
         </div>
 
+        {/* Mobile Swipe Hint */}
+        <div className="sm:hidden flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-neutral-100 dark:bg-[#151518] text-[11px] text-neutral-600 dark:text-neutral-300 font-medium border border-neutral-200 dark:border-neutral-800">
+          <span className="text-[#D4AF37]">⇄</span>
+          <span>{t('compareSwipeHint')}</span>
+        </div>
+
         {/* Responsive Comparison Table Container */}
-        <div className="overflow-x-auto rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#121214] shadow-xl custom-scrollbar">
+        <div className="overflow-x-auto snap-x snap-mandatory scroll-smooth rounded-2xl sm:rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#121214] shadow-xl custom-scrollbar">
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="border-b border-neutral-200 dark:border-neutral-800">
-                {/* 1st column header */}
-                <th className="sticky left-0 z-20 w-48 sm:w-60 min-w-[190px] p-6 bg-neutral-50 dark:bg-[#0E0E10] border-r border-neutral-200 dark:border-neutral-800 align-top">
+                {/* 1st column header (Sticky on mobile) */}
+                <th className="sticky left-0 z-20 w-[110px] min-w-[110px] max-w-[110px] sm:w-60 sm:min-w-[190px] sm:max-w-none p-3 sm:p-6 bg-neutral-50/95 dark:bg-[#0E0E10]/95 backdrop-blur-md border-r border-neutral-200 dark:border-neutral-800 shadow-[4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.4)] align-top">
                   <div className="space-y-1">
-                    <span className="text-xs uppercase tracking-widest text-[#D4AF37] font-bold">{t('catalog')}</span>
-                    <h3 className="text-lg font-serif font-bold text-neutral-900 dark:text-white">{t('characteristics')}</h3>
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-[#D4AF37] font-bold block">{t('catalog')}</span>
+                    <h3 className="text-sm sm:text-lg font-serif font-bold text-neutral-900 dark:text-white leading-tight">{t('characteristics')}</h3>
                   </div>
                 </th>
 
                 {/* Compared Cars Header Columns */}
                 {comparedCars.map((car) => (
-                  <th key={car.id} className="w-64 sm:w-72 md:w-80 min-w-[260px] p-6 align-top border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 bg-white dark:bg-[#121214]">
-                    <div className="space-y-4">
+                  <th key={car.id} className="w-[220px] min-w-[220px] sm:w-72 md:w-80 sm:min-w-[260px] p-3 sm:p-6 align-top border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 bg-white dark:bg-[#121214] snap-start">
+                    <div className="space-y-3 sm:space-y-4">
                       {/* Vehicle Image */}
-                      <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm group">
+                      <div className="relative aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm group">
                         <img
                           src={car.image || getFallbackSvg(600, 375, 20, 2)}
                           alt={`${car.brand} ${car.model}`}
@@ -5912,13 +5957,13 @@ const renderComparisonView = () => {
                         />
                         <button
                           onClick={() => handleRemoveFromCompare(car.id)}
-                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center transition-all backdrop-blur-md shadow-md"
+                          className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center transition-all backdrop-blur-md shadow-md"
                           title={t('removeFromCompare')}
                         >
                           <Icons.X />
                         </button>
-                        <div className="absolute top-2 left-2 flex flex-col gap-1">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                        <div className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 flex flex-col gap-1">
+                          <span className={`px-2 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-bold uppercase tracking-wider ${
                             car.status === 'Vendu'
                               ? 'bg-neutral-900 text-neutral-400'
                               : car.status === 'En arrivage'
@@ -5932,22 +5977,22 @@ const renderComparisonView = () => {
 
                       {/* Brand & Model */}
                       <div>
-                        <span className="text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
-                        <h2 className="text-xl font-serif font-bold text-neutral-900 dark:text-white leading-tight mt-0.5">
+                        <span className="text-[10px] sm:text-xs uppercase tracking-widest text-neutral-500 dark:text-neutral-400 font-medium">{car.brand}</span>
+                        <h2 className="text-sm sm:text-xl font-serif font-bold text-neutral-900 dark:text-white leading-tight mt-0.5 line-clamp-2">
                           {car.model} {car.engine || ''}
                         </h2>
                       </div>
 
                       {/* Price & Best badge */}
-                      <div className="flex items-baseline justify-between gap-2 pt-1 border-t border-neutral-100 dark:border-neutral-800">
+                      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-2 pt-1 border-t border-neutral-100 dark:border-neutral-800">
                         <div>
-                          <div className="text-2xl font-serif font-black text-[#D4AF37]">
+                          <div className="text-lg sm:text-2xl font-serif font-black text-[#D4AF37]">
                             {car.price ? `${Number(car.price).toLocaleString(lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'fr-FR')} €` : '—'}
                           </div>
-                          <span className="text-[10px] text-neutral-400">{t('taxIncludedTradeIn')}</span>
+                          <span className="text-[9px] sm:text-[10px] text-neutral-400 block">{t('taxIncludedTradeIn')}</span>
                         </div>
                         {minPrice !== null && Number(car.price) === minPrice && (
-                          <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
+                          <span className="self-start sm:self-auto px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[8px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
                             ★ {t('compareBestPrice')}
                           </span>
                         )}
@@ -5956,7 +6001,7 @@ const renderComparisonView = () => {
                       {/* Quick Details Button */}
                       <button
                         onClick={() => handleSelectCar(car)}
-                        className="w-full py-2.5 px-4 rounded-xl bg-neutral-100 hover:bg-[#D4AF37] dark:bg-neutral-900 dark:hover:bg-[#D4AF37] text-neutral-900 hover:text-neutral-950 dark:text-white dark:hover:text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37]"
+                        className="w-full py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-neutral-100 hover:bg-[#D4AF37] dark:bg-neutral-900 dark:hover:bg-[#D4AF37] text-neutral-900 hover:text-neutral-950 dark:text-white dark:hover:text-neutral-950 font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all border border-neutral-200 dark:border-neutral-800 hover:border-[#D4AF37] text-center"
                       >
                         {t('compareViewCar')}
                       </button>
@@ -5969,7 +6014,7 @@ const renderComparisonView = () => {
             <tbody>
               {/* Category Header: Spécifications Principales */}
               <tr className="bg-neutral-100/70 dark:bg-[#0D0D0D] border-y border-neutral-200 dark:border-neutral-800">
-                <td colSpan={comparedCars.length + 1} className="py-3 px-6 text-xs font-bold uppercase tracking-widest text-[#D4AF37]">
+                <td colSpan={comparedCars.length + 1} className="py-2.5 sm:py-3 px-3 sm:px-6 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#D4AF37]">
                   {t('carKeySpecs')}
                 </td>
               </tr>
@@ -5983,7 +6028,7 @@ const renderComparisonView = () => {
                   }`}
                 >
                   {/* Row Label (Sticky on mobile) */}
-                  <td className="sticky left-0 z-10 py-3.5 px-6 font-semibold text-xs text-neutral-700 dark:text-neutral-300 bg-neutral-50/90 dark:bg-[#0E0E10]/90 backdrop-blur-sm border-r border-neutral-200 dark:border-neutral-800">
+                  <td className="sticky left-0 z-10 w-[110px] min-w-[110px] max-w-[110px] sm:w-60 sm:min-w-[190px] sm:max-w-none p-2.5 sm:py-3.5 sm:px-6 font-semibold text-[11px] sm:text-xs text-neutral-700 dark:text-neutral-300 bg-neutral-50/95 dark:bg-[#0E0E10]/95 backdrop-blur-sm border-r border-neutral-200 dark:border-neutral-800 shadow-[4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.4)] leading-tight">
                     {row.label}
                   </td>
 
@@ -5993,13 +6038,13 @@ const renderComparisonView = () => {
                     const isBest = row.isBest ? row.isBest(car) : false;
 
                     return (
-                      <td key={car.id} className="py-3.5 px-6 text-xs text-neutral-800 dark:text-neutral-200 border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 font-medium">
-                        <div className="flex items-center justify-between gap-2">
+                      <td key={car.id} className="w-[220px] min-w-[220px] sm:w-72 sm:min-w-[260px] p-2.5 sm:py-3.5 sm:px-6 text-[11px] sm:text-xs text-neutral-800 dark:text-neutral-200 border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 font-medium snap-start">
+                        <div className="flex items-center justify-between gap-1.5 sm:gap-2">
                           <span className={`${isBest ? 'font-bold text-emerald-600 dark:text-emerald-400' : ''}`}>
                             {formatted}
                           </span>
                           {isBest && row.bestBadge && (
-                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[9px] font-bold">
+                            <span className="px-1.5 sm:px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[8px] sm:text-[9px] font-bold whitespace-nowrap">
                               {row.bestBadge}
                             </span>
                           )}
@@ -6014,7 +6059,7 @@ const renderComparisonView = () => {
               {visibleEquipments.length > 0 && (
                 <>
                   <tr className="bg-neutral-100/70 dark:bg-[#0D0D0D] border-y border-neutral-200 dark:border-neutral-800">
-                    <td colSpan={comparedCars.length + 1} className="py-3 px-6 text-xs font-bold uppercase tracking-widest text-[#D4AF37]">
+                    <td colSpan={comparedCars.length + 1} className="py-2.5 sm:py-3 px-3 sm:px-6 text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#D4AF37]">
                       {t('carEquipments')} ({visibleEquipments.length})
                     </td>
                   </tr>
@@ -6026,7 +6071,7 @@ const renderComparisonView = () => {
                         idx % 2 === 0 ? 'bg-transparent' : 'bg-neutral-50/30 dark:bg-neutral-900/20'
                       }`}
                     >
-                      <td className="sticky left-0 z-10 py-3.5 px-6 font-semibold text-xs text-neutral-700 dark:text-neutral-300 bg-neutral-50/90 dark:bg-[#0E0E10]/90 backdrop-blur-sm border-r border-neutral-200 dark:border-neutral-800">
+                      <td className="sticky left-0 z-10 w-[110px] min-w-[110px] max-w-[110px] sm:w-60 sm:min-w-[190px] sm:max-w-none p-2.5 sm:py-3.5 sm:px-6 font-semibold text-[11px] sm:text-xs text-neutral-700 dark:text-neutral-300 bg-neutral-50/95 dark:bg-[#0E0E10]/95 backdrop-blur-sm border-r border-neutral-200 dark:border-neutral-800 shadow-[4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.4)] leading-tight">
                         {translateEquipment(eq, lang)}
                       </td>
 
@@ -6036,13 +6081,13 @@ const renderComparisonView = () => {
                         );
 
                         return (
-                          <td key={car.id} className="py-3.5 px-6 text-center border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0">
+                          <td key={car.id} className="w-[220px] min-w-[220px] sm:w-72 sm:min-w-[260px] p-2.5 sm:py-3.5 sm:px-6 text-center border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 snap-start">
                             {hasEquipment ? (
-                              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-500 font-black text-sm">
+                              <span className="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500/10 text-emerald-500 font-black text-xs sm:text-sm">
                                 ✓
                               </span>
                             ) : (
-                              <span className="text-neutral-400 font-light text-base">—</span>
+                              <span className="text-neutral-400 font-light text-sm sm:text-base">—</span>
                             )}
                           </td>
                         );
@@ -6054,16 +6099,16 @@ const renderComparisonView = () => {
 
               {/* Action Footer Row */}
               <tr className="bg-neutral-50 dark:bg-[#0D0D0D] border-t border-neutral-200 dark:border-neutral-800">
-                <td className="sticky left-0 z-10 py-6 px-6 font-bold text-xs uppercase tracking-wider text-neutral-500 bg-neutral-50 dark:bg-[#0E0E10] border-r border-neutral-200 dark:border-neutral-800">
+                <td className="sticky left-0 z-10 w-[110px] min-w-[110px] max-w-[110px] sm:w-60 sm:min-w-[190px] sm:max-w-none p-3 sm:py-6 sm:px-6 font-bold text-[10px] sm:text-xs uppercase tracking-wider text-neutral-500 bg-neutral-50/95 dark:bg-[#0E0E10]/95 border-r border-neutral-200 dark:border-neutral-800 shadow-[4px_0_12px_rgba(0,0,0,0.06)] dark:shadow-[4px_0_12px_rgba(0,0,0,0.4)] leading-tight">
                   {lang === 'ru' ? 'Действия' : lang === 'en' ? 'Actions' : 'Actions'}
                 </td>
 
                 {comparedCars.map((car) => (
-                  <td key={car.id} className="p-6 align-middle border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0">
-                    <div className="space-y-2.5">
+                  <td key={car.id} className="w-[220px] min-w-[220px] sm:w-72 sm:min-w-[260px] p-3 sm:p-6 align-middle border-r border-neutral-200 dark:border-neutral-800/80 last:border-r-0 snap-start">
+                    <div className="space-y-2">
                       <button
                         onClick={() => handleSelectCar(car)}
-                        className="w-full py-3 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95"
+                        className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 text-center"
                       >
                         {t('compareViewCar')}
                       </button>
@@ -6072,7 +6117,7 @@ const renderComparisonView = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => trackAnalyticsEvent('vehicle_whatsapp_click', { vehicleId: car.id, brand: car.brand, model: car.model })}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm"
+                        className="w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all shadow-sm text-center"
                       >
                         <Icons.WhatsApp />
                         <span>WhatsApp</span>
@@ -7541,7 +7586,7 @@ return (
             <h2 className="text-3xl font-serif text-neutral-900 dark:text-white tracking-wide">{siteSettings[lang]?.featuredTitle || DEFAULT_SETTINGS[lang]?.featuredTitle || t('featuredVehicles')}</h2>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <p className="text-neutral-600 dark:text-neutral-400 text-sm font-light">{siteSettings[lang]?.featuredSubtitle || DEFAULT_SETTINGS[lang]?.featuredSubtitle || t('featuredDescription')}</p>
-              <button onClick={() => { setCurrentView('catalog'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="px-6 py-3 rounded-2xl border border-[#D4AF37]/30 hover:border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-neutral-950 font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap">
+              <button onClick={() => navigateTo('catalog')} className="px-6 py-3 rounded-2xl border border-[#D4AF37]/30 hover:border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-neutral-950 font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap">
                 {t('browseEntireCatalog').replace('{count}', String(cars.length))}
               </button>
             </div>
@@ -7703,7 +7748,7 @@ return (
                 </p>
               </div>
               <button 
-                onClick={() => { setCurrentView('actualites'); window.history.pushState(null, '', '/actualites'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => navigateTo('actualites')}
                 className="px-6 py-3 rounded-2xl border border-[#D4AF37]/40 hover:border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-neutral-950 font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap self-start sm:self-auto"
               >
                 {t('seeAllArticles')} →
@@ -7890,7 +7935,7 @@ return (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative animate-fadeIn">
           {/* Sticky Back Button */}
           <div className="sticky top-[80px] z-40 bg-[#F8F9FA]/90 dark:bg-[#0D0D0D]/90 backdrop-blur-md py-4 border-b border-neutral-200 dark:border-neutral-900 mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 flex items-center justify-between">
-            <button onClick={() => { setCurrentView('home'); window.history.pushState(null, '', '/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
+            <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               {t('backToHome')}
             </button>
@@ -7910,7 +7955,7 @@ return (
               </div>
               <h3 className="text-lg font-serif font-bold text-neutral-900 dark:text-white">{lang === 'ru' ? 'Статьи пока готовятся к публикации' : lang === 'en' ? 'Articles are being prepared' : 'Les articles arrivent bientôt'}</h3>
               <p className="text-xs text-neutral-500 max-w-md mx-auto">{lang === 'ru' ? 'Наши эксперты готовят полезные материалы. Загляните позже!' : lang === 'en' ? 'Our team is preparing great content for you. Check back soon!' : 'Nos experts rédigent actuellement des guides complets pour vous accompagner dans vos projets automobiles.'}</p>
-              <button onClick={() => { setCurrentView('catalog'); window.history.pushState(null, '', '/catalog'); window.scrollTo({ top: 0 }); }} className="px-6 py-3 rounded-xl bg-[#D4AF37] text-neutral-950 font-bold text-xs uppercase tracking-wider hover:bg-[#D4AF37]/90 transition-all">
+              <button onClick={() => navigateTo('catalog')} className="px-6 py-3 rounded-xl bg-[#D4AF37] text-neutral-950 font-bold text-xs uppercase tracking-wider hover:bg-[#D4AF37]/90 transition-all">
                 {t('catalog')}
               </button>
             </div>
@@ -7964,7 +8009,7 @@ return (
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 animate-fadeIn">
           {/* Sticky Back Button */}
           <div className="sticky top-[80px] z-40 bg-[#F8F9FA]/90 dark:bg-[#0D0D0D]/90 backdrop-blur-md py-4 border-b border-neutral-200 dark:border-neutral-900 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 flex items-center justify-between">
-            <button onClick={() => { setCurrentView(previousView === 'actualites' ? 'actualites' : 'actualites'); window.history.pushState(null, '', '/actualites'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
+            <button onClick={() => navigateTo(previousView === 'actualites' ? 'actualites' : 'actualites')} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
               {lang === 'ru' ? '← Все статьи' : lang === 'en' ? '← All articles' : '← Toutes les actualités'}
             </button>
@@ -7987,9 +8032,9 @@ return (
 
           {/* Breadcrumbs */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 overflow-x-auto whitespace-nowrap py-1">
-            <button onClick={() => { setCurrentView('home'); window.history.pushState(null, '', '/'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
+            <button onClick={() => navigateTo('home')} className="hover:text-[#D4AF37] transition-colors">{t('home')}</button>
             <span>/</span>
-            <button onClick={() => { setCurrentView('actualites'); window.history.pushState(null, '', '/actualites'); window.scrollTo({ top: 0 }); }} className="hover:text-[#D4AF37] transition-colors">{lang === 'ru' ? 'Статьи' : lang === 'en' ? 'Articles' : 'Actualités'}</button>
+            <button onClick={() => navigateTo('actualites')} className="hover:text-[#D4AF37] transition-colors">{lang === 'ru' ? 'Статьи' : lang === 'en' ? 'Articles' : 'Actualités'}</button>
             <span>/</span>
             <span className="text-neutral-900 dark:text-white font-semibold truncate max-w-[200px] sm:max-w-xs">{getArticleTitle(selectedArticle, lang)}</span>
           </nav>
@@ -8471,7 +8516,7 @@ return (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         {/* Sticky Back Button */}
         <div className="sticky top-[80px] z-40 bg-[#F8F9FA]/90 dark:bg-[#0D0D0D]/90 backdrop-blur-md py-4 border-b border-neutral-200 dark:border-neutral-900 mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <button onClick={() => { setCurrentView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
+          <button onClick={() => navigateTo('home')} className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400 hover:text-[#D4AF37] text-xs uppercase tracking-widest font-bold transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             {t('backToHome')}
           </button>
