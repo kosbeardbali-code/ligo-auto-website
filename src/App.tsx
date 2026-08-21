@@ -406,7 +406,7 @@ export async function uploadBlobToCloud(
 
   // 1. Primary: Native Vercel Serverless Upload (/api/upload -> Vercel Blob)
   try {
-    onProgress?.(30);
+    onProgress?.(25);
     const apiRes = await fetch('/api/upload', {
       method: 'POST',
       headers: {
@@ -420,13 +420,10 @@ export async function uploadBlobToCloud(
       const data = await apiRes.json();
       if (data?.success && data?.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
         onProgress?.(80);
-        // Strict verification probe
         const isLive = await verifyAssetAccessibility(data.url);
         if (isLive) {
           onProgress?.(100);
           return data.url;
-        } else {
-          console.warn('[Storage] Uploaded URL failed accessibility verification probe:', data.url);
         }
       }
     }
@@ -434,7 +431,36 @@ export async function uploadBlobToCloud(
     console.warn('[Storage] /api/upload endpoint skipped/failed:', apiErr);
   }
 
-  // 2. Secondary: Firebase Storage (if bucket is configured)
+  // 2. Secondary: Permanent Cloudflare-backed Object Storage (iili.io permanent CDN)
+  try {
+    onProgress?.(50);
+    const formData = new FormData();
+    formData.append('source', blob, safeFilename);
+    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
+    formData.append('action', 'upload');
+
+    const resp = await fetch('https://freeimage.host/api/1/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (resp.ok) {
+      const json = await resp.json();
+      const directUrl = json?.image?.url || json?.image?.display_url;
+      if (directUrl && typeof directUrl === 'string' && directUrl.startsWith('https://')) {
+        onProgress?.(85);
+        const isLive = await verifyAssetAccessibility(directUrl);
+        if (isLive) {
+          onProgress?.(100);
+          return directUrl;
+        }
+      }
+    }
+  } catch (cloudErr) {
+    console.warn('[Storage] Permanent Cloud CDN upload failed:', cloudErr);
+  }
+
+  // 3. Tertiary: Firebase Storage (if bucket is configured)
   if (!firebaseStorageDisabled) {
     try {
       const storagePath = `vehicles/${Date.now()}_${safeFilename}`;
@@ -484,7 +510,7 @@ export async function uploadBlobToCloud(
     }
   }
 
-  throw new Error("Не удалось загрузить в постоянное хранилище. Убедитесь, что в Vercel Dashboard подключен Vercel Blob (Storage -> Blob).");
+  throw new Error("Не удалось загрузить в постоянное хранилище. Проверьте интернет-соединение.");
 }
 
 /**
@@ -10650,186 +10676,244 @@ return (
               {/* TAB 2: МЕДИА & ФОТО */}
               {carActiveTab === 'media' && (
                 <div className="space-y-6">
-                  {/* Main Image */}
-                  <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold flex items-center">
-                        Главное изображение<span className="text-red-500 font-bold ml-1">*</span>
-                      </label>
-                      {formData.image && (
-                        <button 
-                          type="button" 
-                          onClick={() => setFormData({ ...formData, image: '' })}
-                          className="text-xs text-red-500 hover:underline font-semibold"
-                        >
-                          Удалить фото
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-                      <div className="sm:col-span-1 aspect-[4/3] rounded-xl overflow-hidden bg-neutral-200 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center relative">
-                        {formData.image ? (
-                          <img src={formData.image} alt="Главное фото" className="w-full h-full object-cover" />
-                        ) : (
-                          <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-4 text-center hover:bg-neutral-300/50 dark:hover:bg-neutral-700/50 transition-colors">
-                            <input 
-                              type="file" 
-                              accept="image/*" 
-                              onChange={(e) => { if (e.target.files?.[0]) handleMainImageUpload(e.target.files[0]); }} 
-                              className="hidden" 
-                            />
-                            <span className="text-2xl mb-1">📷</span>
-                            <span className="text-[10px] text-neutral-500 font-medium">Загрузить с устройства</span>
-                          </label>
-                        )}
-                        {mainImageUploading && (
-                          <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white text-xs gap-2">
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#D4AF37] border-t-transparent"></div>
-                            <span>{mainImageProgress}%</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="sm:col-span-2 space-y-3">
-                        <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-neutral-500 font-bold">Прямая ссылка на фото (URL)</label>
-                          <input 
-                            type="text" 
-                            placeholder="https://..." 
-                            value={formData.image || ''} 
-                            onChange={(e) => setFormData({ ...formData, image: e.target.value })} 
-                            className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white focus:outline-none" 
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-[#D4AF37] font-bold">ALT-текст для главного изображения</label>
-                          <input 
-                            type="text" 
-                            placeholder="например: Peugeot 2008 occasion PureTech vue avant 3/4" 
-                            value={formData.imageAlt || ''} 
-                            onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })} 
-                            className="w-full bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 focus:border-[#D4AF37] rounded-xl py-2 px-3 text-xs text-neutral-900 dark:text-white focus:outline-none" 
-                          />
-                          <span className="text-[9px] text-neutral-400">Альтернативный текст для Google Images и доступности.</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Gallery Section */}
+                  {/* Unified Batch Dropzone & Counter */}
                   <div 
-                    className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-4"
+                    className="p-6 rounded-3xl bg-neutral-50 dark:bg-[#0D0D0D] border-2 border-dashed border-neutral-300 dark:border-neutral-800 hover:border-[#D4AF37] transition-all text-center space-y-4"
                     onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                     onDrop={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                        handleGalleryImagesUpload(Array.from(e.dataTransfer.files));
+                        handleUploadVehiclePhotos(e.dataTransfer.files);
                       }
                     }}
                   >
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div>
-                        <label className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold block">
-                          Галерея фотографий ({formData.galleryImages?.length || 0} / 30)
-                        </label>
-                        <span className="text-[10px] text-neutral-500">
-                          {formData.galleryImages && formData.galleryImages.length >= 30
-                            ? 'Достигнут максимальный лимит 30 фото'
-                            : `Можно добавить ещё ${30 - (formData.galleryImages?.length || 0)} фото (JPG, PNG, WebP)`}
-                        </span>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="text-left">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider">
+                            Фотографии автомобиля ({formData.images?.length || 0} / 30)
+                          </span>
+                          {formData.images && formData.images.length > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4AF37]/20 text-[#D4AF37]">
+                              ★ Первое фото — главное
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-1">
+                          {(formData.images?.length || 0) >= 30
+                            ? 'Достигнут максимальный лимит 30 фотографий'
+                            : `Выберите до ${30 - (formData.images?.length || 0)} фотографий одновременно. Файлы автоматически оптимизируются в WebP и сохраняются в постоянном облаке.`}
+                        </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        {formData.galleryImages && formData.galleryImages.length > 0 && (
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {formData.images && formData.images.length > 0 && (
                           <button
                             type="button"
                             onClick={() => {
-                              if (window.confirm("Удалить все фотографии из галереи?")) {
-                                setFormData({ ...formData, galleryImages: [], galleryImagesAlt: [] });
+                              if (window.confirm("Удалить все фотографии автомобиля?")) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  images: [],
+                                  image: '',
+                                  image800: '',
+                                  image1200: '',
+                                  image1600: '',
+                                  imagesResponsive: {},
+                                  galleryImages: [],
+                                  galleryImagesAlt: []
+                                }));
                               }
                             }}
-                            className="px-2.5 py-1.5 rounded-xl border border-red-500/30 text-red-500 hover:bg-red-500/10 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                            className="px-3 py-2 rounded-xl border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs font-bold transition-all"
                           >
                             Очистить все
                           </button>
                         )}
 
-                        <label className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
-                          (formData.galleryImages?.length || 0) >= 30 
+                        <label className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-md ${
+                          (formData.images?.length || 0) >= 30
                             ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
-                            : 'bg-[#D4AF37] text-neutral-950 cursor-pointer hover:bg-[#D4AF37]/90 shadow-sm'
+                            : 'bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950 cursor-pointer scale-100 hover:scale-105 active:scale-95'
                         }`}>
                           <input 
                             type="file" 
-                            accept="image/*" 
+                            accept="image/jpeg,image/png,image/webp,image/avif" 
                             multiple 
-                            disabled={(formData.galleryImages?.length || 0) >= 30 || galleryUploading}
+                            disabled={(formData.images?.length || 0) >= 30}
                             onClick={(e) => { (e.target as HTMLInputElement).value = ''; }}
-                            onChange={(e) => { if (e.target.files) handleGalleryImagesUpload(Array.from(e.target.files)); }} 
+                            onChange={(e) => { if (e.target.files) handleUploadVehiclePhotos(e.target.files); }} 
                             className="hidden" 
                           />
-                          <span>+ Добавить фото</span>
+                          <span>📷 Выбрать до 30 фото</span>
                         </label>
                       </div>
                     </div>
+                  </div>
 
-                    {galleryUploading && (
-                      <div className="p-4 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 space-y-2">
-                        <div className="flex items-center justify-between text-xs text-[#D4AF37] font-bold">
-                          <span className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-[#D4AF37] border-t-transparent"></div>
-                            Загрузка фото: {galleryProgress.current} из {galleryProgress.total}
-                          </span>
-                          <span>{galleryProgress.pct}%</span>
-                        </div>
-                        <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-[#D4AF37] h-full transition-all duration-300 rounded-full" 
-                            style={{ width: `${galleryProgress.pct}%` }}
-                          />
-                        </div>
+                  {/* Active Upload Queue Section */}
+                  {uploadQueue.length > 0 && (
+                    <div className="p-4 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 space-y-3">
+                      <div className="flex items-center justify-between text-xs font-bold text-[#D4AF37]">
+                        <span className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#D4AF37] border-t-transparent"></div>
+                          Очередь загрузки: {uploadQueue.filter(q => q.status === 'ready').length} из {uploadQueue.length} готово
+                        </span>
+                        <span>
+                          {Math.round((uploadQueue.filter(q => q.status === 'ready').length / uploadQueue.length) * 100)}%
+                        </span>
                       </div>
-                    )}
 
-                    {formData.galleryImages && formData.galleryImages.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-72 overflow-y-auto custom-scrollbar p-1">
-                        {formData.galleryImages.map((imgUrl, idx) => (
-                          <div key={idx} className="flex gap-3 p-2.5 rounded-xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 items-center">
-                            <img src={imgUrl} alt={`Фото ${idx + 1}`} className="w-16 h-12 object-cover rounded-lg flex-shrink-0" />
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <input 
-                                type="text" 
-                                placeholder={`ALT-описание фото #${idx + 1}`}
-                                value={formData.galleryImagesAlt?.[idx] || ''} 
-                                onChange={(e) => handleUpdateGalleryAlt(idx, e.target.value)} 
-                                className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 rounded-lg py-1 px-2 text-[10px] text-neutral-900 dark:text-white focus:outline-none"
-                              />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        {uploadQueue.map((item) => (
+                          <div key={item.id} className="p-3 rounded-xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 flex items-center gap-3">
+                            <img src={item.previewUrl} alt="preview" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between text-[11px] mb-1">
+                                <span className="truncate font-medium text-neutral-800 dark:text-neutral-200">{item.file.name}</span>
+                                <span className={`text-[10px] font-bold ${item.status === 'error' ? 'text-red-500' : item.status === 'ready' ? 'text-emerald-500' : 'text-[#D4AF37]'}`}>
+                                  {item.stage || `${item.progress}%`}
+                                </span>
+                              </div>
+                              <div className="w-full bg-neutral-100 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full transition-all duration-200 ${item.status === 'error' ? 'bg-red-500' : item.status === 'ready' ? 'bg-emerald-500' : 'bg-[#D4AF37]'}`} 
+                                  style={{ width: `${item.status === 'ready' ? 100 : item.progress}%` }}
+                                />
+                              </div>
+                              {item.status === 'error' && (
+                                <div className="flex items-center justify-between mt-1">
+                                  <span className="text-[9px] text-red-500 truncate">{item.errorMessage || 'Ошибка'}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRetryUploadQueueItem(item.id)}
+                                    className="text-[10px] text-[#D4AF37] hover:underline font-bold"
+                                  >
+                                    Повторить
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                            <button 
-                              type="button" 
-                              onClick={() => {
-                                const newImgs = formData.galleryImages?.filter((_, i) => i !== idx) || [];
-                                const newAlts = formData.galleryImagesAlt?.filter((_, i) => i !== idx) || [];
-                                setFormData({ ...formData, galleryImages: newImgs, galleryImagesAlt: newAlts });
-                              }}
-                              className="text-red-500 p-1.5 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition-colors"
-                              title="Удалить фото"
+                            <button
+                              type="button"
+                              onClick={() => handleCancelUploadQueueItem(item.id)}
+                              className="text-neutral-400 hover:text-red-500 text-xs p-1"
+                              title="Отменить"
                             >
-                              <Icons.Trash />
+                              ✕
                             </button>
                           </div>
                         ))}
                       </div>
-                    ) : (
-                      <div className="text-center py-8 text-neutral-400 text-xs border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl space-y-1">
-                        <div className="text-2xl">📸</div>
-                        <div className="font-semibold text-neutral-700 dark:text-neutral-300">В галерее пока нет дополнительных фото</div>
-                        <div className="text-[11px]">Вы можете загрузить до 30 качественных снимков (перетащите файлы сюда или нажмите кнопку выше)</div>
+                    </div>
+                  )}
+
+                  {/* Photo Assets Grid */}
+                  {formData.images && formData.images.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {formData.images.map((asset, idx) => (
+                          <div 
+                            key={asset.id || idx} 
+                            className={`relative rounded-2xl overflow-hidden bg-white dark:bg-[#121214] border-2 transition-all p-3 space-y-3 ${
+                              asset.isPrimary ? 'border-[#D4AF37] shadow-lg ring-1 ring-[#D4AF37]/30' : 'border-neutral-200 dark:border-neutral-800'
+                            }`}
+                          >
+                            <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-100 dark:bg-neutral-900 group">
+                              <img 
+                                src={asset.url} 
+                                alt={asset.alt || `Фото ${idx + 1}`} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  console.warn(`[AssetGrid] Image failed to load: ${asset.url}`);
+                                  (e.currentTarget as HTMLImageElement).src = getFallbackSvg(400, 300);
+                                }}
+                              />
+                              
+                              {/* Primary Badge */}
+                              <div className="absolute top-2 left-2">
+                                {asset.isPrimary ? (
+                                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#D4AF37] text-neutral-950 shadow-md flex items-center gap-1">
+                                    ★ Главное фото
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-black/60 backdrop-blur-sm text-white">
+                                    #{idx + 1}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Reorder & Delete Overlay */}
+                              <div className="absolute top-2 right-2 flex items-center gap-1">
+                                {idx > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleMoveAsset(asset.id, 'left')}
+                                    className="p-1.5 rounded-lg bg-black/70 hover:bg-[#D4AF37] text-white hover:text-neutral-950 text-xs transition-colors shadow"
+                                    title="Переместить влево"
+                                  >
+                                    ←
+                                  </button>
+                                )}
+                                {idx < (formData.images?.length || 0) - 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleMoveAsset(asset.id, 'right')}
+                                    className="p-1.5 rounded-lg bg-black/70 hover:bg-[#D4AF37] text-white hover:text-neutral-950 text-xs transition-colors shadow"
+                                    title="Переместить вправо"
+                                  >
+                                    →
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveAsset(asset.id)}
+                                  className="p-1.5 rounded-lg bg-red-600/90 hover:bg-red-600 text-white text-xs transition-colors shadow"
+                                  title="Удалить фото"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Card Actions & ALT Input */}
+                            <div className="space-y-2">
+                              {!asset.isPrimary && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetPrimaryAsset(asset.id)}
+                                  className="w-full py-1.5 rounded-xl border border-[#D4AF37]/50 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-neutral-950 text-[11px] font-bold transition-all uppercase tracking-wider"
+                                >
+                                  Сделать главным
+                                </button>
+                              )}
+
+                              <div className="space-y-1">
+                                <input 
+                                  type="text" 
+                                  placeholder="ALT-описание для Google Images" 
+                                  value={asset.alt || ''} 
+                                  onChange={(e) => handleUpdateAssetAlt(asset.id, e.target.value)} 
+                                  className="w-full bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 rounded-xl py-1.5 px-2.5 text-[11px] text-neutral-900 dark:text-white focus:outline-none focus:border-[#D4AF37]" 
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    uploadQueue.length === 0 && (
+                      <div className="text-center py-12 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl space-y-2">
+                        <div className="text-4xl">📸</div>
+                        <div className="font-bold text-neutral-800 dark:text-neutral-200 text-sm">Фотографии автомобиля не добавлены</div>
+                        <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+                          Нажмите кнопку выше или перетащите файлы сюда, чтобы загрузить до 30 фотографий.
+                        </p>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
 
