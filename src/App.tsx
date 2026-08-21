@@ -3057,6 +3057,18 @@ export function getOrCreateSessionId(): string {
   }
 }
 
+export function isAdministratorSession(): boolean {
+  try {
+    if (typeof window === 'undefined') return false;
+    if (localStorage.getItem('ligo_admin_logged_in') === 'true') return true;
+    if (sessionStorage.getItem('ligo_admin_logged_in') === 'true') return true;
+    if (localStorage.getItem('ligo_is_admin_device') === 'true') return true;
+    if (window.location.pathname.startsWith('/admin')) return true;
+    if (window.location.hash.includes('admin')) return true;
+  } catch {}
+  return false;
+}
+
 export interface TrafficSourceInfo {
   source: string;
   utmSource?: string;
@@ -5629,9 +5641,14 @@ export function App() {
     });
   };
 
-  // Analytics event tracking
+  // Analytics event tracking (Exclusive for real external visitors)
   const trackAnalyticsEvent = (eventName: AnalyticsEvent['event'], data: Partial<AnalyticsEvent> = {}) => {
     try {
+      // ИСКЛЮЧЕНИЕ АДМИНИСТРАТОРА: просмотры, клики и действия администратора полностью исключаются из статистики
+      if (isAdmin || isAdministratorSession()) {
+        return;
+      }
+
       const dedupeKey = `${eventName}_${data.vehicleId || ''}_${data.articleId || ''}_${data.path || window.location.pathname}`;
       const now = Date.now();
       if (
@@ -5742,7 +5759,7 @@ export function App() {
 
   // Automatic Page View Tracking for visitor sessions on route/view changes
   useEffect(() => {
-    if (currentView === 'admin') return; // Do not track admin visits to own panel
+    if (isAdmin || isAdministratorSession() || currentView === 'admin') return; // Do not track admin visits
 
     const timer = setTimeout(() => {
       if (currentView === 'home') {
@@ -6136,7 +6153,14 @@ export function App() {
     e.preventDefault();
     if (adminPassword === 'France2026') {
       setIsAdmin(true);
-      try { localStorage.setItem('ligo_admin_logged_in', 'true'); } catch {}
+      try { 
+        localStorage.setItem('ligo_admin_logged_in', 'true'); 
+        localStorage.setItem('ligo_is_admin_device', 'true');
+        const currentVid = localStorage.getItem('ligo_visitor_id');
+        if (currentVid) {
+          localStorage.setItem('ligo_admin_visitor_id', currentVid);
+        }
+      } catch {}
       setAdminLoginError(false);
       setAdminPassword('');
       showNotification("Connexion réussie au panneau d'administration", "success");
@@ -7483,7 +7507,15 @@ const renderAdminDashboard = () => {
         {/* TAB 5: ANALYTICS & TRAFFIC INSIGHTS */}
         {activeAdminTab === 'analytics' && (() => {
           const now = Date.now();
+          const adminVid = typeof window !== 'undefined' ? localStorage.getItem('ligo_visitor_id') : null;
+          const savedAdminVid = typeof window !== 'undefined' ? localStorage.getItem('ligo_admin_visitor_id') : null;
+
           const filteredEvents = analyticsEvents.filter(e => {
+            // ИСКЛЮЧЕНИЕ АДМИНИСТРАТОРА: действия админа и тестовые заходы с админского устройства не учитываются
+            if ((e as any).isAdmin || (e as any).isStaff) return false;
+            if (adminVid && e.visitorId === adminVid) return false;
+            if (savedAdminVid && e.visitorId === savedAdminVid) return false;
+
             const t = new Date(e.timestamp).getTime();
             if (analyticsPeriod === 'today') {
               const todayStart = new Date();
@@ -7578,7 +7610,7 @@ const renderAdminDashboard = () => {
               {/* Header with Period Switcher & Live indicator */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-900 rounded-2xl p-6 shadow-sm">
                 <div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <h3 className="text-xl font-serif text-neutral-900 dark:text-white flex items-center gap-2">
                       <span>📊</span> {lang === 'ru' ? 'Аналитика и статистика посетителей' : lang === 'en' ? 'Analytics & Traffic Insights' : 'Statistiques & Trafic Visiteurs'}
                     </h3>
@@ -7586,9 +7618,13 @@ const renderAdminDashboard = () => {
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                       Live Tracking
                     </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20" title={lang === 'ru' ? 'Просмотры и действия администратора автоматически исключены' : 'Admin actions excluded'}>
+                      <span>🛡️</span>
+                      {lang === 'ru' ? 'Только посетители (Админ исключен)' : lang === 'en' ? 'Visitors only (Admin excluded)' : 'Visiteurs uniquement (Admin exclu)'}
+                    </span>
                   </div>
                   <p className="text-neutral-600 dark:text-neutral-400 text-xs mt-1.5">
-                    {lang === 'ru' ? 'Отслеживание реальных заходов, просмотров авто, кликов по WhatsApp/телефону и переходов по статьям.' : 'Suivi en temps réel des consultations de véhicules, clics WhatsApp/appels et lectures d’articles.'}
+                    {lang === 'ru' ? 'Отслеживание реальных заходов незарегистрированных посетителей: просмотры авто, клики по WhatsApp/телефону и сравнения.' : 'Suivi en temps réel des visiteurs réels (hors administrateur) : consultations, clics WhatsApp/appels et comparateur.'}
                   </p>
                 </div>
 
@@ -11489,7 +11525,14 @@ return (
               e.preventDefault();
               if (adminPassword === 'France2026') {
                 setIsAdmin(true);
-                try { localStorage.setItem('ligo_admin_logged_in', 'true'); } catch {}
+                try { 
+                  localStorage.setItem('ligo_admin_logged_in', 'true'); 
+                  localStorage.setItem('ligo_is_admin_device', 'true');
+                  const currentVid = localStorage.getItem('ligo_visitor_id');
+                  if (currentVid) {
+                    localStorage.setItem('ligo_admin_visitor_id', currentVid);
+                  }
+                } catch {}
                 setShowAdminLoginModal(false);
                 setAdminPassword('');
                 navigateTo('admin');
