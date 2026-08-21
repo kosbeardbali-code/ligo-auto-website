@@ -3937,182 +3937,9 @@ export function normalizeCar(raw: any): Car {
 }
 
 
-const DEMO_CARS = [
-  {
-    id: "demo-1",
-    brand: "Porsche",
-    model: "911 GT3 RS",
-    year: 2023,
-    km: 4800,
-    price: 289000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 525,
-    co2: 290,
-    vin: "WP0ZZZ99ZPS240811",
-    status: "En stock",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuClvuoUxKQIu-RmKS7kxWdKDQU7g4pTofke_W29SOKrl2Q1zpfNa-82f2MdubRYVCgtf7fY3uZxofApF7_grlRusi7X1YiqOzf6sSjCkug0EyimW0dOSyFP8pzxz1Q6IN9BxQ9l893DsnYEry4D-SJB4j_K-_Y2-mnHNUltlBVqbZp1dckyEbOVDIR5oRm0eFGwKGSLWw2oSiTzS51KjpApor6UZCRhkFxe7M0U9YlAl2VUJgDiqiJN",
-    description: "État absolument parfait. Configuration de collection exclusive avec pack Weissach, freins carbone-céramique (PCCB), système d'élévation de l'essieu avant (Lift) et finition intérieure en cuir étendu/Alcantara avec surpiqûres jaune Racing. Garantie active Porsche Approved.",
-    description_en: "Absolutely perfect condition. Exclusive collector configuration with Weissach package, carbon-ceramic brakes (PCCB), front axle lift system, and extended leather/Alcantara interior with Racing Yellow stitching. Active Porsche Approved warranty.",
-    description_ru: "Состояние абсолютно идеальное. Эксклюзивная коллекционная конфигурация с пакетом Weissach, карбоно-керамическими тормозами (PCCB), системой подъема передней оси (Lift) и отделкой салона расширенной кожей/Alcantara с контрастной прострочкой цвета Racing Yellow. Активная гарантия Porsche Approved.",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 1
-  },
-  {
-    id: "demo-2",
-    brand: "Ferrari",
-    model: "F8 Tributo",
-    year: 2022,
-    km: 7200,
-    price: 315000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 720,
-    co2: 280,
-    vin: "ZFF81AHA000284561",
-    status: "En stock",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDTbmRwZBxvLeWY9FCQrzSC13P-Qss_BKa7Qc8_ObbsE0jBoWhgUgSsrc-CVB3s0Cetf6ClQUG8gfv91j9OyK2NRGJagwp7_kRessWeAIGxAHY1iD52m8tM5_UTomP8KGb6RuhB59kky40dfd5GRULpGKRB707GiWnRtuFPhd-3YKAREzTR6dHeFGVwVTkcTzzG7ZMqPEtdpvjTUkudUZmDwZEtaOXIO8yhWzQRYg3MLEMcwWscKt1D",
-    description: "Peinture originale Rosso Corsa avec toit contrasté Nero DS. Équipée de jantes forgées 20 pouces, étriers de frein jaunes, sièges racing Daytona en fibre de carbone et finition carbone. Protection complète par film transparent (PPF).",
-    description_en: "Original Rosso Corsa paint with contrasting Nero DS roof. Equipped with 20-inch forged wheels, yellow brake calipers, Daytona carbon fiber racing seats, and carbon interior trim. Fully covered with transparent protective film (PPF).",
-    description_ru: "Оригинальная краска Rosso Corsa с контрастной крышей Nero DS. Оснащена 20-дюймовыми коваными дисками, окрашенными в желтый цвет тормозными суппортами, гоночными сиденьями из углеродного волокна Daytona и отделкой салона карбоном. Полностью покрыта прозрачной защитной пленкой (PPF).",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 2
-  },
-  {
-    id: "demo-3",
-    brand: "Audi",
-    model: "RS6 Avant Performance",
-    year: 2024,
-    km: 12000,
-    price: 154900,
-    fuel: "Hybride",
-    transmission: "Automatique",
-    hp: 630,
-    co2: 215,
-    vin: "WAUZZZ4GZPS182455",
-    status: "En arrivage",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCUegYAhIi4Tgdh7bIIdSIHMP8BdTXPie_4Ot2mQza2NVN-2mMNXgAlZSZJEyJqf9NCRDruU3lbuCUKKPoTo44eSwyIN6Jme_aG9f7IR03ezODgtdMbvbfM57ue1gECOBoTVy50vjv3ipd0dNjg1NNosiWdIgC-Dxong1pKNojzUw8ic5Vx9Rtyf3Vh9D-cgvgzVhvGnHlH9eUo5jHBWvRZTINSiE8LiYBPcp8A_XHM5Jvl3BDRySKT",
-    description: "Premier propriétaire. Magnifique teinte métallisée Noir Mythic d'Audi Exclusive. Configuration maximale avec roues arrière directrices, échappement sport RS, phares HD Matrix LED avec technologie laser et système audio Bang & Olufsen Advanced 3D.",
-    description_en: "First owner. Beautiful Mythic Black metallic color from Audi Exclusive. Maximum options including rear-wheel steering, RS sport exhaust, HD Matrix LED headlights with laser light, and Bang & Olufsen Advanced 3D sound system.",
-    description_ru: "Первый владелец. Красивейший цвет металлик Mythic Black от Audi Exclusive. Максимальная комплектация, включающая полноуправляемое шасси (подруливающие задние колеса), спортивный выхлоп RS, фары HD Matrix LED с лазерной оптикой последнего поколения и премиальную аудиосистему Bang & Olufsen Advanced 3D.",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 3
-  },
-  {
-    id: "demo-4",
-    brand: "Aston Martin",
-    model: "Vantage V8 F1 Edition",
-    year: 2023,
-    km: 8500,
-    price: 179000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 535,
-    co2: 263,
-    vin: "SCFKS53E8PGC02415",
-    status: "En stock",
-    image: "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&q=80&w=1200",
-    description: "Série spéciale F1 Edition. Teinte exclusive Satin Aston Martin Racing Green. Châssis optimisé, kit aérodynamique spécifique apportant un appui supplémentaire, et jantes exclusives de 21 pouces. Échappement sport actif.",
-    description_en: "Special F1 Edition series. Unique Satin Aston Martin Racing Green color. Optimized chassis, special aerodynamic kit creating additional downforce, and exclusive 21-inch wheels. Active sport exhaust.",
-    description_ru: "Специальная серия F1 Edition. Уникальный цвет Satin Aston Martin Racing Green. Оптимизированное шасси, специальный аэродинамический комплект, создающий дополнительную прижимную силу, и эксклюзивные 21-дюймовые диски. Активный спортивный выхлоп.",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 4
-  },
-  {
-    id: "demo-5",
-    brand: "Lamborghini",
-    model: "Huracán Tecnica",
-    year: 2023,
-    km: 3900,
-    price: 295000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 640,
-    co2: 328,
-    vin: "ZH1UA5ZS4NLA09812",
-    status: "En stock",
-    image: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200",
-    description: "Moteur V10 atmosphérique de 640 chevaux. Propulsion arrière avec roues arrière directrices. Peinture métallisée Verde Selvans. Pack carbone complet intérieur et extérieur, freins carbone-céramique.",
-    description_en: "Naturally aspirated 640 hp V10 engine. Rear-wheel drive with rear-wheel steering. Verde Selvans metallic paint. Full carbon pack interior and exterior, carbon-ceramic brakes.",
-    description_ru: "Атмосферный двигатель V10 мощностью 640 лошадиных сил. Задний привод с подруливающей задней осью. Окраска кузова металлик Verde Selvans. Полный карбоновый пакет салона и экстерьера, карбоно-керамические тормоза.",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 5
-  },
-  {
-    id: "demo-6",
-    brand: "Mercedes-Benz",
-    model: "AMG GT 63 S E Performance",
-    year: 2022,
-    km: 14500,
-    price: 168000,
-    fuel: "Hybride",
-    transmission: "Automatique",
-    hp: 843,
-    co2: 180,
-    vin: "WDD1903781A024105",
-    status: "En stock",
-    image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=1200",
-    description: "Technologie hybride E Performance issue de la Formule 1. Puissance cumulée de 843 ch. Teinte mate designo Gris Sélénite Magno. Toit panoramique, système de freinage haute performance AMG en céramique.",
-    description_en: "Formula 1 derived E Performance hybrid technology. Combined power of 843 hp. designo Selenite Grey Magno matte paint. Panoramic sunroof, AMG high-performance ceramic braking system.",
-    description_ru: "Гибридная технология E Performance, заимствованная из Формулы-1. Суммарная мощность 843 л.с. Матовый цвет Gris Sélénite Magno designo (матовый). Панорамный люк, высокоэффективная тормозная система AMG из керамики.",
-    verifiedVin: true,
-    featuredOnHomepage: true,
-    homepageOrder: 6
-  },
-  {
-    id: "demo-7",
-    brand: "Bentley",
-    model: "Continental GT V8 Mulliner",
-    year: 2021,
-    km: 19800,
-    price: 225000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 550,
-    co2: 268,
-    vin: "SCBGD4ZG8MC084155",
-    status: "En stock",
-    image: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&q=80&w=1200",
-    description: "Finition exclusive Mulliner. Intérieur en cuir matelassé fait main avec motif double losange. Peinture Onyx Black. Système audio Naim for Bentley d'une précision exceptionnelle, suspension pneumatique adaptative Bentley Dynamic Ride.",
-    description_en: "Exclusive Mulliner spec. Handcrafted quilted leather interior with double diamond pattern. Onyx Black exterior. Naim for Bentley ultra-premium audio system, Bentley Dynamic Ride active adaptive air suspension.",
-    description_ru: "Эксклюзивная отделка Mulliner. Салон из стеганой кожи ручной работы с двойным ромбовидным узором. Окраска кузова Onyx Black. Аудиосистема Naim для Bentley исключительной точности звучания, активная адаптивная пневмоподвеска Bentley Dynamic Ride.",
-    verifiedVin: true,
-    featuredOnHomepage: false,
-    homepageOrder: 7
-  },
-  {
-    id: "demo-8",
-    brand: "Maserati",
-    model: "MC20 Cielo",
-    year: 2023,
-    km: 2100,
-    price: 245000,
-    fuel: "Essence",
-    transmission: "Automatique",
-    hp: 630,
-    co2: 262,
-    vin: "ZAM82CMA0P1028456",
-    status: "En stock",
-    image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=1200",
-    description: "Version Spyder Cielo avec toit en verre électrochrome intelligent. Moteur V6 Nettuno à double combustion issu de la F1. Couleur de carrosserie Acquamarina. Monocoque ultraléger en fibre de carbone.",
-    description_en: "Spyder Cielo version with smart electrochromic glass roof. F1-derived Nettuno twin-combustion V6 engine. Acquamarina body color. Ultra-lightweight carbon fiber monocoque.",
-    description_ru: "Версия Spyder Cielo с умной электрохромной стеклянной крышей. Двигатель V6 Nettuno с двойным сгоранием, созданный на основе технологий F1. Цвет кузова Acquamarina. Сверхлегкий монокок из углеродного волокна.",
-    verifiedVin: true,
-    featuredOnHomepage: false,
-    homepageOrder: 8
-  }
-];
-
-
-
 export const loadLocalCars = (): Car[] => {
   try {
-    const saved = localStorage.getItem("cars");
+    const saved = localStorage.getItem("ligo_cars_cache") || localStorage.getItem("cars");
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -4122,7 +3949,7 @@ export const loadLocalCars = (): Car[] => {
   } catch (e) {
     console.error("Failed to parse local cars:", e);
   }
-  return DEMO_CARS.map(normalizeCar);
+  return [];
 };
 
 
@@ -4278,6 +4105,28 @@ export function App() {
 
   // Cars, Articles, Categories collections state
   const [cars, setCars] = useState<Car[]>(loadLocalCars);
+  const [isCarsLoaded, setIsCarsLoaded] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("ligo_cars_cache") || localStorage.getItem("cars");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) && parsed.length > 0;
+      }
+    } catch {}
+    return false;
+  });
+
+  // Cars local cache
+  useEffect(() => {
+    try {
+      if (cars && cars.length > 0) {
+        localStorage.setItem('ligo_cars_cache', JSON.stringify(cars));
+      }
+    } catch (e) {
+      console.warn('Failed to cache cars to localStorage', e);
+    }
+  }, [cars]);
+
   const [articles, setArticles] = useState<Article[]>(loadLocalArticles);
   // Articles local cache
   useEffect(() => {
@@ -4944,10 +4793,15 @@ export function App() {
           );
           if (found) {
             setSelectedCar(found);
-            setActiveImage(found.image || '');
-            setCurrentCarGallery([found.image, ...(found.galleryImages || [])].filter(Boolean));
+            const heroImg = found.imagesResponsive?.w1200 || found.image1200 || found.image || '';
+            setActiveImage(heroImg);
+            setCurrentCarGallery([heroImg, ...(found.galleryImages || [])].filter(Boolean));
+            setCurrentView('car-details');
+          } else if (!isCarsLoaded) {
+            // Firestore data is still fetching on fresh load/refresh: keep car-details view and wait for data
             setCurrentView('car-details');
           } else {
+            // All cars loaded and slug genuinely not found
             setCurrentView('catalog');
           }
         } else {
@@ -5085,15 +4939,18 @@ export function App() {
   useEffect(() => {
     const carsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
     const unsubscribeCars = onSnapshot(query(carsCollectionRef), (snapshot) => {
-      if (!snapshot.empty) {
-        const list: Car[] = [];
-        snapshot.forEach((docSnap) => {
-          list.push(normalizeCar({ id: docSnap.id, ...docSnap.data() }));
-        });
-        setCars(list);
-      }
+      const list: Car[] = [];
+      snapshot.forEach((docSnap) => {
+        list.push(normalizeCar({ id: docSnap.id, ...docSnap.data() }));
+      });
+      setCars(list);
+      setIsCarsLoaded(true);
+      try {
+        localStorage.setItem('ligo_cars_cache', JSON.stringify(list));
+      } catch {}
     }, (err) => {
       console.warn('Firestore cars sync warning:', err);
+      setIsCarsLoaded(true);
     });
 
     const articlesCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'articles');
@@ -9326,6 +9183,16 @@ return (
               </section>
             );
           })()}
+        </section>
+      )}
+
+      {/* Car details loading state while fetching */}
+      {currentView === 'car-details' && !selectedCar && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <div className="inline-block w-10 h-10 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-neutral-500 text-sm font-medium">
+            {lang === 'ru' ? 'Загрузка информации об автомобиле...' : lang === 'en' ? 'Loading vehicle details...' : 'Chargement des détails du véhicule...'}
+          </p>
         </section>
       )}
 
