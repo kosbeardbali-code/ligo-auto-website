@@ -132,6 +132,36 @@ export interface ResponsiveImageMap {
   w1600?: string;
 }
 
+export interface VehicleImageAsset {
+  id: string;
+  storageKey: string;
+  url: string;
+  thumbnailUrl?: string; // 400px for admin grid & preview
+  mediumUrl?: string;    // 800px for catalog cards
+  fullUrl?: string;      // 1600px for hero & lightbox
+  width: number;
+  height: number;
+  mimeType: string;
+  sizeBytes: number;
+  isPrimary: boolean;
+  sortOrder: number;
+  alt?: string;
+  status: 'pending' | 'uploading' | 'processing' | 'ready' | 'error';
+  errorMessage?: string;
+  createdAt: string;
+}
+
+export interface UploadQueueItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+  progress: number;
+  stage: string;
+  status: 'pending' | 'uploading' | 'processing' | 'ready' | 'error';
+  errorMessage?: string;
+  asset?: VehicleImageAsset;
+}
+
 export interface ResponsiveImageVersion {
   url: string;
   blob?: Blob;
@@ -762,6 +792,76 @@ export async function uploadGalleryImageFile(file: File, onProgress?: (pct: numb
   });
   onProgress?.(100);
   return cloudUrl;
+}
+
+/**
+ * Uploads a vehicle photo to persistent cloud storage with single WebP compression from original,
+ * metadata extraction (dimensions, byte size, mime type), and unique storage key generation.
+ */
+export async function uploadPersistentVehicleAsset(
+  file: File,
+  carId: string = 'car',
+  sortOrder: number = 0,
+  isPrimary: boolean = false,
+  onProgress?: (pct: number, stage: string) => void
+): Promise<VehicleImageAsset> {
+  const assetId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const cleanCarId = (carId || 'car').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
+  const storageKey = `vehicles/${cleanCarId}/${assetId}/original.webp`;
+
+  onProgress?.(10, 'Чтение файла...');
+
+  // 1. Extract image dimensions
+  let origWidth = 1600;
+  let origHeight = 1200;
+  try {
+    const dims = await new Promise<{ width: number; height: number }>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ width: img.naturalWidth || img.width || 1600, height: img.naturalHeight || img.height || 1200 });
+      img.onerror = () => resolve({ width: 1600, height: 1200 });
+      img.src = URL.createObjectURL(file);
+    });
+    origWidth = dims.width;
+    origHeight = dims.height;
+  } catch (e) {}
+
+  onProgress?.(30, 'Оптимизация WebP...');
+
+  // 2. High-quality WebP compression from original
+  const webpBlob = await compressImageToWebpBlob(file, 1600, 1200, 0.82);
+
+  onProgress?.(50, 'Загрузка в облако...');
+
+  // 3. Upload to persistent cloud storage
+  const filename = `${assetId}_${(file.name || 'photo').replace(/[^a-zA-Z0-9._-]/g, '_')}.webp`;
+  const cloudUrl = await uploadBlobToCloud(webpBlob, filename, (uploadPct) => {
+    const totalPct = 50 + Math.round(uploadPct * 0.48);
+    onProgress?.(totalPct, `Загрузка: ${uploadPct}%`);
+  });
+
+  if (!cloudUrl || (!cloudUrl.startsWith('https://') && !cloudUrl.startsWith('http://'))) {
+    throw new Error('Не удалось получить постоянный URL хранилища');
+  }
+
+  onProgress?.(100, 'Готово');
+
+  return {
+    id: assetId,
+    storageKey,
+    url: cloudUrl,
+    thumbnailUrl: cloudUrl,
+    mediumUrl: cloudUrl,
+    fullUrl: cloudUrl,
+    width: Math.min(origWidth, 1600),
+    height: Math.min(origHeight, 1200),
+    mimeType: 'image/webp',
+    sizeBytes: webpBlob.size,
+    isPrimary,
+    sortOrder,
+    alt: '',
+    status: 'ready',
+    createdAt: new Date().toISOString()
+  };
 }
 
 
@@ -3540,6 +3640,7 @@ export interface Car {
   galleryImages?: string[];
   galleryImagesAlt?: string[];
   galleryImagesResponsive?: ResponsiveImageMap[];
+  images?: VehicleImageAsset[];
   description?: string;
   description_en?: string;
   description_ru?: string;
@@ -4081,6 +4182,77 @@ export function normalizeCar(raw: any): Car {
   const galleryImages = raw.galleryImages || [];
   const galleryImagesAlt = raw.galleryImagesAlt || [];
   const galleryImagesResponsive = raw.galleryImagesResponsive || [];
+
+  // Normalize structured VehicleImageAsset array
+  let images: VehicleImageAsset[] = [];
+  if (Array.isArray(raw.images) && raw.images.length > 0) {
+    images = raw.images.map((img: any, idx: number) => ({
+      id: img.id || `img_${idx}_${Date.now()}`,
+      storageKey: img.storageKey || `vehicles/${raw.id || 'car'}/${img.id || idx}/original.webp`,
+      url: img.url || '',
+      thumbnailUrl: img.thumbnailUrl || img.url || '',
+      mediumUrl: img.mediumUrl || img.url || '',
+      fullUrl: img.fullUrl || img.url || '',
+      width: Number(img.width) || 1600,
+      height: Number(img.height) || 1200,
+      mimeType: img.mimeType || 'image/webp',
+      sizeBytes: Number(img.sizeBytes) || 100000,
+      isPrimary: Boolean(img.isPrimary !== undefined ? img.isPrimary : idx === 0),
+      sortOrder: Number(img.sortOrder !== undefined ? img.sortOrder : idx),
+      alt: img.alt || '',
+      status: img.status || 'ready',
+      errorMessage: img.errorMessage || '',
+      createdAt: img.createdAt || raw.createdAt || new Date().toISOString()
+    }));
+  } else {
+    // Synthesize images array from legacy fields
+    if (image) {
+      images.push({
+        id: `img_primary_${raw.id || 'car'}`,
+        storageKey: `vehicles/${raw.id || 'car'}/primary/original.webp`,
+        url: image,
+        thumbnailUrl: image800 || image,
+        mediumUrl: image800 || image,
+        fullUrl: image1600 || image1200 || image,
+        width: 1600,
+        height: 1200,
+        mimeType: 'image/webp',
+        sizeBytes: 100000,
+        isPrimary: true,
+        sortOrder: 0,
+        alt: imageAlt,
+        status: 'ready',
+        createdAt: raw.createdAt || new Date().toISOString()
+      });
+    }
+    galleryImages.forEach((galUrl: string, gIdx: number) => {
+      if (galUrl) {
+        images.push({
+          id: `img_gal_${gIdx}_${raw.id || 'car'}`,
+          storageKey: `vehicles/${raw.id || 'car'}/gal_${gIdx}/original.webp`,
+          url: galUrl,
+          thumbnailUrl: galUrl,
+          mediumUrl: galUrl,
+          fullUrl: galUrl,
+          width: 1600,
+          height: 1200,
+          mimeType: 'image/webp',
+          sizeBytes: 100000,
+          isPrimary: false,
+          sortOrder: images.length,
+          alt: galleryImagesAlt[gIdx] || '',
+          status: 'ready',
+          createdAt: raw.createdAt || new Date().toISOString()
+        });
+      }
+    });
+  }
+
+  // Ensure exactly one primary image if images exist
+  if (images.length > 0 && !images.some(i => i.isPrimary)) {
+    images[0].isPrimary = true;
+  }
+
   const equipments: string[] = Array.isArray(raw.equipments) ? Array.from(new Set(raw.equipments.map((eq: any) => normalizeEquipmentKey(String(eq))))) : [];
   const customEquipments = Array.isArray(raw.customEquipments) ? raw.customEquipments : [];
   const faq = Array.isArray(raw.faq) && raw.faq.length > 0 ? raw.faq : generateCarDefaultFaq({ brand, model, engine, year, km, fuel, transmission, hp, price });
@@ -4164,6 +4336,7 @@ export function normalizeCar(raw: any): Car {
     galleryImages,
     galleryImagesAlt,
     galleryImagesResponsive,
+    images,
     seoTitle,
     metaDescription,
     focusKeyword,
@@ -4185,6 +4358,24 @@ export function normalizeCar(raw: any): Car {
   };
 }
 
+export const getCarHeroImageUrl = (car: Car | null | undefined): string => {
+  if (!car) return '';
+  if (car.images && car.images.length > 0) {
+    const primary = car.images.find(img => img.isPrimary) || car.images[0];
+    return primary?.url || car.image || '';
+  }
+  return car.imagesResponsive?.w1200 || car.image1200 || car.image || '';
+};
+
+export const getCarImageGalleryUrls = (car: Car | null | undefined): string[] => {
+  if (!car) return [];
+  if (car.images && car.images.length > 0) {
+    const primary = car.images.find(img => img.isPrimary) || car.images[0];
+    const rest = car.images.filter(img => img.id !== primary.id);
+    return [primary.url, ...rest.map(r => r.url)].filter(Boolean);
+  }
+  return [car.imagesResponsive?.w1200 || car.image1200 || car.image, ...(car.galleryImages || [])].filter(Boolean) as string[];
+};
 
 export const loadLocalCars = (): Car[] => {
   try {
@@ -4508,6 +4699,7 @@ export function App() {
   const [mainImageProgress, setMainImageProgress] = useState(0);
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [galleryProgress, setGalleryProgress] = useState({ current: 0, total: 0, pct: 0 });
+  const [uploadQueue, setUploadQueue] = useState<UploadQueueItem[]>([]);
 
   const [testDriveForm, setTestDriveForm] = useState<any>({
     name: '',
@@ -4799,6 +4991,39 @@ export function App() {
       galleryImages: base.galleryImages || [],
       galleryImagesAlt: base.galleryImagesAlt || [],
       galleryImagesResponsive: base.galleryImagesResponsive || [],
+      images: base.images && base.images.length > 0 ? base.images : (base.image ? [{
+        id: `img_primary_${base.id || 'car'}`,
+        storageKey: `vehicles/${base.id || 'car'}/primary/original.webp`,
+        url: base.image,
+        thumbnailUrl: base.image800 || base.image,
+        mediumUrl: base.image800 || base.image,
+        fullUrl: base.image1600 || base.image1200 || base.image,
+        width: 1600,
+        height: 1200,
+        mimeType: 'image/webp',
+        sizeBytes: 100000,
+        isPrimary: true,
+        sortOrder: 0,
+        alt: base.imageAlt || '',
+        status: 'ready' as const,
+        createdAt: new Date().toISOString()
+      }, ...(base.galleryImages || []).map((u, i) => ({
+        id: `img_gal_${i}_${base.id || 'car'}`,
+        storageKey: `vehicles/${base.id || 'car'}/gal_${i}/original.webp`,
+        url: u,
+        thumbnailUrl: u,
+        mediumUrl: u,
+        fullUrl: u,
+        width: 1600,
+        height: 1200,
+        mimeType: 'image/webp',
+        sizeBytes: 100000,
+        isPrimary: false,
+        sortOrder: i + 1,
+        alt: base.galleryImagesAlt?.[i] || '',
+        status: 'ready' as const,
+        createdAt: new Date().toISOString()
+      }))] : []),
       seoTitle: trans.fr?.seoTitle || '',
       metaDescription: trans.fr?.metaDescription || '',
       focusKeyword: trans.fr?.focusKeyword || '',
@@ -4931,9 +5156,10 @@ export function App() {
   ) => {
     setPreviousView(currentView);
     if (options?.car) {
-      setSelectedCar(options.car);
-      setActiveImage(options.car.image || '');
-      setCurrentCarGallery([options.car.image, ...(options.car.galleryImages || [])].filter(Boolean));
+      const normalized = normalizeCar(options.car);
+      setSelectedCar(normalized);
+      setActiveImage(getCarHeroImageUrl(normalized));
+      setCurrentCarGallery(getCarImageGalleryUrls(normalized));
     }
     if (options?.article) {
       setSelectedArticle(options.article);
@@ -5042,10 +5268,11 @@ export function App() {
             String(c.id) === slug
           );
           if (found) {
-            setSelectedCar(found);
-            const heroImg = found.imagesResponsive?.w1200 || found.image1200 || found.image || '';
+            const normalized = normalizeCar(found);
+            setSelectedCar(normalized);
+            const heroImg = getCarHeroImageUrl(normalized);
             setActiveImage(heroImg);
-            setCurrentCarGallery([heroImg, ...(found.galleryImages || [])].filter(Boolean));
+            setCurrentCarGallery(getCarImageGalleryUrls(normalized));
             setCurrentView('car-details');
           } else if (!isCarsLoaded) {
             // Firestore data is still fetching on fresh load/refresh: keep car-details view and wait for data
@@ -5277,39 +5504,120 @@ export function App() {
     }
   };
 
-  const handleMainImageUpload = async (file: File) => {
-    try {
-      setMainImageUploading(true);
-      setMainImageProgress(10);
-      showNotification("Оптимизация и сохранение фото в постоянное облачное хранилище...", "info");
-      const res = await uploadVehicleImageSet(file, (pct) => setMainImageProgress(pct));
-      setFormData(prev => ({ 
-        ...prev, 
-        image: res.url,
-        image800: res.url800,
-        image1200: res.url1200,
-        image1600: res.url1600,
-        imagesResponsive: res.responsiveMap
-      }));
-      showNotification(`✨ Главное фото загружено в облако: ${res.stats}`, "success");
-    } catch (e: any) {
-      showNotification(e?.message || "Ошибка при загрузке главного фото в облако", "error");
-    } finally {
-      setMainImageUploading(false);
-      setMainImageProgress(0);
+  // Managed Upload Queue & Persistent Vehicle Photo Handlers
+  const runQueueWorker = async (itemsToProcess: UploadQueueItem[], currentFormDataImages: VehicleImageAsset[] = []) => {
+    setGalleryUploading(true);
+    const CONCURRENCY = 3;
+    let index = 0;
+    let activeWorkers = 0;
+
+    let localImages = [...currentFormDataImages];
+
+    const worker = async () => {
+      while (index < itemsToProcess.length) {
+        const itemIdx = index++;
+        const item = itemsToProcess[itemIdx];
+        if (!item || item.status === 'ready') continue;
+
+        // Mark as uploading
+        setUploadQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'uploading', progress: 10, stage: 'Оптимизация...' } : q));
+
+        try {
+          const isPrimary = localImages.length === 0;
+          const sortOrder = localImages.length;
+          const carIdPrefix = `${(formData.brand || 'car')}_${(formData.model || '')}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+
+          const asset = await uploadPersistentVehicleAsset(
+            item.file,
+            carIdPrefix,
+            sortOrder,
+            isPrimary,
+            (pct, stage) => {
+              setUploadQueue(prev => prev.map(q => q.id === item.id ? { ...q, progress: pct, stage } : q));
+            }
+          );
+
+          localImages.push(asset);
+
+          // Update item to ready
+          setUploadQueue(prev => prev.map(q => q.id === item.id ? { ...q, status: 'ready', progress: 100, stage: 'Готово', asset } : q));
+
+          // Sync into formData.images
+          setFormData(prev => {
+            const currentList = prev.images || [];
+            const updated = [...currentList, asset];
+            if (!updated.some(img => img.isPrimary) && updated.length > 0) {
+              updated[0].isPrimary = true;
+            }
+            const primary = updated.find(img => img.isPrimary) || updated[0];
+            const gallery = updated.filter(img => !img.isPrimary).map(img => img.url);
+
+            return {
+              ...prev,
+              images: updated,
+              image: primary ? primary.url : '',
+              image800: primary ? (primary.mediumUrl || primary.url) : '',
+              image1200: primary ? (primary.fullUrl || primary.url) : '',
+              image1600: primary ? (primary.fullUrl || primary.url) : '',
+              imagesResponsive: primary ? {
+                w800: primary.mediumUrl || primary.url,
+                w1200: primary.fullUrl || primary.url,
+                w1600: primary.fullUrl || primary.url,
+              } : {},
+              galleryImages: gallery,
+              galleryImagesAlt: updated.filter(img => !img.isPrimary).map(img => img.alt || '')
+            };
+          });
+
+          // Cleanup object URL
+          try { URL.revokeObjectURL(item.previewUrl); } catch (e) {}
+        } catch (err: any) {
+          console.error(`Upload failed for file ${item.file.name}:`, err);
+          setUploadQueue(prev => prev.map(q => q.id === item.id ? {
+            ...q,
+            status: 'error',
+            progress: 0,
+            stage: 'Ошибка загрузки',
+            errorMessage: err?.message || 'Сбой загрузки в хранилище'
+          } : q));
+        }
+      }
+    };
+
+    const workerPromises: Promise<void>[] = [];
+    for (let w = 0; w < Math.min(CONCURRENCY, itemsToProcess.length); w++) {
+      workerPromises.push(worker());
     }
+
+    await Promise.all(workerPromises);
+
+    setGalleryUploading(false);
+    setUploadQueue(prev => {
+      const remainingErrors = prev.filter(q => q.status === 'error');
+      const allReady = prev.filter(q => q.status === 'ready');
+      if (allReady.length > 0) {
+        showNotification(`✨ Обработано и сохранено ${allReady.length} фото!`, "success");
+      }
+      if (remainingErrors.length > 0) {
+        showNotification(`${remainingErrors.length} фото не удалось загрузить. Нажмите «Повторить».`, "warning");
+      }
+      return prev.filter(q => q.status !== 'ready');
+    });
   };
 
-  const handleGalleryImagesUpload = async (files: FileList | File[]) => {
-    const rawFiles = Array.from(files);
-    if (!rawFiles.length) return;
+  const handleUploadVehiclePhotos = async (files: FileList | File[]) => {
+    const rawFiles = Array.from(files).filter(f => f.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif)$/i.test(f.name));
+    if (!rawFiles.length) {
+      showNotification("Пожалуйста, выберите файлы изображений (JPG, PNG, WebP).", "warning");
+      return;
+    }
 
     const MAX_PHOTOS = 30;
-    const currentImgs = formData.galleryImages || [];
+    const currentImgs = formData.images || [];
     const currentCount = currentImgs.length;
 
     if (currentCount >= MAX_PHOTOS) {
-      showNotification(`В галерее уже загружено максимальное количество (${MAX_PHOTOS}) фото.`, "warning");
+      showNotification(`В автомобиле уже загружено максимальное количество (${MAX_PHOTOS}) фото.`, "warning");
       return;
     }
 
@@ -5317,76 +5625,155 @@ export function App() {
     const filesToUpload = rawFiles.slice(0, availableSlots);
 
     if (rawFiles.length > availableSlots) {
-      showNotification(`Выбрано ${rawFiles.length} фото. Будет загружено ${availableSlots} (лимит: ${MAX_PHOTOS} фото).`, "info");
-    } else {
-      showNotification(`Оптимизация и загрузка ${filesToUpload.length} фото в галерею...`, "info");
+      showNotification(`Выбрано ${rawFiles.length} фото. Будет загружено ${availableSlots} (максимум: ${MAX_PHOTOS} фото).`, "info");
     }
 
-    try {
-      setGalleryUploading(true);
-      setGalleryProgress({ current: 0, total: filesToUpload.length, pct: 0 });
+    const newQueueItems: UploadQueueItem[] = filesToUpload.map((file, idx) => ({
+      id: `queue_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 6)}`,
+      file,
+      previewUrl: URL.createObjectURL(file),
+      progress: 0,
+      stage: 'В очереди...',
+      status: 'pending'
+    }));
 
-      let successCount = 0;
+    setUploadQueue(prev => [...prev, ...newQueueItems]);
+    runQueueWorker(newQueueItems, currentImgs);
+  };
 
-      for (let i = 0; i < filesToUpload.length; i++) {
-        const file = filesToUpload[i];
-        setGalleryProgress({
-          current: i + 1,
-          total: filesToUpload.length,
-          pct: Math.round(((i + 1) / filesToUpload.length) * 100)
-        });
+  const handleRetryUploadQueueItem = (queueId: string) => {
+    const item = uploadQueue.find(q => q.id === queueId);
+    if (!item) return;
 
-        try {
-          // Fast single WebP cloud upload (1600px quality 0.82)
-          const photoUrl = await uploadGalleryImageFile(file);
-          if (photoUrl) {
-            successCount++;
-            setFormData(prev => {
-              const currentList = prev.galleryImages || [];
-              const currentAlts = prev.galleryImagesAlt || [];
-              if (currentList.length >= MAX_PHOTOS) return prev;
-              return {
-                ...prev,
-                galleryImages: [...currentList, photoUrl],
-                galleryImagesAlt: [...currentAlts, '']
-              };
-            });
-          }
-        } catch (imgErr: any) {
-          console.warn(`Cloud upload issue on photo #${i + 1}, using optimized local WebP:`, imgErr);
-          try {
-            const fallbackWebp = await compressImageToWebpBase64(file, 1200, 900, 0.75);
-            if (fallbackWebp) {
-              successCount++;
-              setFormData(prev => {
-                const currentList = prev.galleryImages || [];
-                const currentAlts = prev.galleryImagesAlt || [];
-                if (currentList.length >= MAX_PHOTOS) return prev;
-                return {
-                  ...prev,
-                  galleryImages: [...currentList, fallbackWebp],
-                  galleryImagesAlt: [...currentAlts, '']
-                };
-              });
-            }
-          } catch (fErr) {
-            console.error(`Failed to process photo #${i + 1}:`, fErr);
-          }
-        }
+    const retryItem: UploadQueueItem = {
+      ...item,
+      status: 'pending',
+      progress: 0,
+      stage: 'Повторная попытка...',
+      errorMessage: undefined
+    };
+
+    setUploadQueue(prev => prev.map(q => q.id === queueId ? retryItem : q));
+    runQueueWorker([retryItem], formData.images || []);
+  };
+
+  const handleCancelUploadQueueItem = (queueId: string) => {
+    setUploadQueue(prev => {
+      const item = prev.find(q => q.id === queueId);
+      if (item?.previewUrl) {
+        try { URL.revokeObjectURL(item.previewUrl); } catch (e) {}
+      }
+      return prev.filter(q => q.id !== queueId);
+    });
+  };
+
+  const handleSetPrimaryAsset = (assetId: string) => {
+    setFormData(prev => {
+      const currentList = prev.images || [];
+      const updated = currentList.map(img => ({
+        ...img,
+        isPrimary: img.id === assetId
+      }));
+
+      const primary = updated.find(img => img.isPrimary) || updated[0];
+      const gallery = updated.filter(img => !img.isPrimary).map(img => img.url);
+
+      return {
+        ...prev,
+        images: updated,
+        image: primary ? primary.url : '',
+        image800: primary ? (primary.mediumUrl || primary.url) : '',
+        image1200: primary ? (primary.fullUrl || primary.url) : '',
+        image1600: primary ? (primary.fullUrl || primary.url) : '',
+        imagesResponsive: primary ? {
+          w800: primary.mediumUrl || primary.url,
+          w1200: primary.fullUrl || primary.url,
+          w1600: primary.fullUrl || primary.url,
+        } : {},
+        galleryImages: gallery,
+        galleryImagesAlt: updated.filter(img => !img.isPrimary).map(img => img.alt || '')
+      };
+    });
+    showNotification("Главное фото автомобиля обновлено!", "success");
+  };
+
+  const handleRemoveAsset = (assetId: string) => {
+    setFormData(prev => {
+      const currentList = prev.images || [];
+      let updated = currentList.filter(img => img.id !== assetId);
+
+      // If removed photo was primary, make the first remaining photo primary
+      if (updated.length > 0 && !updated.some(img => img.isPrimary)) {
+        updated[0] = { ...updated[0], isPrimary: true };
       }
 
-      if (successCount > 0) {
-        showNotification(`✨ Успешно добавлено ${successCount} фото в галерею!`, "success");
-      } else {
-        showNotification("Не удалось загрузить выбранные фото.", "error");
-      }
-    } catch (e: any) {
-      console.error("Gallery upload error:", e);
-      showNotification(e?.message || "Ошибка при загрузке фото в галерею", "error");
-    } finally {
-      setGalleryUploading(false);
-      setGalleryProgress({ current: 0, total: 0, pct: 0 });
-    }
+      // Re-index sortOrder
+      updated = updated.map((img, idx) => ({ ...img, sortOrder: idx }));
+
+      const primary = updated.find(img => img.isPrimary) || updated[0];
+      const gallery = updated.filter(img => !img.isPrimary).map(img => img.url);
+
+      return {
+        ...prev,
+        images: updated,
+        image: primary ? primary.url : '',
+        image800: primary ? (primary.mediumUrl || primary.url) : '',
+        image1200: primary ? (primary.fullUrl || primary.url) : '',
+        image1600: primary ? (primary.fullUrl || primary.url) : '',
+        imagesResponsive: primary ? {
+          w800: primary.mediumUrl || primary.url,
+          w1200: primary.fullUrl || primary.url,
+          w1600: primary.fullUrl || primary.url,
+        } : {},
+        galleryImages: gallery,
+        galleryImagesAlt: updated.filter(img => !img.isPrimary).map(img => img.alt || '')
+      };
+    });
+    showNotification("Фото удалено из автомобиля.", "info");
+  };
+
+  const handleMoveAsset = (assetId: string, direction: 'left' | 'right') => {
+    setFormData(prev => {
+      const currentList = [...(prev.images || [])];
+      const index = currentList.findIndex(img => img.id === assetId);
+      if (index === -1) return prev;
+
+      const targetIndex = direction === 'left' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= currentList.length) return prev;
+
+      // Swap
+      const temp = currentList[index];
+      currentList[index] = currentList[targetIndex];
+      currentList[targetIndex] = temp;
+
+      // Re-index sortOrder
+      const updated = currentList.map((img, idx) => ({ ...img, sortOrder: idx }));
+      const primary = updated.find(img => img.isPrimary) || updated[0];
+      const gallery = updated.filter(img => !img.isPrimary).map(img => img.url);
+
+      return {
+        ...prev,
+        images: updated,
+        image: primary ? primary.url : '',
+        galleryImages: gallery
+      };
+    });
+  };
+
+  const handleUpdateAssetAlt = (assetId: string, alt: string) => {
+    setFormData(prev => {
+      const currentList = prev.images || [];
+      const updated = currentList.map(img => img.id === assetId ? { ...img, alt } : img);
+      return { ...prev, images: updated };
+    });
+  };
+
+  const handleMainImageUpload = async (file: File) => {
+    await handleUploadVehiclePhotos([file]);
+  };
+
+  const handleGalleryImagesUpload = async (files: FileList | File[]) => {
+    await handleUploadVehiclePhotos(files);
   };
 
   const handleArticleFeaturedImageUpload = async (file: File) => {
@@ -5796,9 +6183,9 @@ export function App() {
     setPreviousView(currentView);
     setCurrentView('car-details');
     setActiveDetailsTab('specs');
-    const heroImage = normalized.imagesResponsive?.w1200 || normalized.image1200 || normalized.image || '';
+    const heroImage = getCarHeroImageUrl(normalized);
     setActiveImage(heroImage);
-    setCurrentCarGallery([heroImage, ...(normalized.galleryImages || [])].filter(Boolean));
+    setCurrentCarGallery(getCarImageGalleryUrls(normalized));
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -6269,11 +6656,54 @@ export function App() {
       focusKeyword: formData.translations?.ru?.focusKeyword || `купить ${brand} ${model}`.toLowerCase()
     };
 
+    // Save protection: prevent saving if queue is active
+    if (uploadQueue.some(i => i.status === 'uploading' || i.status === 'processing')) {
+      showNotification("Пожалуйста, дождитесь завершения загрузки всех фотографий перед сохранением автомобиля.", "warning");
+      return;
+    }
+
+    // Filter and sanitize images: only persistent cloud URLs allowed
+    const validAssets: VehicleImageAsset[] = (formData.images || [])
+      .filter(img => img && typeof img.url === 'string' && (img.url.startsWith('https://') || img.url.startsWith('http://')))
+      .map((img, idx) => ({
+        ...img,
+        sortOrder: idx
+      }));
+
+    if (validAssets.length > 0 && !validAssets.some(img => img.isPrimary)) {
+      validAssets[0].isPrimary = true;
+    }
+
+    const primaryAsset = validAssets.find(img => img.isPrimary) || validAssets[0];
+    const finalImage = primaryAsset ? primaryAsset.url : (image.startsWith('http') ? image : '');
+    const finalImage800 = primaryAsset ? (primaryAsset.mediumUrl || primaryAsset.url) : finalImage;
+    const finalImage1200 = primaryAsset ? (primaryAsset.fullUrl || primaryAsset.url) : finalImage;
+    const finalImage1600 = primaryAsset ? (primaryAsset.fullUrl || primaryAsset.url) : finalImage;
+    const finalGalleryImages = validAssets.filter(img => !img.isPrimary).map(img => img.url);
+    const finalGalleryImagesAlt = validAssets.filter(img => !img.isPrimary).map(img => img.alt || '');
+
     const carData: Partial<Car> = {
       brand, model, engine, year, km, price, fuel, transmission, hp, co2, vin, status,
-      image, image800, image1200, image1600, imagesResponsive,
-      imageAlt, color, doors, seats, bodyType, verifiedVin,
-      featuredOnHomepage, homepageOrder, galleryImages, galleryImagesAlt, galleryImagesResponsive, equipments, customEquipments, faq,
+      image: finalImage,
+      image800: finalImage800,
+      image1200: finalImage1200,
+      image1600: finalImage1600,
+      imagesResponsive: finalImage ? {
+        w800: finalImage800,
+        w1200: finalImage1200,
+        w1600: finalImage1600
+      } : undefined,
+      imageAlt: primaryAsset?.alt || imageAlt,
+      images: validAssets,
+      galleryImages: finalGalleryImages,
+      galleryImagesAlt: finalGalleryImagesAlt,
+      galleryImagesResponsive: validAssets.filter(img => !img.isPrimary).map(img => ({
+        w800: img.mediumUrl || img.url,
+        w1200: img.fullUrl || img.url,
+        w1600: img.fullUrl || img.url
+      })),
+      color, doors, seats, bodyType, verifiedVin,
+      featuredOnHomepage, homepageOrder, equipments, customEquipments, faq,
       description: frTrans.description,
       description_en: enTrans.description,
       description_ru: ruTrans.description,
@@ -6285,46 +6715,9 @@ export function App() {
       updatedAt: new Date().toISOString()
     };
 
-    showNotification("Сохранение и синхронизация в облако...", "info");
+    showNotification("Сохранение в базу данных...", "info");
 
     try {
-      const cleanCarPrefix = `${(brand || 'car').replace(/[^a-zA-Z0-9]/g, '_')}_${(model || '').replace(/[^a-zA-Z0-9]/g, '_')}`.toLowerCase();
-
-      // Ensure main photo and responsive resolutions are persistent cloud URLs
-      const cloudMainImage = await ensureCloudUrl(image, `${cleanCarPrefix}_main`);
-      const cloudImage800 = image800 ? await ensureCloudUrl(image800, `${cleanCarPrefix}_800w`) : cloudMainImage;
-      const cloudImage1200 = image1200 ? await ensureCloudUrl(image1200, `${cleanCarPrefix}_1200w`) : cloudMainImage;
-      const cloudImage1600 = image1600 ? await ensureCloudUrl(image1600, `${cleanCarPrefix}_1600w`) : cloudMainImage;
-
-      const cloudImagesResponsive: ResponsiveImageMap = {
-        w800: imagesResponsive?.w800 ? await ensureCloudUrl(imagesResponsive.w800, `${cleanCarPrefix}_resp_800w`) : cloudImage800,
-        w1200: imagesResponsive?.w1200 ? await ensureCloudUrl(imagesResponsive.w1200, `${cleanCarPrefix}_resp_1200w`) : cloudImage1200,
-        w1600: imagesResponsive?.w1600 ? await ensureCloudUrl(imagesResponsive.w1600, `${cleanCarPrefix}_resp_1600w`) : cloudImage1600,
-      };
-
-      // Ensure gallery photos are persistent cloud URLs
-      const cloudGalleryImages: string[] = [];
-      for (let i = 0; i < (galleryImages || []).length; i++) {
-        const gUrl = await ensureCloudUrl(galleryImages[i], `${cleanCarPrefix}_gal_${i}`);
-        cloudGalleryImages.push(gUrl);
-      }
-
-      const cloudGalleryResponsive: ResponsiveImageMap[] = (galleryImagesResponsive || []).length > 0
-        ? (galleryImagesResponsive || []).map((item, i) => ({
-            w800: item?.w800 || cloudGalleryImages[i] || '',
-            w1200: item?.w1200 || cloudGalleryImages[i] || '',
-            w1600: item?.w1600 || cloudGalleryImages[i] || '',
-          }))
-        : [];
-
-      carData.image = cloudMainImage;
-      carData.image800 = cloudImage800;
-      carData.image1200 = cloudImage1200;
-      carData.image1600 = cloudImage1600;
-      carData.imagesResponsive = cloudImagesResponsive;
-      carData.galleryImages = cloudGalleryImages;
-      carData.galleryImagesResponsive = cloudGalleryResponsive;
-
       const payload = cleanFirestoreData(carData);
 
       if (carToEdit && carToEdit.id) {
@@ -6341,11 +6734,11 @@ export function App() {
         const newCar = { id: docAdded.id, ...carData, createdAt: new Date().toISOString() } as Car;
         setCars(prev => [newCar, ...prev]);
       }
-      showNotification("Автомобиль успешно сохранен в облачной базе!", "success");
+      showNotification("✨ Автомобиль успешно сохранен в облачной базе!", "success");
       setShowAddEditModal(false);
     } catch (err: any) {
       console.error("Save cloud error:", err);
-      // Fallback offline update
+      // Fallback local update
       if (carToEdit && carToEdit.id) {
         const targetId = String(carToEdit.id);
         setCars(prev => prev.map(c => String(c.id) === targetId ? { ...c, ...carData, id: targetId } as Car : c));
@@ -8644,12 +9037,13 @@ return (
                   className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
                 >
                   <img 
-                    src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(800, 500, 24, 3)} 
+                    src={getCarHeroImageUrl(car) || getFallbackSvg(800, 500, 24, 3)} 
                     alt={`${car.brand} ${car.model}`}
                     loading="lazy"
                     decoding="async"
                     className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                     onError={(e) => {
+                      console.warn(`[Catalog] Failed to load image for car ${car.brand} ${car.model} (${car.id}):`, (e.currentTarget as HTMLImageElement).src);
                       const fallback = getFallbackSvg(800, 500, 24, 3);
                       if (e.currentTarget.src !== fallback) {
                         e.currentTarget.src = fallback;
@@ -9192,12 +9586,16 @@ return (
                 onClick={() => { setLightboxIndex(currentCarGallery.indexOf(activeImage) || 0); setShowLightbox(true); }}
               >
                 <img 
-                  src={activeImage || selectedCar.imagesResponsive?.w1200 || selectedCar.image1200 || selectedCar.image || getFallbackSvg()} 
+                  src={activeImage || getCarHeroImageUrl(selectedCar) || getFallbackSvg()} 
                   alt={selectedCar.imageAlt || getCarMainImageAlt(selectedCar)} 
                   fetchPriority="high"
                   decoding="async"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
-                  onError={(e) => { const fb = getFallbackSvg(); if (e.currentTarget.src !== fb) e.currentTarget.src = fb; }} 
+                  onError={(e) => {
+                    console.warn(`[CarDetails] Hero image failed to load for ${selectedCar.brand} ${selectedCar.model}:`, (e.currentTarget as HTMLImageElement).src);
+                    const fb = getFallbackSvg();
+                    if (e.currentTarget.src !== fb) e.currentTarget.src = fb;
+                  }} 
                 />
                 <div className="absolute top-4 right-4 p-2.5 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm text-neutral-800 dark:text-neutral-200 shadow-md group-hover:scale-110 transition-transform">
                   <Icons.Maximize />
@@ -9229,7 +9627,11 @@ return (
                           src={img} 
                           alt={galleryAlt} 
                           className="w-full h-full object-cover" 
-                          onError={(e) => { const fb = getFallbackSvg(400, 250, 16, 2); if (e.currentTarget.src !== fb) e.currentTarget.src = fb; }} 
+                          onError={(e) => {
+                            console.warn(`[CarDetails] Gallery thumbnail #${idx + 1} failed to load:`, (e.currentTarget as HTMLImageElement).src);
+                            const fb = getFallbackSvg(400, 250, 16, 2);
+                            if (e.currentTarget.src !== fb) e.currentTarget.src = fb;
+                          }} 
                         />
                       </button>
                     );
@@ -9825,12 +10227,13 @@ return (
                   className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
                 >
                   <img 
-                    src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(800, 500, 24, 3)} 
+                    src={getCarHeroImageUrl(car) || getFallbackSvg(800, 500, 24, 3)} 
                     alt={`${car.brand} ${car.model}`}
                     loading="lazy"
                     decoding="async"
                     className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                     onError={(e) => {
+                      console.warn(`[Catalog] Failed to load image for car ${car.brand} ${car.model} (${car.id}):`, (e.currentTarget as HTMLImageElement).src);
                       const fallback = getFallbackSvg(800, 500, 24, 3);
                       if (e.currentTarget.src !== fallback) {
                         e.currentTarget.src = fallback;
@@ -9946,7 +10349,6 @@ return (
                       </div>
                     )}
                   </div>
-
                 </div>
               </div>
             ))}
@@ -9972,28 +10374,6 @@ return (
         </footer>
       )}
 
-
-      
-
-
-      
-
-
-      
-
-
-      
-
-
-      
-
-
-      
-
-
-      
-
-
       {/* Floating Comparison Bottom Bar */}
       {comparedCarIds.length > 0 && currentView !== 'comparison' && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-white/95 dark:bg-[#121214]/95 backdrop-blur-md border border-[#D4AF37]/50 shadow-2xl rounded-2xl p-4 flex items-center gap-4 max-w-lg w-[90%]">
@@ -10018,7 +10398,7 @@ return (
         </div>
       )}
 
-            {/* Модальное окно добавления/редактирования автомобиля */}
+      {/* Модальное окно добавления/редактирования автомобиля */}
       {showAddEditModal && (
         <div id="add-edit-modal-wrapper" className="fixed inset-0 z-50 flex justify-center items-start p-3 sm:p-6 bg-neutral-950/80 backdrop-blur-md overflow-y-auto">
           <div className="relative w-full max-w-4xl bg-white dark:bg-[#121214] border border-neutral-200 dark:border-neutral-800 rounded-3xl overflow-hidden shadow-2xl my-4 sm:my-8 text-neutral-900 dark:text-white flex flex-col max-h-[92vh]">
@@ -11058,14 +11438,16 @@ return (
                 </button>
                 <button 
                   type="submit" 
-                  disabled={mainImageUploading || galleryUploading}
+                  disabled={uploadQueue.some(q => q.status === 'uploading' || q.status === 'processing') || mainImageUploading || galleryUploading}
                   className={`flex-1 py-3.5 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all shadow-lg active:scale-[0.99] ${
-                    mainImageUploading || galleryUploading 
-                      ? 'bg-neutral-300 text-neutral-500 cursor-not-allowed' 
+                    (uploadQueue.some(q => q.status === 'uploading' || q.status === 'processing') || mainImageUploading || galleryUploading)
+                      ? 'bg-neutral-300 dark:bg-neutral-800 text-neutral-500 cursor-not-allowed' 
                       : 'bg-[#D4AF37] hover:bg-[#D4AF37]/90 text-neutral-950'
                   }`}
                 >
-                  {mainImageUploading || galleryUploading ? 'Загрузка медиа...' : 'СОХРАНИТЬ АВТОМОБИЛЬ'}
+                  {uploadQueue.some(q => q.status === 'uploading' || q.status === 'processing') || mainImageUploading || galleryUploading 
+                    ? 'Дождитесь завершения загрузки фотографий' 
+                    : 'СОХРАНИТЬ АВТОМОБИЛЬ'}
                 </button>
               </div>
             </form>
@@ -11856,7 +12238,7 @@ return (
           <button onClick={() => setShowLightbox(false)} className="absolute top-6 right-6 text-white/80 hover:text-white p-2 text-2xl z-50">✕</button>
           <button onClick={() => setLightboxIndex(prev => (prev - 1 + currentCarGallery.length) % currentCarGallery.length)} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 text-3xl">‹</button>
           <button onClick={() => setLightboxIndex(prev => (prev + 1) % currentCarGallery.length)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 text-3xl">›</button>
-          <img src={currentCarGallery[lightboxIndex] || selectedCar?.imagesResponsive?.w1600 || selectedCar?.image1600 || selectedCar?.image || ""} alt="Full view" className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl" />
+          <img src={currentCarGallery[lightboxIndex] || getCarHeroImageUrl(selectedCar) || ""} alt="Full view" className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl" />
         </div>
       )}
     </div>
