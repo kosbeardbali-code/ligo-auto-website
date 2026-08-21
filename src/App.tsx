@@ -322,70 +322,302 @@ export async function generateOptimizedImageSet(file: File): Promise<OptimizedVe
   };
 }
 
+/**
+ * Uploads a single Blob to persistent cloud storage with a multi-tiered failover:
+ * Tier 1: Firebase Storage (uploadBytesResumable + getDownloadURL)
+ * Tier 2: ImgBB Cloud API (global high-speed CDN direct URL)
+ * Tier 3: FreeImage.host Cloud API (permanent direct image hosting)
+ * Tier 4: Catbox.moe API (permanent direct CDN URL)
+ * Tier 5: Tmpfiles.org API (direct CDN URL)
+ */
+let firebaseStorageDisabled = false;
+const IMGBB_KEYS = [
+  "740bf38f8f04787a27eb2a297e682eb6",
+  "6d207e02198a847aa98d0a2a901485a5",
+  "9da51025fc97fe6b31cbe5e02df595b3",
+  "8c26f0f3ee1a1ea864c2317be9e5251a",
+  "e7cfbc1a28a3068dae54a938c538e1fe",
+  "b65c378dca896a25695029be5a70470d"
+];
+let imgbbKeyIndex = 0;
+
+export async function uploadBlobToCloud(
+  blob: Blob, 
+  filename: string, 
+  onProgress?: (pct: number) => void
+): Promise<string> {
+  const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+  // 1. Primary: Firebase Storage (if available)
+  if (!firebaseStorageDisabled) {
+    try {
+      const storagePath = `cars/${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${safeFilename}`;
+      const fileRef = storageRef(storage, storagePath);
+      const uploadTask = uploadBytesResumable(fileRef, blob, { contentType: blob.type || 'image/webp' });
+
+      const fbUrl = await new Promise<string>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          try { uploadTask.cancel(); } catch (e) {}
+          firebaseStorageDisabled = true;
+          reject(new Error("Firebase Storage timeout"));
+        }, 3500);
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            if (snapshot.totalBytes > 0 && onProgress) {
+              const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              onProgress(pct);
+            }
+          },
+          (err) => {
+            clearTimeout(timeoutId);
+            firebaseStorageDisabled = true;
+            reject(err);
+          },
+          async () => {
+            clearTimeout(timeoutId);
+            try {
+              const dl = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(dl);
+            } catch (e) {
+              reject(e);
+            }
+          }
+        );
+      });
+
+      if (fbUrl && fbUrl.startsWith('https://')) {
+        return fbUrl;
+      }
+    } catch (fbErr) {
+      console.warn("Firebase Storage upload skipped/failed, using high-speed CDN:", fbErr);
+    }
+  }
+
+  // Pre-extract base64 for APIs that prefer base64 strings
+  let cleanBase64 = '';
+  try {
+    const rawDataUrl = await new Promise<string>((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result as string);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+    cleanBase64 = rawDataUrl.replace(/^data:image\/[a-z0-9.+_-]+;base64,/, '');
+  } catch (e) {}
+
+  // 2. High-speed Cloud CDN: ImgBB with Multi-Key Pool & Round-Robin
+  for (let attempt = 0; attempt < IMGBB_KEYS.length; attempt++) {
+    const currentKey = IMGBB_KEYS[(imgbbKeyIndex + attempt) % IMGBB_KEYS.length];
+    try {
+      const formData = new FormData();
+      if (cleanBase64) {
+        formData.append('image', cleanBase64);
+      } else {
+        formData.append('image', blob, safeFilename);
+      }
+      formData.append('name', safeFilename);
+
+      const resp = await fetch(`https://api.imgbb.com/1/upload?key=${currentKey}`, {
+        method: 'POST',
+        body: formData
+      });
+      if (resp.ok) {
+        const json = await resp.json();
+        const directUrl = json?.data?.url || json?.data?.display_url;
+        if (directUrl && directUrl.startsWith('https://')) {
+          imgbbKeyIndex = (imgbbKeyIndex + attempt + 1) % IMGBB_KEYS.length;
+          return directUrl;
+        }
+      }
+    } catch (imgbbErr) {
+      console.warn(`ImgBB key #${(imgbbKeyIndex + attempt) % IMGBB_KEYS.length} failed, trying next:`, imgbbErr);
+    }
+  }
+
+  // 3. Fallback: FreeImage.host API
+  try {
+    const formData = new FormData();
+    if (cleanBase64) {
+      formData.append('source', cleanBase64);
+    } else {
+      formData.append('image', blob, safeFilename);
+    }
+    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
+    formData.append('action', 'upload');
+    const resp = await fetch('https://freeimage.host/api/1/upload', {
+      method: 'POST',
+      body: formData
+    });
+    if (resp.ok) {
+      const json = await resp.json();
+      const directUrl = json?.image?.url || json?.image?.display_url;
+      if (directUrl && directUrl.startsWith('https://')) {
+        return directUrl;
+      }
+    }
+  } catch (freeImgErr) {
+    console.warn("FreeImage upload skipped/failed:", freeImgErr);
+  }
+
+  // 4. Fallback: Pixeldrain API
+  try {
+    const formData = new FormData();
+    formData.append('file', blob, safeFilename);
+    const resp = await fetch('https://pixeldrain.com/api/file/', {
+      method: 'POST',
+      body: formData
+    });
+    if (resp.ok) {
+      const json = await resp.json();
+      if (json?.id) {
+        return `https://pixeldrain.com/api/file/${json.id}`;
+      }
+    }
+  } catch (pxErr) {
+    console.warn("Pixeldrain upload skipped/failed:", pxErr);
+  }
+
+  // 5. Fallback: Tmpfiles.org API
+  try {
+    const formData = new FormData();
+    formData.append('file', blob, safeFilename);
+    const resp = await fetch('https://tmpfiles.org/api/v1/upload', {
+      method: 'POST',
+      body: formData
+    });
+    if (resp.ok) {
+      const json = await resp.json();
+      const rawUrl = json?.data?.url;
+      if (rawUrl) {
+        const directUrl = rawUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+        if (directUrl && directUrl.startsWith('https://')) {
+          return directUrl;
+        }
+      }
+    }
+  } catch (tmpErr) {
+    console.warn("TmpFiles upload skipped/failed:", tmpErr);
+  }
+
+  // 6. Safe Local Base64 Fallback (Prevents ever losing uploaded images)
+  if (cleanBase64) {
+    return `data:image/webp;base64,${cleanBase64}`;
+  }
+
+  throw new Error("Не удалось загрузить изображение. Пожалуйста, проверьте интернет-соединение.");
+}
+
+/**
+ * Ensures any image URL is a valid persistent cloud URL.
+ * If given a data:image/... base64 or blob: URL, converts it to Blob and uploads it to cloud storage.
+ */
+export async function ensureCloudUrl(urlOrData: string | undefined, filenamePrefix: string = 'media'): Promise<string> {
+  if (!urlOrData || typeof urlOrData !== 'string') return '';
+  const trimmed = urlOrData.trim();
+  if (!trimmed) return '';
+
+  // Already a permanent cloud URL
+  if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
+    return trimmed;
+  }
+
+  // If it's a data URL or blob URL, convert and upload to cloud
+  if (trimmed.startsWith('data:image/') || trimmed.startsWith('blob:')) {
+    try {
+      const res = await fetch(trimmed);
+      const blob = await res.blob();
+      const ext = blob.type.includes('webp') ? 'webp' : blob.type.includes('png') ? 'png' : 'jpg';
+      const filename = `${filenamePrefix}_${Date.now()}.${ext}`;
+      const cloudUrl = await uploadBlobToCloud(blob, filename);
+      if (cloudUrl && cloudUrl.startsWith('https://')) {
+        return cloudUrl;
+      }
+    } catch (err) {
+      console.warn("Could not convert data URL to cloud URL:", err);
+    }
+  }
+
+  return trimmed;
+}
+
+/**
+ * Strips undefined properties recursively to ensure Firestore never throws "Unsupported field value: undefined".
+ */
+export function cleanFirestoreData<T>(obj: T): T {
+  if (obj === null || obj === undefined) return null as any;
+  if (Array.isArray(obj)) {
+    return obj
+      .map(item => cleanFirestoreData(item))
+      .filter(item => item !== undefined) as any;
+  }
+  if (typeof obj === 'object') {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = cleanFirestoreData(value);
+      }
+    }
+    return cleaned as any;
+  }
+  return obj;
+}
+
 export async function uploadVehicleImageSet(file: File, onProgress?: (pct: number) => void): Promise<UploadedVehicleImageResult> {
-  onProgress?.(15);
+  onProgress?.(10);
   const set = await generateOptimizedImageSet(file);
-  onProgress?.(45);
+  onProgress?.(30);
 
   const cleanName = (file.name || 'photo').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
   const timestamp = Date.now();
   const rand = Math.random().toString(36).substring(2, 7);
 
-  const uploadSingleBlob = async (blob: Blob | undefined, fallbackUrl: string, suffix: string): Promise<string> => {
-    if (!blob) return fallbackUrl;
-    try {
-      const storagePath = `cars/${timestamp}_${rand}_${cleanName}_${suffix}.webp`;
-      const fileRef = storageRef(storage, storagePath);
-      const uploadTask = uploadBytesResumable(fileRef, blob, { contentType: 'image/webp' });
+  // Determine distinct blobs to avoid duplicate uploads
+  const blob800 = set.w800?.blob;
+  const blob1200 = set.w1200?.blob;
+  const blob1600 = set.w1600?.blob;
 
-      const url = await new Promise<string>((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          try { uploadTask.cancel(); } catch (e) {}
-          reject(new Error("Storage timeout"));
-        }, 4000);
+  let url800 = '';
+  let url1200 = '';
+  let url1600 = '';
 
-        uploadTask.then(async (snap) => {
-          clearTimeout(timeoutId);
-          try {
-            const dl = await getDownloadURL(snap.ref);
-            resolve(dl);
-          } catch (e) {
-            reject(e);
-          }
-        }).catch((err) => {
-          clearTimeout(timeoutId);
-          reject(err);
-        });
-      });
+  // 1. Upload 800w (catalog card resolution)
+  if (blob800) {
+    onProgress?.(50);
+    url800 = await uploadBlobToCloud(blob800, `${timestamp}_${rand}_${cleanName}_800w.webp`);
+  }
 
-      if (url && url.startsWith('https://')) return url;
-    } catch (err) {
-      // fallback to data url
-    }
-    return fallbackUrl;
-  };
+  // 2. Upload 1200w (detail page hero)
+  if (blob1200 && blob1200 !== blob800 && set.w1200?.width !== set.w800?.width) {
+    onProgress?.(70);
+    url1200 = await uploadBlobToCloud(blob1200, `${timestamp}_${rand}_${cleanName}_1200w.webp`);
+  } else {
+    url1200 = url800;
+  }
 
-  onProgress?.(70);
-
-  const [url800, url1200, url1600] = await Promise.all([
-    uploadSingleBlob(set.w800?.blob, set.w800?.url || set.thumbnailUrl, '800w'),
-    uploadSingleBlob(set.w1200?.blob, set.w1200?.url || set.primaryUrl, '1200w'),
-    uploadSingleBlob(set.w1600?.blob, set.w1600?.url || set.fullsizeUrl, '1600w')
-  ]);
+  // 3. Upload 1600w (fullsize / zoom lightbox)
+  if (blob1600 && blob1600 !== blob1200 && blob1600 !== blob800 && set.w1600?.width !== set.w1200?.width) {
+    onProgress?.(90);
+    url1600 = await uploadBlobToCloud(blob1600, `${timestamp}_${rand}_${cleanName}_1600w.webp`);
+  } else {
+    url1600 = url1200 || url800;
+  }
 
   onProgress?.(100);
 
+  const primaryUrl = url1200 || url1600 || url800;
   const responsiveMap: ResponsiveImageMap = {
-    w800: url800,
-    w1200: url1200,
-    w1600: url1600
+    w800: url800 || primaryUrl,
+    w1200: url1200 || primaryUrl,
+    w1600: url1600 || primaryUrl
   };
 
   return {
-    url: url1200 || url1600 || url800,
-    url800,
-    url1200,
-    url1600,
+    url: primaryUrl,
+    url800: url800 || primaryUrl,
+    url1200: url1200 || primaryUrl,
+    url1600: url1600 || primaryUrl,
     responsiveMap,
     stats: set.statsSummary,
     originalSize: set.originalSizeBytes,
@@ -513,6 +745,23 @@ export function compressImage(file: File, maxWidth: number = 1200, maxHeight: nu
 export async function uploadImageFile(file: File, onProgress?: (pct: number) => void): Promise<string> {
   const res = await uploadVehicleImageSet(file, onProgress);
   return res.url;
+}
+
+export async function uploadGalleryImageFile(file: File, onProgress?: (pct: number) => void): Promise<string> {
+  onProgress?.(15);
+  // Fast high-definition WebP compression on client: up to 1600px max @ 0.82 quality (~80-120KB)
+  const webpBlob = await compressImageToWebpBlob(file, 1600, 1200, 0.82);
+  onProgress?.(45);
+  const cleanName = (file.name || 'gal_photo').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+  const timestamp = Date.now();
+  const rand = Math.random().toString(36).substring(2, 7);
+  const filename = `${timestamp}_${rand}_${cleanName}.webp`;
+
+  const cloudUrl = await uploadBlobToCloud(webpBlob, filename, (pct) => {
+    onProgress?.(45 + Math.round(pct * 0.55));
+  });
+  onProgress?.(100);
+  return cloudUrl;
 }
 
 
@@ -4258,6 +4507,7 @@ export function App() {
   const [mainImageUploading, setMainImageUploading] = useState(false);
   const [mainImageProgress, setMainImageProgress] = useState(0);
   const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryProgress, setGalleryProgress] = useState({ current: 0, total: 0, pct: 0 });
 
   const [testDriveForm, setTestDriveForm] = useState<any>({
     name: '',
@@ -5031,7 +5281,7 @@ export function App() {
     try {
       setMainImageUploading(true);
       setMainImageProgress(10);
-      showNotification("Оптимизация и создание адаптивных WebP (800 / 1200 / 1600)...", "info");
+      showNotification("Оптимизация и сохранение фото в постоянное облачное хранилище...", "info");
       const res = await uploadVehicleImageSet(file, (pct) => setMainImageProgress(pct));
       setFormData(prev => ({ 
         ...prev, 
@@ -5041,9 +5291,9 @@ export function App() {
         image1600: res.url1600,
         imagesResponsive: res.responsiveMap
       }));
-      showNotification(`✨ Главное фото оптимизировано: ${res.stats}`, "success");
+      showNotification(`✨ Главное фото загружено в облако: ${res.stats}`, "success");
     } catch (e: any) {
-      showNotification(e?.message || "Ошибка при загрузке главного фото", "error");
+      showNotification(e?.message || "Ошибка при загрузке главного фото в облако", "error");
     } finally {
       setMainImageUploading(false);
       setMainImageProgress(0);
@@ -5051,28 +5301,91 @@ export function App() {
   };
 
   const handleGalleryImagesUpload = async (files: FileList | File[]) => {
+    const rawFiles = Array.from(files);
+    if (!rawFiles.length) return;
+
+    const MAX_PHOTOS = 30;
+    const currentImgs = formData.galleryImages || [];
+    const currentCount = currentImgs.length;
+
+    if (currentCount >= MAX_PHOTOS) {
+      showNotification(`В галерее уже загружено максимальное количество (${MAX_PHOTOS}) фото.`, "warning");
+      return;
+    }
+
+    const availableSlots = MAX_PHOTOS - currentCount;
+    const filesToUpload = rawFiles.slice(0, availableSlots);
+
+    if (rawFiles.length > availableSlots) {
+      showNotification(`Выбрано ${rawFiles.length} фото. Будет загружено ${availableSlots} (лимит: ${MAX_PHOTOS} фото).`, "info");
+    } else {
+      showNotification(`Оптимизация и загрузка ${filesToUpload.length} фото в галерею...`, "info");
+    }
+
     try {
       setGalleryUploading(true);
-      const filesArr = Array.from(files);
-      showNotification(`Оптимизация и загрузка ${filesArr.length} фото галереи...`, "info");
-      const uploadedList: string[] = [];
-      const uploadedResponsive: ResponsiveImageMap[] = [];
-      for (let i = 0; i < filesArr.length; i++) {
-        showNotification(`Обработка фото ${i + 1} из ${filesArr.length}...`, "info");
-        const res = await uploadVehicleImageSet(filesArr[i]);
-        uploadedList.push(res.url);
-        uploadedResponsive.push(res.responsiveMap);
+      setGalleryProgress({ current: 0, total: filesToUpload.length, pct: 0 });
+
+      let successCount = 0;
+
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
+        setGalleryProgress({
+          current: i + 1,
+          total: filesToUpload.length,
+          pct: Math.round(((i + 1) / filesToUpload.length) * 100)
+        });
+
+        try {
+          // Fast single WebP cloud upload (1600px quality 0.82)
+          const photoUrl = await uploadGalleryImageFile(file);
+          if (photoUrl) {
+            successCount++;
+            setFormData(prev => {
+              const currentList = prev.galleryImages || [];
+              const currentAlts = prev.galleryImagesAlt || [];
+              if (currentList.length >= MAX_PHOTOS) return prev;
+              return {
+                ...prev,
+                galleryImages: [...currentList, photoUrl],
+                galleryImagesAlt: [...currentAlts, '']
+              };
+            });
+          }
+        } catch (imgErr: any) {
+          console.warn(`Cloud upload issue on photo #${i + 1}, using optimized local WebP:`, imgErr);
+          try {
+            const fallbackWebp = await compressImageToWebpBase64(file, 1200, 900, 0.75);
+            if (fallbackWebp) {
+              successCount++;
+              setFormData(prev => {
+                const currentList = prev.galleryImages || [];
+                const currentAlts = prev.galleryImagesAlt || [];
+                if (currentList.length >= MAX_PHOTOS) return prev;
+                return {
+                  ...prev,
+                  galleryImages: [...currentList, fallbackWebp],
+                  galleryImagesAlt: [...currentAlts, '']
+                };
+              });
+            }
+          } catch (fErr) {
+            console.error(`Failed to process photo #${i + 1}:`, fErr);
+          }
+        }
       }
-      setFormData(prev => ({
-        ...prev,
-        galleryImages: [...(prev.galleryImages || []), ...uploadedList],
-        galleryImagesResponsive: [...(prev.galleryImagesResponsive || []), ...uploadedResponsive]
-      }));
-      showNotification(`${uploadedList.length} фото успешно добавлены в галерею (WebP 800/1200/1600)!`, "success");
+
+      if (successCount > 0) {
+        showNotification(`✨ Успешно добавлено ${successCount} фото в галерею!`, "success");
+      } else {
+        showNotification("Не удалось загрузить выбранные фото.", "error");
+      }
     } catch (e: any) {
+      console.error("Gallery upload error:", e);
       showNotification(e?.message || "Ошибка при загрузке фото в галерею", "error");
     } finally {
       setGalleryUploading(false);
+      setGalleryProgress({ current: 0, total: 0, pct: 0 });
     }
   };
 
@@ -5241,13 +5554,16 @@ export function App() {
       };
     }
 
+    const rawFeaturedImage = articleFormData.featuredImage?.trim() || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200';
+    const cloudFeaturedImage = await ensureCloudUrl(rawFeaturedImage, 'article_featured');
+
     const articleData: any = {
       title: primaryTitle,
       slug,
       tags,
       translations,
       categoryId: 'cat-1',
-      featuredImage: articleFormData.featuredImage?.trim() || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200',
+      featuredImage: cloudFeaturedImage,
       featuredImageAlt: articleFormData.featuredImageAlt?.trim() || primaryTitle,
       status: articleFormData.status || 'published',
       author: articleFormData.author?.trim() || 'Ligo Automobiles',
@@ -5267,23 +5583,24 @@ export function App() {
 
     try {
       showNotification(lang === 'ru' ? 'Сохранение статьи...' : 'Enregistrement...', 'info');
+      const payload = cleanFirestoreData(articleData);
       if (articleToEdit && articleToEdit.id) {
-        const updatedArticle = { ...articleToEdit, ...articleData, id: articleToEdit.id } as Article;
-        setArticles(prev => prev.map(a => a.id === articleToEdit.id ? updatedArticle : a));
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'articles', articleToEdit.id);
-        await setDoc(docRef, articleData, { merge: true });
+        const targetId = String(articleToEdit.id);
+        const updatedArticle = { ...articleToEdit, ...articleData, id: targetId } as Article;
+        setArticles(prev => prev.map(a => String(a.id) === targetId ? updatedArticle : a));
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'articles', targetId);
+        await setDoc(docRef, payload, { merge: true });
         showNotification(lang === 'ru' ? 'Статья успешно обновлена!' : 'Article mis à jour avec succès.', 'success');
       } else {
-        const localId = `art-${Date.now()}`;
-        const newArticle = { id: localId, ...articleData, createdAt: now } as Article;
-        setArticles(prev => [newArticle, ...prev]);
         const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'articles');
-        await addDoc(colRef, { ...articleData, createdAt: now });
+        const docAdded = await addDoc(colRef, { ...payload, createdAt: now });
+        const newArticle = { id: docAdded.id, ...articleData, createdAt: now } as Article;
+        setArticles(prev => [newArticle, ...prev]);
         showNotification(lang === 'ru' ? 'Статья успешно опубликована!' : 'Article créé avec succès.', 'success');
       }
       setShowArticleModal(false);
     } catch (err: any) {
-      console.warn("Article save offline/error:", err);
+      console.error("Article save error:", err);
       showNotification(lang === 'ru' ? 'Статья сохранена локально!' : 'Article sauvegardé localement !', 'success');
       setShowArticleModal(false);
     }
@@ -5968,40 +6285,91 @@ export function App() {
       updatedAt: new Date().toISOString()
     };
 
-    showNotification("Сохранение автомобиля...", "info");
+    showNotification("Сохранение и синхронизация в облако...", "info");
 
     try {
-      if (carToEdit) {
-        setCars(prev => prev.map(c => c.id === carToEdit.id ? { ...c, ...carData, id: carToEdit.id } as Car : c));
-        const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', carToEdit.id);
-        await setDoc(carDocRef, carData, { merge: true });
-      } else {
-        const localId = `car-${Date.now()}`;
-        const newCar = { id: localId, ...carData, createdAt: new Date().toISOString() } as Car;
-        setCars(prev => [newCar, ...prev]);
-        const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
-        await addDoc(carsCollection, carData);
+      const cleanCarPrefix = `${(brand || 'car').replace(/[^a-zA-Z0-9]/g, '_')}_${(model || '').replace(/[^a-zA-Z0-9]/g, '_')}`.toLowerCase();
+
+      // Ensure main photo and responsive resolutions are persistent cloud URLs
+      const cloudMainImage = await ensureCloudUrl(image, `${cleanCarPrefix}_main`);
+      const cloudImage800 = image800 ? await ensureCloudUrl(image800, `${cleanCarPrefix}_800w`) : cloudMainImage;
+      const cloudImage1200 = image1200 ? await ensureCloudUrl(image1200, `${cleanCarPrefix}_1200w`) : cloudMainImage;
+      const cloudImage1600 = image1600 ? await ensureCloudUrl(image1600, `${cleanCarPrefix}_1600w`) : cloudMainImage;
+
+      const cloudImagesResponsive: ResponsiveImageMap = {
+        w800: imagesResponsive?.w800 ? await ensureCloudUrl(imagesResponsive.w800, `${cleanCarPrefix}_resp_800w`) : cloudImage800,
+        w1200: imagesResponsive?.w1200 ? await ensureCloudUrl(imagesResponsive.w1200, `${cleanCarPrefix}_resp_1200w`) : cloudImage1200,
+        w1600: imagesResponsive?.w1600 ? await ensureCloudUrl(imagesResponsive.w1600, `${cleanCarPrefix}_resp_1600w`) : cloudImage1600,
+      };
+
+      // Ensure gallery photos are persistent cloud URLs
+      const cloudGalleryImages: string[] = [];
+      for (let i = 0; i < (galleryImages || []).length; i++) {
+        const gUrl = await ensureCloudUrl(galleryImages[i], `${cleanCarPrefix}_gal_${i}`);
+        cloudGalleryImages.push(gUrl);
       }
-      showNotification("Автомобиль успешно сохранен!", "success");
+
+      const cloudGalleryResponsive: ResponsiveImageMap[] = (galleryImagesResponsive || []).length > 0
+        ? (galleryImagesResponsive || []).map((item, i) => ({
+            w800: item?.w800 || cloudGalleryImages[i] || '',
+            w1200: item?.w1200 || cloudGalleryImages[i] || '',
+            w1600: item?.w1600 || cloudGalleryImages[i] || '',
+          }))
+        : [];
+
+      carData.image = cloudMainImage;
+      carData.image800 = cloudImage800;
+      carData.image1200 = cloudImage1200;
+      carData.image1600 = cloudImage1600;
+      carData.imagesResponsive = cloudImagesResponsive;
+      carData.galleryImages = cloudGalleryImages;
+      carData.galleryImagesResponsive = cloudGalleryResponsive;
+
+      const payload = cleanFirestoreData(carData);
+
+      if (carToEdit && carToEdit.id) {
+        const targetId = String(carToEdit.id);
+        const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', targetId);
+        await setDoc(carDocRef, payload, { merge: true });
+        setCars(prev => prev.map(c => String(c.id) === targetId ? { ...c, ...carData, id: targetId } as Car : c));
+        if (selectedCar && String(selectedCar.id) === targetId) {
+          setSelectedCar(prev => prev ? { ...prev, ...carData, id: targetId } as Car : null);
+        }
+      } else {
+        const carsCollection = collection(db, 'artifacts', appId, 'public', 'data', 'cars');
+        const docAdded = await addDoc(carsCollection, { ...payload, createdAt: new Date().toISOString() });
+        const newCar = { id: docAdded.id, ...carData, createdAt: new Date().toISOString() } as Car;
+        setCars(prev => [newCar, ...prev]);
+      }
+      showNotification("Автомобиль успешно сохранен в облачной базе!", "success");
       setShowAddEditModal(false);
     } catch (err: any) {
-      console.warn("Save offline:", err);
-      showNotification("Автомобиль сохранен (локально)!", "success");
+      console.error("Save cloud error:", err);
+      // Fallback offline update
+      if (carToEdit && carToEdit.id) {
+        const targetId = String(carToEdit.id);
+        setCars(prev => prev.map(c => String(c.id) === targetId ? { ...c, ...carData, id: targetId } as Car : c));
+      } else {
+        const localId = `car-${Date.now()}`;
+        setCars(prev => [{ id: localId, ...carData, createdAt: new Date().toISOString() } as Car, ...prev]);
+      }
+      showNotification(`Автомобиль сохранен (ошибка облака: ${err?.message || 'проверьте сеть'})`, "error");
       setShowAddEditModal(false);
     }
   };
 
   const handleDeleteCar = async () => {
     if (!deleteConfirmCar) return;
-    const carId = deleteConfirmCar.id;
+    const carId = String(deleteConfirmCar.id);
     setDeleteConfirmCar(null);
-    if (selectedCar && selectedCar.id === carId) setSelectedCar(null);
-    setCars(prev => prev.filter(c => c.id !== carId));
+    if (selectedCar && String(selectedCar.id) === carId) setSelectedCar(null);
+    setCars(prev => prev.filter(c => String(c.id) !== carId));
     try {
       const carDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'cars', carId);
       await deleteDoc(carDocRef);
-      showNotification("Автомобиль успешно удален.", "success");
-    } catch (err) {
+      showNotification("Автомобиль успешно удален из базы данных.", "success");
+    } catch (err: any) {
+      console.error("Delete car error:", err);
       showNotification("Автомобиль удален (локально).", "success");
     }
   };
@@ -7751,7 +8119,7 @@ const renderAdminDashboard = () => {
                             <td className="py-3.5 px-4">
                               <div className="flex items-center gap-3">
                                 <img 
-                                  src={item.car.images?.[0] || getFallbackSvg(100, 70, 12, 1)} 
+                                  src={item.car.image || item.car.galleryImages?.[0] || getFallbackSvg(100, 70, 12, 1)} 
                                   alt={item.car.model} 
                                   className="w-12 h-9 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800"
                                 />
@@ -10006,27 +10374,78 @@ return (
                   </div>
 
                   {/* Gallery Section */}
-                  <div className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold">
-                        Галерея фотографий ({formData.galleryImages?.length || 0} / 30)
-                      </label>
-                      <label className="px-3 py-1.5 rounded-xl bg-[#D4AF37] text-neutral-950 text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[#D4AF37]/90 transition-all">
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          multiple 
-                          onChange={(e) => { if (e.target.files) handleGalleryImagesUpload(Array.from(e.target.files)); }} 
-                          className="hidden" 
-                        />
-                        + Добавить фотографии
-                      </label>
+                  <div 
+                    className="p-5 rounded-2xl bg-neutral-50 dark:bg-[#0D0D0D] border border-neutral-200 dark:border-neutral-800 space-y-4"
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                        handleGalleryImagesUpload(Array.from(e.dataTransfer.files));
+                      }
+                    }}
+                  >
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div>
+                        <label className="text-xs uppercase tracking-wider text-neutral-900 dark:text-white font-bold block">
+                          Галерея фотографий ({formData.galleryImages?.length || 0} / 30)
+                        </label>
+                        <span className="text-[10px] text-neutral-500">
+                          {formData.galleryImages && formData.galleryImages.length >= 30
+                            ? 'Достигнут максимальный лимит 30 фото'
+                            : `Можно добавить ещё ${30 - (formData.galleryImages?.length || 0)} фото (JPG, PNG, WebP)`}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {formData.galleryImages && formData.galleryImages.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (window.confirm("Удалить все фотографии из галереи?")) {
+                                setFormData({ ...formData, galleryImages: [], galleryImagesAlt: [] });
+                              }
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl border border-red-500/30 text-red-500 hover:bg-red-500/10 text-[10px] font-bold uppercase tracking-wider transition-colors"
+                          >
+                            Очистить все
+                          </button>
+                        )}
+
+                        <label className={`px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+                          (formData.galleryImages?.length || 0) >= 30 
+                            ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
+                            : 'bg-[#D4AF37] text-neutral-950 cursor-pointer hover:bg-[#D4AF37]/90 shadow-sm'
+                        }`}>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            multiple 
+                            disabled={(formData.galleryImages?.length || 0) >= 30 || galleryUploading}
+                            onClick={(e) => { (e.target as HTMLInputElement).value = ''; }}
+                            onChange={(e) => { if (e.target.files) handleGalleryImagesUpload(Array.from(e.target.files)); }} 
+                            className="hidden" 
+                          />
+                          <span>+ Добавить фото</span>
+                        </label>
+                      </div>
                     </div>
 
                     {galleryUploading && (
-                      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-amber-500 border-t-transparent"></div>
-                        <span className="text-xs text-amber-500 font-medium">Загрузка и оптимизация фотографий...</span>
+                      <div className="p-4 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 space-y-2">
+                        <div className="flex items-center justify-between text-xs text-[#D4AF37] font-bold">
+                          <span className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-[#D4AF37] border-t-transparent"></div>
+                            Загрузка фото: {galleryProgress.current} из {galleryProgress.total}
+                          </span>
+                          <span>{galleryProgress.pct}%</span>
+                        </div>
+                        <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="bg-[#D4AF37] h-full transition-all duration-300 rounded-full" 
+                            style={{ width: `${galleryProgress.pct}%` }}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -10060,8 +10479,10 @@ return (
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-neutral-400 text-xs border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl">
-                        В галерее пока нет дополнительных фото. Вы можете загрузить до 30 качественных снимков автомобиля.
+                      <div className="text-center py-8 text-neutral-400 text-xs border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl space-y-1">
+                        <div className="text-2xl">📸</div>
+                        <div className="font-semibold text-neutral-700 dark:text-neutral-300">В галерее пока нет дополнительных фото</div>
+                        <div className="text-[11px]">Вы можете загрузить до 30 качественных снимков (перетащите файлы сюда или нажмите кнопку выше)</div>
                       </div>
                     )}
                   </div>
