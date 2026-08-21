@@ -125,7 +125,276 @@ export function getArticleSlug(article: any, l?: string): string {
          article.slug || "";
 }
 
-export function compressImageToWebpBlob(file: File, maxWidth: number = 1600, maxHeight: number = 1200, quality: number = 0.82): Promise<Blob> {
+export interface ResponsiveImageMap {
+  original?: string;
+  w800?: string;
+  w1200?: string;
+  w1600?: string;
+}
+
+export interface ResponsiveImageVersion {
+  url: string;
+  blob?: Blob;
+  width: number;
+  height: number;
+  sizeBytes: number;
+  format: 'webp' | 'jpeg' | 'png';
+  quality: number;
+}
+
+export interface OptimizedVehicleImageSet {
+  originalWidth: number;
+  originalHeight: number;
+  originalSizeBytes: number;
+  originalFormat: string;
+  w800?: ResponsiveImageVersion;
+  w1200?: ResponsiveImageVersion;
+  w1600?: ResponsiveImageVersion;
+  primaryUrl: string;       // Default high-res (1200/1600)
+  thumbnailUrl: string;     // Lightweight 800px for catalog
+  fullsizeUrl: string;      // 1600px zoom/modal
+  statsSummary: string;
+}
+
+export interface UploadedVehicleImageResult {
+  url: string;
+  url800: string;
+  url1200: string;
+  url1600: string;
+  responsiveMap: ResponsiveImageMap;
+  stats: string;
+  originalSize: number;
+  webp800Size: number;
+  webp1600Size: number;
+}
+
+/**
+ * Generates responsive WebP images directly from the original image (Single-Decode branch).
+ * - 800px WebP (quality = 0.78) for catalog cards
+ * - 1200px WebP (quality = 0.80) for vehicle detail hero
+ * - 1600px WebP (quality = 0.80) for full-res view / lightbox
+ * - Never upscales (caps to original dimension)
+ * - Safeguard: keeps original if WebP isn't smaller (<92% of original)
+ */
+export async function generateOptimizedImageSet(file: File): Promise<OptimizedVehicleImageSet> {
+  const origSize = file.size;
+  const origType = file.type || 'image/jpeg';
+
+  // 1. Single decode from the original File
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const image = new Image();
+      image.src = e.target?.result as string;
+      image.onload = () => resolve(image);
+      image.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+
+  const origW = img.naturalWidth || img.width || 1600;
+  const origH = img.naturalHeight || img.height || 1200;
+
+  // 2. Helper to render specific resolution directly from the ORIGINAL decoded image
+  const renderVersion = async (targetMaxWidth: number, targetQuality: number): Promise<ResponsiveImageVersion> => {
+    let width = origW;
+    let height = origH;
+
+    // Never upscale
+    if (width > targetMaxWidth) {
+      height = Math.round((origH * targetMaxWidth) / origW);
+      width = targetMaxWidth;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error("Canvas context creation failed");
+    }
+
+    // High quality bicubic rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, width, height);
+
+    // Export to WebP with target quality
+    let webpBlob: Blob | null = null;
+    try {
+      webpBlob = await new Promise<Blob | null>((res) => {
+        canvas.toBlob((b) => res(b), 'image/webp', targetQuality);
+      });
+    } catch (e) {
+      webpBlob = null;
+    }
+
+    let webpDataUrl = '';
+    try {
+      webpDataUrl = canvas.toDataURL('image/webp', targetQuality);
+    } catch (e) {
+      webpDataUrl = '';
+    }
+
+    const isValidWebp = (webpBlob && webpBlob.type === 'image/webp') || (webpDataUrl && webpDataUrl.startsWith('data:image/webp'));
+
+    if (isValidWebp && webpBlob) {
+      const webpSize = webpBlob.size;
+      return {
+        url: webpDataUrl,
+        blob: webpBlob,
+        width,
+        height,
+        sizeBytes: webpSize,
+        format: 'webp',
+        quality: targetQuality
+      };
+    }
+
+    // Fallback to high quality JPEG if browser does not support WebP canvas export
+    const jpegBlob = await new Promise<Blob | null>((res) => {
+      canvas.toBlob((b) => res(b), 'image/jpeg', targetQuality);
+    });
+    const jpegDataUrl = canvas.toDataURL('image/jpeg', targetQuality);
+    return {
+      url: jpegDataUrl,
+      blob: jpegBlob || undefined,
+      width,
+      height,
+      sizeBytes: jpegBlob ? jpegBlob.size : Math.round(jpegDataUrl.length * 0.75),
+      format: 'jpeg',
+      quality: targetQuality
+    };
+  };
+
+  // Generate responsive versions directly from original
+  // Catalog: 800px @ quality 0.78 (~50-80 KB)
+  const w800 = await renderVersion(Math.min(800, origW), 0.78);
+
+  // Detail Page Hero: 1200px @ quality 0.80 (~90-140 KB)
+  let w1200: ResponsiveImageVersion | undefined;
+  if (origW > 800) {
+    w1200 = await renderVersion(Math.min(1200, origW), 0.80);
+  } else {
+    w1200 = w800;
+  }
+
+  // Fullsize Zoom: 1600px @ quality 0.80 (~140-190 KB)
+  let w1600: ResponsiveImageVersion | undefined;
+  if (origW > 1200) {
+    w1600 = await renderVersion(Math.min(1600, origW), 0.80);
+  } else {
+    w1600 = w1200;
+  }
+
+  // Formatting helpers
+  const kb = (bytes: number) => `${Math.round(bytes / 1024)} КБ`;
+  const pct = (part: number, total: number) => {
+    if (total <= 0) return '0%';
+    const diff = Math.round(((total - part) / total) * 100);
+    return diff > 0 ? `-${diff}%` : `+${Math.abs(diff)}%`;
+  };
+
+  const statsParts = [`Оригинал: ${origW}×${origH} (${kb(origSize)})`];
+  if (w1600) {
+    statsParts.push(`1600px: ${w1600.width}×${w1600.height} (${kb(w1600.sizeBytes)}, ${pct(w1600.sizeBytes, origSize)})`);
+  }
+  if (w1200 && w1200.width !== w1600?.width) {
+    statsParts.push(`1200px: ${w1200.width}×${w1200.height} (${kb(w1200.sizeBytes)}, ${pct(w1200.sizeBytes, origSize)})`);
+  }
+  if (w800) {
+    statsParts.push(`Каталог 800px: ${w800.width}×${w800.height} (${kb(w800.sizeBytes)}, ${pct(w800.sizeBytes, origSize)})`);
+  }
+
+  return {
+    originalWidth: origW,
+    originalHeight: origH,
+    originalSizeBytes: origSize,
+    originalFormat: origType,
+    w800,
+    w1200,
+    w1600,
+    primaryUrl: (w1200 || w1600 || w800).url,
+    thumbnailUrl: w800.url,
+    fullsizeUrl: (w1600 || w1200 || w800).url,
+    statsSummary: statsParts.join(' ➔ ')
+  };
+}
+
+export async function uploadVehicleImageSet(file: File, onProgress?: (pct: number) => void): Promise<UploadedVehicleImageResult> {
+  onProgress?.(15);
+  const set = await generateOptimizedImageSet(file);
+  onProgress?.(45);
+
+  const cleanName = (file.name || 'photo').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+  const timestamp = Date.now();
+  const rand = Math.random().toString(36).substring(2, 7);
+
+  const uploadSingleBlob = async (blob: Blob | undefined, fallbackUrl: string, suffix: string): Promise<string> => {
+    if (!blob) return fallbackUrl;
+    try {
+      const storagePath = `cars/${timestamp}_${rand}_${cleanName}_${suffix}.webp`;
+      const fileRef = storageRef(storage, storagePath);
+      const uploadTask = uploadBytesResumable(fileRef, blob, { contentType: 'image/webp' });
+
+      const url = await new Promise<string>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+          try { uploadTask.cancel(); } catch (e) {}
+          reject(new Error("Storage timeout"));
+        }, 4000);
+
+        uploadTask.then(async (snap) => {
+          clearTimeout(timeoutId);
+          try {
+            const dl = await getDownloadURL(snap.ref);
+            resolve(dl);
+          } catch (e) {
+            reject(e);
+          }
+        }).catch((err) => {
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+      });
+
+      if (url && url.startsWith('https://')) return url;
+    } catch (err) {
+      // fallback to data url
+    }
+    return fallbackUrl;
+  };
+
+  onProgress?.(70);
+
+  const [url800, url1200, url1600] = await Promise.all([
+    uploadSingleBlob(set.w800?.blob, set.w800?.url || set.thumbnailUrl, '800w'),
+    uploadSingleBlob(set.w1200?.blob, set.w1200?.url || set.primaryUrl, '1200w'),
+    uploadSingleBlob(set.w1600?.blob, set.w1600?.url || set.fullsizeUrl, '1600w')
+  ]);
+
+  onProgress?.(100);
+
+  const responsiveMap: ResponsiveImageMap = {
+    w800: url800,
+    w1200: url1200,
+    w1600: url1600
+  };
+
+  return {
+    url: url1200 || url1600 || url800,
+    url800,
+    url1200,
+    url1600,
+    responsiveMap,
+    stats: set.statsSummary,
+    originalSize: set.originalSizeBytes,
+    webp800Size: set.w800?.sizeBytes || 0,
+    webp1600Size: set.w1600?.sizeBytes || 0
+  };
+}
+
+export function compressImageToWebpBlob(file: File, maxWidth: number = 1600, maxHeight: number = 1200, quality: number = 0.80): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -156,6 +425,8 @@ export function compressImageToWebpBlob(file: File, maxWidth: number = 1600, max
           reject(new Error("Canvas context creation failed"));
           return;
         }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
         canvas.toBlob(
@@ -183,7 +454,7 @@ export function compressImageToWebpBlob(file: File, maxWidth: number = 1600, max
   });
 }
 
-export function compressImageToWebpBase64(file: File, maxWidth: number = 1600, maxHeight: number = 1200, quality: number = 0.82): Promise<string> {
+export function compressImageToWebpBase64(file: File, maxWidth: number = 1600, maxHeight: number = 1200, quality: number = 0.80): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -214,6 +485,8 @@ export function compressImageToWebpBase64(file: File, maxWidth: number = 1600, m
           resolve(event.target?.result as string);
           return;
         }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
         try {
@@ -233,84 +506,13 @@ export function compressImageToWebpBase64(file: File, maxWidth: number = 1600, m
   });
 }
 
-export function compressImage(file: File, maxWidth: number = 1200, maxHeight: number = 800, quality: number = 0.85): Promise<string> {
+export function compressImage(file: File, maxWidth: number = 1200, maxHeight: number = 800, quality: number = 0.80): Promise<string> {
   return compressImageToWebpBase64(file, maxWidth, maxHeight, quality);
 }
 
 export async function uploadImageFile(file: File, onProgress?: (pct: number) => void): Promise<string> {
-  onProgress?.(20);
-  
-  // 1. Быстрая компрессия и оптимизация в WebP (Blob + Data URL)
-  let blob: Blob | null = null;
-  let base64 = '';
-  
-  try {
-    const results = await Promise.all([
-      compressImageToWebpBlob(file, 1600, 1200, 0.82),
-      compressImageToWebpBase64(file, 1600, 1200, 0.82)
-    ]);
-    blob = results[0];
-    base64 = results[1];
-  } catch (compErr) {
-    console.warn("Client-side compression fallback:", compErr);
-    base64 = await compressImageToWebpBase64(file, 1200, 900, 0.80);
-  }
-
-  onProgress?.(50);
-
-  const cleanName = (file.name || 'photo').replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-  const storagePath = `cars/${Date.now()}_${Math.random().toString(36).substring(2, 8)}_${cleanName}.webp`;
-
-  // 2. Первичное облачное хранилище: Firebase Storage с быстрым таймаутом (4 секунды)
-  if (blob) {
-    try {
-      const fileRef = storageRef(storage, storagePath);
-      const uploadTask = uploadBytesResumable(fileRef, blob, {
-        contentType: blob.type || 'image/webp'
-      });
-
-      const fbUrl = await new Promise<string>((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-          try { uploadTask.cancel(); } catch (cErr) {}
-          reject(new Error("Firebase Storage timeout"));
-        }, 4000);
-
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            if (snapshot.totalBytes > 0 && onProgress) {
-              const pct = 50 + Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 48);
-              onProgress(Math.min(98, pct));
-            }
-          },
-          (error) => {
-            clearTimeout(timeoutId);
-            reject(error);
-          },
-          async () => {
-            clearTimeout(timeoutId);
-            try {
-              const url = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(url);
-            } catch (e) {
-              reject(e);
-            }
-          }
-        );
-      });
-
-      if (fbUrl && fbUrl.startsWith('https://')) {
-        onProgress?.(100);
-        return fbUrl;
-      }
-    } catch (fbError) {
-      console.warn("Firebase Storage upload skipped/unavailable, using direct optimized WebP data:", fbError);
-    }
-  }
-
-  // 3. Надежное мгновенное сохранение оптимизированного WebP Base64 (100% без сбоев и зависаний)
-  onProgress?.(100);
-  return base64;
+  const res = await uploadVehicleImageSet(file, onProgress);
+  return res.url;
 }
 
 
@@ -3069,9 +3271,14 @@ export interface Car {
   vin?: string;
   status: string;
   image: string;
+  image800?: string;
+  image1200?: string;
+  image1600?: string;
+  imagesResponsive?: ResponsiveImageMap;
   imageAlt?: string;
   galleryImages?: string[];
   galleryImagesAlt?: string[];
+  galleryImagesResponsive?: ResponsiveImageMap[];
   description?: string;
   description_en?: string;
   description_ru?: string;
@@ -3598,6 +3805,10 @@ export function normalizeCar(raw: any): Car {
   const vin = raw.vin || '';
   const status = raw.status || 'En stock';
   const image = raw.image || '';
+  const image800 = raw.image800 || raw.imagesResponsive?.w800 || image;
+  const image1200 = raw.image1200 || raw.imagesResponsive?.w1200 || image;
+  const image1600 = raw.image1600 || raw.imagesResponsive?.w1600 || image;
+  const imagesResponsive: ResponsiveImageMap = raw.imagesResponsive || (image ? { w800: image800, w1200: image1200, w1600: image1600 } : {});
   const imageAlt = raw.imageAlt || (brand + ' ' + model + ' ' + engine + " d'occasion");
   const color = raw.color || '';
   const doors = Number(raw.doors) || 5;
@@ -3608,6 +3819,7 @@ export function normalizeCar(raw: any): Car {
   const homepageOrder = Number(raw.homepageOrder) || 1;
   const galleryImages = raw.galleryImages || [];
   const galleryImagesAlt = raw.galleryImagesAlt || [];
+  const galleryImagesResponsive = raw.galleryImagesResponsive || [];
   const equipments: string[] = Array.isArray(raw.equipments) ? Array.from(new Set(raw.equipments.map((eq: any) => normalizeEquipmentKey(String(eq))))) : [];
   const customEquipments = Array.isArray(raw.customEquipments) ? raw.customEquipments : [];
   const faq = Array.isArray(raw.faq) && raw.faq.length > 0 ? raw.faq : generateCarDefaultFaq({ brand, model, engine, year, km, fuel, transmission, hp, price });
@@ -3669,6 +3881,10 @@ export function normalizeCar(raw: any): Car {
     vin,
     status,
     image,
+    image800,
+    image1200,
+    image1600,
+    imagesResponsive,
     imageAlt,
     description: trans.fr?.description || raw.description || '',
     description_en: trans.en?.description || raw.description_en || '',
@@ -3686,6 +3902,7 @@ export function normalizeCar(raw: any): Car {
     homepageOrder,
     galleryImages,
     galleryImagesAlt,
+    galleryImagesResponsive,
     seoTitle,
     metaDescription,
     focusKeyword,
@@ -4449,6 +4666,10 @@ export function App() {
       vin: base.vin || '',
       status: base.status || 'En stock',
       image: base.image || '',
+      image800: base.image800 || base.imagesResponsive?.w800 || base.image || '',
+      image1200: base.image1200 || base.imagesResponsive?.w1200 || base.image || '',
+      image1600: base.image1600 || base.imagesResponsive?.w1600 || base.image || '',
+      imagesResponsive: base.imagesResponsive || (base.image ? { w800: base.image800 || base.image, w1200: base.image1200 || base.image, w1600: base.image1600 || base.image } : {}),
       imageAlt: base.imageAlt || '',
       description: trans.fr?.description || '',
       description_en: trans.en?.description || '',
@@ -4466,6 +4687,7 @@ export function App() {
       homepageOrder: base.homepageOrder || 1,
       galleryImages: base.galleryImages || [],
       galleryImagesAlt: base.galleryImagesAlt || [],
+      galleryImagesResponsive: base.galleryImagesResponsive || [],
       seoTitle: trans.fr?.seoTitle || '',
       metaDescription: trans.fr?.metaDescription || '',
       focusKeyword: trans.fr?.focusKeyword || '',
@@ -4940,10 +5162,17 @@ export function App() {
     try {
       setMainImageUploading(true);
       setMainImageProgress(10);
-      showNotification("Оптимизация и сохранение фото в постоянное хранилище...", "info");
-      const url = await uploadImageFile(file, (pct) => setMainImageProgress(pct));
-      setFormData(prev => ({ ...prev, image: url }));
-      showNotification("Главное фото успешно сохранено в постоянном хранилище!", "success");
+      showNotification("Оптимизация и создание адаптивных WebP (800 / 1200 / 1600)...", "info");
+      const res = await uploadVehicleImageSet(file, (pct) => setMainImageProgress(pct));
+      setFormData(prev => ({ 
+        ...prev, 
+        image: res.url,
+        image800: res.url800,
+        image1200: res.url1200,
+        image1600: res.url1600,
+        imagesResponsive: res.responsiveMap
+      }));
+      showNotification(`✨ Главное фото оптимизировано: ${res.stats}`, "success");
     } catch (e: any) {
       showNotification(e?.message || "Ошибка при загрузке главного фото", "error");
     } finally {
@@ -4956,18 +5185,21 @@ export function App() {
     try {
       setGalleryUploading(true);
       const filesArr = Array.from(files);
-      showNotification(`Загрузка ${filesArr.length} фото в постоянное хранилище...`, "info");
+      showNotification(`Оптимизация и загрузка ${filesArr.length} фото галереи...`, "info");
       const uploadedList: string[] = [];
+      const uploadedResponsive: ResponsiveImageMap[] = [];
       for (let i = 0; i < filesArr.length; i++) {
-        showNotification(`Загрузка фото ${i + 1} из ${filesArr.length}...`, "info");
-        const url = await uploadImageFile(filesArr[i]);
-        uploadedList.push(url);
+        showNotification(`Обработка фото ${i + 1} из ${filesArr.length}...`, "info");
+        const res = await uploadVehicleImageSet(filesArr[i]);
+        uploadedList.push(res.url);
+        uploadedResponsive.push(res.responsiveMap);
       }
       setFormData(prev => ({
         ...prev,
-        galleryImages: [...(prev.galleryImages || []), ...uploadedList]
+        galleryImages: [...(prev.galleryImages || []), ...uploadedList],
+        galleryImagesResponsive: [...(prev.galleryImagesResponsive || []), ...uploadedResponsive]
       }));
-      showNotification(`${uploadedList.length} фото успешно добавлено в галерею!`, "success");
+      showNotification(`${uploadedList.length} фото успешно добавлены в галерею (WebP 800/1200/1600)!`, "success");
     } catch (e: any) {
       showNotification(e?.message || "Ошибка при загрузке фото в галерею", "error");
     } finally {
@@ -5378,8 +5610,9 @@ export function App() {
     setPreviousView(currentView);
     setCurrentView('car-details');
     setActiveDetailsTab('specs');
-    setActiveImage(normalized.image || '');
-    setCurrentCarGallery([normalized.image, ...(normalized.galleryImages || [])].filter(Boolean));
+    const heroImage = normalized.imagesResponsive?.w1200 || normalized.image1200 || normalized.image || '';
+    setActiveImage(heroImage);
+    setCurrentCarGallery([heroImage, ...(normalized.galleryImages || [])].filter(Boolean));
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -5784,6 +6017,13 @@ export function App() {
     const vin = (formData.vin || '').trim();
     const status = formData.status || 'En stock';
     const image = formData.image || '';
+    const image800 = formData.image800 || formData.imagesResponsive?.w800 || image;
+    const image1200 = formData.image1200 || formData.imagesResponsive?.w1200 || image;
+    const image1600 = formData.image1600 || formData.imagesResponsive?.w1600 || image;
+    const imagesResponsive = formData.imagesResponsive || (image ? { w800: image800, w1200: image1200, w1600: image1600 } : undefined);
+    const galleryImages = formData.galleryImages || [];
+    const galleryImagesAlt = formData.galleryImagesAlt || [];
+    const galleryImagesResponsive = formData.galleryImagesResponsive || [];
     const imageAlt = formData.imageAlt || `${brand} ${model} ${engine} d'occasion`;
     const color = formData.color || '';
     const doors = Number(formData.doors) || 5;
@@ -5792,8 +6032,6 @@ export function App() {
     const verifiedVin = Boolean(formData.verifiedVin);
     const featuredOnHomepage = Boolean(formData.featuredOnHomepage);
     const homepageOrder = Number(formData.homepageOrder) || 1;
-    const galleryImages = formData.galleryImages || [];
-    const galleryImagesAlt = formData.galleryImagesAlt || [];
     const equipments = (formData.equipments || []).map(normalizeEquipmentKey).filter(Boolean);
     const customEquipments = formData.customEquipments || [];
     const faq = (formData.faq && formData.faq.length > 0) ? formData.faq : generateCarDefaultFaq({ brand, model, engine, year, km, fuel, transmission, hp, price });
@@ -5842,8 +6080,9 @@ export function App() {
 
     const carData: Partial<Car> = {
       brand, model, engine, year, km, price, fuel, transmission, hp, co2, vin, status,
-      image, imageAlt, color, doors, seats, bodyType, verifiedVin,
-      featuredOnHomepage, homepageOrder, galleryImages, galleryImagesAlt, equipments, customEquipments, faq,
+      image, image800, image1200, image1600, imagesResponsive,
+      imageAlt, color, doors, seats, bodyType, verifiedVin,
+      featuredOnHomepage, homepageOrder, galleryImages, galleryImagesAlt, galleryImagesResponsive, equipments, customEquipments, faq,
       description: frTrans.description,
       description_en: enTrans.description,
       description_ru: ruTrans.description,
@@ -6269,8 +6508,10 @@ const renderComparisonView = () => {
                   {/* Photo with remove button & status badge */}
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                     <img
-                      src={car.image || getFallbackSvg(400, 300, 16, 2)}
+                      src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(400, 300, 16, 2)}
                       alt={`${car.brand} ${car.model}`}
+                      loading="lazy"
+                      decoding="async"
                       className={`w-full h-full object-cover ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                       onError={(e: any) => { e.currentTarget.src = getFallbackSvg(400, 300, 16, 2); }}
                     />
@@ -6487,8 +6728,10 @@ const renderComparisonView = () => {
                       {/* Vehicle Image */}
                       <div className="relative aspect-[16/10] rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm group">
                         <img
-                          src={car.image || getFallbackSvg(600, 375, 20, 2)}
+                          src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(600, 375, 20, 2)}
                           alt={`${car.brand} ${car.model}`}
+                          loading="lazy"
+                          decoding="async"
                           className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                           onError={(e: any) => { e.currentTarget.src = getFallbackSvg(600, 375, 20, 2); }}
                         />
@@ -8140,8 +8383,10 @@ return (
                   className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
                 >
                   <img 
-                    src={car.image || getFallbackSvg(800, 500, 24, 3)} 
+                    src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(800, 500, 24, 3)} 
                     alt={`${car.brand} ${car.model}`}
+                    loading="lazy"
+                    decoding="async"
                     className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                     onError={(e) => {
                       const fallback = getFallbackSvg(800, 500, 24, 3);
@@ -8686,8 +8931,10 @@ return (
                 onClick={() => { setLightboxIndex(currentCarGallery.indexOf(activeImage) || 0); setShowLightbox(true); }}
               >
                 <img 
-                  src={activeImage || selectedCar.image || getFallbackSvg()} 
+                  src={activeImage || selectedCar.imagesResponsive?.w1200 || selectedCar.image1200 || selectedCar.image || getFallbackSvg()} 
                   alt={selectedCar.imageAlt || getCarMainImageAlt(selectedCar)} 
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                   onError={(e) => { const fb = getFallbackSvg(); if (e.currentTarget.src !== fb) e.currentTarget.src = fb; }} 
                 />
@@ -9010,8 +9257,10 @@ return (
                       <div>
                         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100 dark:bg-neutral-900">
                           <img 
-                            src={simCar.image || getFallbackSvg()} 
+                            src={simCar.imagesResponsive?.w800 || simCar.image800 || simCar.image || getFallbackSvg()} 
                             alt={simCar.imageAlt || getCarMainImageAlt(simCar)} 
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                           />
                           <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-neutral-950/80 text-white backdrop-blur-sm">
@@ -9305,8 +9554,10 @@ return (
                   className="relative aspect-[16/10] overflow-hidden bg-neutral-950 cursor-pointer"
                 >
                   <img 
-                    src={car.image || getFallbackSvg(800, 500, 24, 3)} 
+                    src={car.imagesResponsive?.w800 || car.image800 || car.image || getFallbackSvg(800, 500, 24, 3)} 
                     alt={`${car.brand} ${car.model}`}
+                    loading="lazy"
+                    decoding="async"
                     className={`w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ${car.status === 'Vendu' ? 'grayscale opacity-60' : ''}`}
                     onError={(e) => {
                       const fallback = getFallbackSvg(800, 500, 24, 3);
@@ -11274,7 +11525,7 @@ return (
           <button onClick={() => setShowLightbox(false)} className="absolute top-6 right-6 text-white/80 hover:text-white p-2 text-2xl z-50">✕</button>
           <button onClick={() => setLightboxIndex(prev => (prev - 1 + currentCarGallery.length) % currentCarGallery.length)} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 text-3xl">‹</button>
           <button onClick={() => setLightboxIndex(prev => (prev + 1) % currentCarGallery.length)} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3 text-3xl">›</button>
-          <img src={currentCarGallery[lightboxIndex] || ""} alt="Full view" className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg" />
+          <img src={currentCarGallery[lightboxIndex] || selectedCar?.imagesResponsive?.w1600 || selectedCar?.image1600 || selectedCar?.image || ""} alt="Full view" className="max-h-[85vh] max-w-[90vw] object-contain rounded-lg shadow-2xl" />
         </div>
       )}
     </div>
