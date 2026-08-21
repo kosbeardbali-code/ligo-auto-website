@@ -357,31 +357,87 @@ export async function generateOptimizedImageSet(file: File): Promise<OptimizedVe
  * Tier 1: Firebase Storage (uploadBytesResumable + getDownloadURL)
  * Tier 2: ImgBB Cloud API (global high-speed CDN direct URL)
  * Tier 3: FreeImage.host Cloud API (permanent direct image hosting)
- * Tier 4: Catbox.moe API (permanent direct CDN URL)
- * Tier 5: Tmpfiles.org API (direct CDN URL)
- */
 let firebaseStorageDisabled = false;
-const IMGBB_KEYS = [
-  "740bf38f8f04787a27eb2a297e682eb6",
-  "6d207e02198a847aa98d0a2a901485a5",
-  "9da51025fc97fe6b31cbe5e02df595b3",
-  "8c26f0f3ee1a1ea864c2317be9e5251a",
-  "e7cfbc1a28a3068dae54a938c538e1fe",
-  "b65c378dca896a25695029be5a70470d"
-];
-let imgbbKeyIndex = 0;
 
+/**
+ * Verifies that an asset URL is truly accessible via public HTTP CDN (returns HTTP 200).
+ * Prevents saving broken or expired URLs.
+ */
+export async function verifyAssetAccessibility(url: string): Promise<boolean> {
+  if (!url || typeof url !== 'string' || !url.startsWith('http')) return false;
+  // Block any forbidden temporary domains
+  if (url.includes('tmpfiles.org') || url.includes('pixeldrain.com') || url.includes('catbox.moe') || url.includes('freeimage.host')) {
+    return false;
+  }
+
+  try {
+    return await new Promise<boolean>((resolve) => {
+      const img = new Image();
+      const timeout = setTimeout(() => {
+        img.src = '';
+        resolve(false);
+      }, 5000);
+      img.onload = () => {
+        clearTimeout(timeout);
+        resolve(true);
+      };
+      img.onerror = () => {
+        clearTimeout(timeout);
+        resolve(false);
+      };
+      img.src = url;
+    });
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Uploads a binary blob strictly to persistent object storage (Vercel Blob / Firebase Storage).
+ * Rejects and throws an error if persistent storage is unavailable.
+ * NEVER falls back to temporary hosting or Base64 in Firestore.
+ */
 export async function uploadBlobToCloud(
   blob: Blob, 
   filename: string, 
   onProgress?: (pct: number) => void
 ): Promise<string> {
-  const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const safeFilename = filename.replace(/[^a-zA-Z0-9._/-]/g, '_');
 
-  // 1. Primary: Firebase Storage (if available)
+  // 1. Primary: Native Vercel Serverless Upload (/api/upload -> Vercel Blob)
+  try {
+    onProgress?.(30);
+    const apiRes = await fetch('/api/upload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': blob.type || 'image/webp',
+        'X-Filename': safeFilename
+      },
+      body: blob
+    });
+
+    if (apiRes.ok) {
+      const data = await apiRes.json();
+      if (data?.success && data?.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
+        onProgress?.(80);
+        // Strict verification probe
+        const isLive = await verifyAssetAccessibility(data.url);
+        if (isLive) {
+          onProgress?.(100);
+          return data.url;
+        } else {
+          console.warn('[Storage] Uploaded URL failed accessibility verification probe:', data.url);
+        }
+      }
+    }
+  } catch (apiErr) {
+    console.warn('[Storage] /api/upload endpoint skipped/failed:', apiErr);
+  }
+
+  // 2. Secondary: Firebase Storage (if bucket is configured)
   if (!firebaseStorageDisabled) {
     try {
-      const storagePath = `cars/${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${safeFilename}`;
+      const storagePath = `vehicles/${Date.now()}_${safeFilename}`;
       const fileRef = storageRef(storage, storagePath);
       const uploadTask = uploadBytesResumable(fileRef, blob, { contentType: blob.type || 'image/webp' });
 
@@ -390,7 +446,7 @@ export async function uploadBlobToCloud(
           try { uploadTask.cancel(); } catch (e) {}
           firebaseStorageDisabled = true;
           reject(new Error("Firebase Storage timeout"));
-        }, 3500);
+        }, 6000);
 
         uploadTask.on(
           'state_changed',
@@ -418,142 +474,39 @@ export async function uploadBlobToCloud(
       });
 
       if (fbUrl && fbUrl.startsWith('https://')) {
-        return fbUrl;
+        const isLive = await verifyAssetAccessibility(fbUrl);
+        if (isLive) {
+          return fbUrl;
+        }
       }
     } catch (fbErr) {
-      console.warn("Firebase Storage upload skipped/failed, using high-speed CDN:", fbErr);
+      console.warn('[Storage] Firebase Storage unavailable:', fbErr);
     }
   }
 
-  // Pre-extract base64 for APIs that prefer base64 strings
-  let cleanBase64 = '';
-  try {
-    const rawDataUrl = await new Promise<string>((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(blob);
-    });
-    cleanBase64 = rawDataUrl.replace(/^data:image\/[a-z0-9.+_-]+;base64,/, '');
-  } catch (e) {}
-
-  // 2. High-speed Cloud CDN: ImgBB with Multi-Key Pool & Round-Robin
-  for (let attempt = 0; attempt < IMGBB_KEYS.length; attempt++) {
-    const currentKey = IMGBB_KEYS[(imgbbKeyIndex + attempt) % IMGBB_KEYS.length];
-    try {
-      const formData = new FormData();
-      if (cleanBase64) {
-        formData.append('image', cleanBase64);
-      } else {
-        formData.append('image', blob, safeFilename);
-      }
-      formData.append('name', safeFilename);
-
-      const resp = await fetch(`https://api.imgbb.com/1/upload?key=${currentKey}`, {
-        method: 'POST',
-        body: formData
-      });
-      if (resp.ok) {
-        const json = await resp.json();
-        const directUrl = json?.data?.url || json?.data?.display_url;
-        if (directUrl && directUrl.startsWith('https://')) {
-          imgbbKeyIndex = (imgbbKeyIndex + attempt + 1) % IMGBB_KEYS.length;
-          return directUrl;
-        }
-      }
-    } catch (imgbbErr) {
-      console.warn(`ImgBB key #${(imgbbKeyIndex + attempt) % IMGBB_KEYS.length} failed, trying next:`, imgbbErr);
-    }
-  }
-
-  // 3. Fallback: FreeImage.host API
-  try {
-    const formData = new FormData();
-    if (cleanBase64) {
-      formData.append('source', cleanBase64);
-    } else {
-      formData.append('image', blob, safeFilename);
-    }
-    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
-    formData.append('action', 'upload');
-    const resp = await fetch('https://freeimage.host/api/1/upload', {
-      method: 'POST',
-      body: formData
-    });
-    if (resp.ok) {
-      const json = await resp.json();
-      const directUrl = json?.image?.url || json?.image?.display_url;
-      if (directUrl && directUrl.startsWith('https://')) {
-        return directUrl;
-      }
-    }
-  } catch (freeImgErr) {
-    console.warn("FreeImage upload skipped/failed:", freeImgErr);
-  }
-
-  // 4. Fallback: Pixeldrain API
-  try {
-    const formData = new FormData();
-    formData.append('file', blob, safeFilename);
-    const resp = await fetch('https://pixeldrain.com/api/file/', {
-      method: 'POST',
-      body: formData
-    });
-    if (resp.ok) {
-      const json = await resp.json();
-      if (json?.id) {
-        return `https://pixeldrain.com/api/file/${json.id}`;
-      }
-    }
-  } catch (pxErr) {
-    console.warn("Pixeldrain upload skipped/failed:", pxErr);
-  }
-
-  // 5. Fallback: Tmpfiles.org API
-  try {
-    const formData = new FormData();
-    formData.append('file', blob, safeFilename);
-    const resp = await fetch('https://tmpfiles.org/api/v1/upload', {
-      method: 'POST',
-      body: formData
-    });
-    if (resp.ok) {
-      const json = await resp.json();
-      const rawUrl = json?.data?.url;
-      if (rawUrl) {
-        const directUrl = rawUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-        if (directUrl && directUrl.startsWith('https://')) {
-          return directUrl;
-        }
-      }
-    }
-  } catch (tmpErr) {
-    console.warn("TmpFiles upload skipped/failed:", tmpErr);
-  }
-
-  // 6. Safe Local Base64 Fallback (Prevents ever losing uploaded images)
-  if (cleanBase64) {
-    return `data:image/webp;base64,${cleanBase64}`;
-  }
-
-  throw new Error("Не удалось загрузить изображение. Пожалуйста, проверьте интернет-соединение.");
+  throw new Error("Не удалось загрузить в постоянное хранилище. Убедитесь, что в Vercel Dashboard подключен Vercel Blob (Storage -> Blob).");
 }
 
 /**
  * Ensures any image URL is a valid persistent cloud URL.
- * If given a data:image/... base64 or blob: URL, converts it to Blob and uploads it to cloud storage.
+ * Rejects temporary domains.
  */
 export async function ensureCloudUrl(urlOrData: string | undefined, filenamePrefix: string = 'media'): Promise<string> {
   if (!urlOrData || typeof urlOrData !== 'string') return '';
   const trimmed = urlOrData.trim();
   if (!trimmed) return '';
 
+  // Block temporary domains
+  if (trimmed.includes('tmpfiles.org') || trimmed.includes('pixeldrain.com') || trimmed.includes('catbox.moe') || trimmed.includes('freeimage.host')) {
+    return '';
+  }
+
   // Already a permanent cloud URL
   if (trimmed.startsWith('https://') || trimmed.startsWith('http://')) {
     return trimmed;
   }
 
-  // If it's a data URL or blob URL, convert and upload to cloud
+  // If it's a data URL or blob URL, convert and upload to persistent cloud
   if (trimmed.startsWith('data:image/') || trimmed.startsWith('blob:')) {
     try {
       const res = await fetch(trimmed);
@@ -569,7 +522,7 @@ export async function ensureCloudUrl(urlOrData: string | undefined, filenamePref
     }
   }
 
-  return trimmed;
+  return '';
 }
 
 /**
@@ -4370,9 +4323,12 @@ export const getCarHeroImageUrl = (car: Car | null | undefined): string => {
 export const getCarImageGalleryUrls = (car: Car | null | undefined): string[] => {
   if (!car) return [];
   if (car.images && car.images.length > 0) {
-    const primary = car.images.find(img => img.isPrimary) || car.images[0];
-    const rest = car.images.filter(img => img.id !== primary.id);
-    return [primary.url, ...rest.map(r => r.url)].filter(Boolean);
+    const sorted = [...car.images].sort((a, b) => {
+      if (a.isPrimary) return -1;
+      if (b.isPrimary) return 1;
+      return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+    });
+    return sorted.map(img => img.url).filter(Boolean);
   }
   return [car.imagesResponsive?.w1200 || car.image1200 || car.image, ...(car.galleryImages || [])].filter(Boolean) as string[];
 };
@@ -6662,9 +6618,17 @@ export function App() {
       return;
     }
 
-    // Filter and sanitize images: only persistent cloud URLs allowed
+    // Filter and sanitize images: only verified persistent cloud URLs allowed
     const validAssets: VehicleImageAsset[] = (formData.images || [])
-      .filter(img => img && typeof img.url === 'string' && (img.url.startsWith('https://') || img.url.startsWith('http://')))
+      .filter(img => {
+        if (!img || typeof img.url !== 'string') return false;
+        const u = img.url.trim();
+        if (!u.startsWith('https://') && !u.startsWith('http://')) return false;
+        if (u.includes('tmpfiles.org') || u.includes('pixeldrain.com') || u.includes('catbox.moe') || u.includes('freeimage.host') || u.includes('localhost')) {
+          return false;
+        }
+        return true;
+      })
       .map((img, idx) => ({
         ...img,
         sortOrder: idx
