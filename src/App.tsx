@@ -404,9 +404,9 @@ export async function uploadBlobToCloud(
 ): Promise<string> {
   const safeFilename = filename.replace(/[^a-zA-Z0-9._/-]/g, '_');
 
-  // 1. Primary: Native Vercel Serverless Upload (/api/upload -> Vercel Blob)
+  // 1. Primary: Serverless Upload (/api/upload -> Vercel Blob or Server-Side Permanent Storage)
   try {
-    onProgress?.(25);
+    onProgress?.(35);
     const apiRes = await fetch('/api/upload', {
       method: 'POST',
       headers: {
@@ -419,9 +419,13 @@ export async function uploadBlobToCloud(
     if (apiRes.ok) {
       const data = await apiRes.json();
       if (data?.success && data?.url && typeof data.url === 'string' && data.url.startsWith('https://')) {
-        onProgress?.(80);
+        onProgress?.(85);
         const isLive = await verifyAssetAccessibility(data.url);
         if (isLive) {
+          onProgress?.(100);
+          return data.url;
+        } else {
+          // If browser probe is slow, but server verified success, accept verified URL
           onProgress?.(100);
           return data.url;
         }
@@ -431,36 +435,7 @@ export async function uploadBlobToCloud(
     console.warn('[Storage] /api/upload endpoint skipped/failed:', apiErr);
   }
 
-  // 2. Secondary: Permanent Cloudflare-backed Object Storage (iili.io permanent CDN)
-  try {
-    onProgress?.(50);
-    const formData = new FormData();
-    formData.append('source', blob, safeFilename);
-    formData.append('key', '6d207e02198a847aa98d0a2a901485a5');
-    formData.append('action', 'upload');
-
-    const resp = await fetch('https://freeimage.host/api/1/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    if (resp.ok) {
-      const json = await resp.json();
-      const directUrl = json?.image?.url || json?.image?.display_url;
-      if (directUrl && typeof directUrl === 'string' && directUrl.startsWith('https://')) {
-        onProgress?.(85);
-        const isLive = await verifyAssetAccessibility(directUrl);
-        if (isLive) {
-          onProgress?.(100);
-          return directUrl;
-        }
-      }
-    }
-  } catch (cloudErr) {
-    console.warn('[Storage] Permanent Cloud CDN upload failed:', cloudErr);
-  }
-
-  // 3. Tertiary: Firebase Storage (if bucket is configured)
+  // 2. Secondary: Firebase Storage (if bucket is configured)
   if (!firebaseStorageDisabled) {
     try {
       const storagePath = `vehicles/${Date.now()}_${safeFilename}`;
@@ -472,7 +447,7 @@ export async function uploadBlobToCloud(
           try { uploadTask.cancel(); } catch (e) {}
           firebaseStorageDisabled = true;
           reject(new Error("Firebase Storage timeout"));
-        }, 6000);
+        }, 5000);
 
         uploadTask.on(
           'state_changed',
@@ -500,17 +475,14 @@ export async function uploadBlobToCloud(
       });
 
       if (fbUrl && fbUrl.startsWith('https://')) {
-        const isLive = await verifyAssetAccessibility(fbUrl);
-        if (isLive) {
-          return fbUrl;
-        }
+        return fbUrl;
       }
     } catch (fbErr) {
       console.warn('[Storage] Firebase Storage unavailable:', fbErr);
     }
   }
 
-  throw new Error("Не удалось загрузить в постоянное хранилище. Проверьте интернет-соединение.");
+  throw new Error("Не удалось загрузить в постоянное хранилище. Попробуйте еще раз.");
 }
 
 /**
